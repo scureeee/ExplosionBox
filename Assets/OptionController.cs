@@ -11,7 +11,7 @@ public class OptionController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        objectCountToSet = 7;
+        objectCountToSet = 12;
         DataManager.instance.objectCount = objectCountToSet;
     }
 
