@@ -27,6 +27,8 @@ public class TurnController : MonoBehaviour
 
     public GameObject enemyObject;
 
+    public GameObject randomObject;
+
     void Start()
     {
         turnCount = 0f;
@@ -51,16 +53,6 @@ public class TurnController : MonoBehaviour
         // ターンの決定
         Debug.Log("オブジェクト生成が完了しました。DecideFirstTurnを実行します。");
         DecideFirstTurn();
-
-
-        if ((int)turnCount == turnCount)
-        {
-            Debug.Log("整数");
-        }
-        else
-        {
-            Debug.Log("非整数");
-        }
     }
 
     void GenerateObjectsInCircle(int numberOfObjects)
@@ -134,6 +126,18 @@ public class TurnController : MonoBehaviour
         EnemyBombSite();
     }
 
+    void PlayerBombSite()
+    {
+        enemyObject.SetActive(false);
+    }
+
+    public void NumberRandom()
+    {
+        // ランダムにオブジェクトを選択
+        int randomIndex = Random.Range(0, objectArray.Length);
+        randomObject = objectArray[randomIndex];
+    }
+
     void EnemyBombSite()
     {
         Debug.Log("BombSite");
@@ -151,9 +155,7 @@ public class TurnController : MonoBehaviour
             return;
         }
 
-        // ランダムにオブジェクトを選択
-        int randomIndex = Random.Range(0, objectArray.Length);
-        GameObject randomObject = objectArray[randomIndex];
+        NumberRandom();
 
         // 対応する番号を辞書から取得
         int assignedNumber = objectNumberMapping[randomObject];
@@ -170,10 +172,28 @@ public class TurnController : MonoBehaviour
 
         Debug.Log(turnCount);
 
-        PlayerOpenTurn();
+        PlayerTurn();
     }
 
-    void PlayerOpenTurn()
+    public void EnemyBoxChoice()
+    {
+        playerObject.SetActive(false );
+
+        enemyObject.SetActive(true);
+
+        //Enemyがboxを選択する
+        NumberRandom();
+
+        if(randomObject.tag == "Cube")
+        {
+
+        }else if(randomObject.tag == "Explosion")
+        {
+
+        }
+    }
+
+    void PlayerTurn()
     {
         playerObject.SetActive(true);
 

@@ -16,14 +16,19 @@ public class ClickController : MonoBehaviour
     private Vector3 targetPosition;
 
     //プレイヤーが移動中かどうか
-    private bool isMoving = false;
+    public bool isMoving = false;
 
     //アニメーターコンポーネント
-    private Animator animator;
+    public Animator animator;
+
+    private TurnController turnController;
+
     //Start is called before the first frame update
     void Start()
     {
         animator = GetComponent<Animator>();
+
+        turnController = FindObjectOfType<TurnController>();
 
     }
 
@@ -40,19 +45,39 @@ public class ClickController : MonoBehaviour
             //Rayを投射
             if(Physics.Raycast(ray, out hit))
             {
-                //タグを比較
-                if(hit.collider.CompareTag("Cube"))
+                //turnCountが整数か判別
+                if ((int)turnController.turnCount == turnController.turnCount)
                 {
-                    //プレイヤーをcubeに移動させる
-                    targetPosition = hit.point;
+                    Debug.Log("整数");
 
-                    isMoving = true; // フラグを有効化
+                    if(hit.collider.CompareTag("Cube"))
+                    {
+                        hit.collider.gameObject.tag = "Explosion";
+
+                        Debug.Log($"オブジェクト{hit.collider.gameObject.name}のタグを'Explosion'に変更しました。");
+
+                        turnController.EnemyBoxChoice();
+                    }
                 }
-                if(hit.collider.CompareTag("Base"))
+                else
                 {
-                    Debug.Log("KKK");
-                    //プレイヤーをcubeに移動させる
-                    targetPosition = hit.point;
+                    Debug.Log("非整数");
+
+                    //タグを比較
+                    //explosionが付いていない
+                    if (hit.collider.CompareTag("Cube") || hit.collider.CompareTag("Explosion"))
+                    {
+                        //プレイヤーをcubeに移動させる
+                        targetPosition = hit.point;
+
+                        isMoving = true; // フラグを有効化
+                    }
+                    if (hit.collider.CompareTag("Base"))
+                    {
+                        Debug.Log("KKK");
+                        //プレイヤーをcubeに移動させる
+                        targetPosition = hit.point;
+                    }
                 }
             }
         }
@@ -81,10 +106,5 @@ public class ClickController : MonoBehaviour
 
         animator.SetBool("Bool Walk", true);
         // ターゲット位置に到達したら移動を終了
-        if (Vector3.Distance(player.transform.position, targetPosition) < 0.01f)
-        {
-            isMoving = false; // フラグをリセット
-            animator.SetBool("Bool Walk", false);
-        }
     }
 }
