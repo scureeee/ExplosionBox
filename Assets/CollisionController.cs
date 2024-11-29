@@ -9,6 +9,8 @@ public class CollisionController : MonoBehaviour
 
     public GameObject openBotton;
 
+    public GameObject buckBotton;
+
     public GameObject openCamera;
 
     private ClickController clickController;
@@ -51,6 +53,8 @@ public class CollisionController : MonoBehaviour
 
         openCamera.SetActive(false);
 
+        buckBotton.SetActive(false);
+
         turnController.playerObject.SetActive(true);
     }
 
@@ -58,6 +62,8 @@ public class CollisionController : MonoBehaviour
     {
         openBotton.SetActive(true);
 
+        buckBotton.SetActive(true);
+        
         openCamera.SetActive(true);
     }
 
