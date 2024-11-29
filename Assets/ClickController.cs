@@ -56,6 +56,8 @@ public class ClickController : MonoBehaviour
 
                         Debug.Log($"オブジェクト{hit.collider.gameObject.name}のタグを'Explosion'に変更しました。");
 
+                        turnController.turnCount = turnController.turnCount + 0.5f;
+
                         turnController.EnemyBoxChoice();
                     }
                 }
@@ -71,12 +73,6 @@ public class ClickController : MonoBehaviour
                         targetPosition = hit.point;
 
                         isMoving = true; // フラグを有効化
-                    }
-                    if (hit.collider.CompareTag("Base"))
-                    {
-                        Debug.Log("KKK");
-                        //プレイヤーをcubeに移動させる
-                        targetPosition = hit.point;
                     }
                 }
             }

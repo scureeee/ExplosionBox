@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
-    public static DataManager instance { get; private set; }
+    public static DataManager Instance { get; private set; }
 
     //シーン間で共有するオブジェクト数を保持する変数
     public int objectCount;
@@ -13,9 +13,10 @@ public class DataManager : MonoBehaviour
     private void Awake()
     {
         //シングルトンパターンでインスタンスを一つだけに制限
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
+            //シーンをまたいでも破棄されない
             DontDestroyOnLoad(gameObject);
         }
         else

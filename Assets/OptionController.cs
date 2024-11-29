@@ -7,18 +7,29 @@ public class OptionController : MonoBehaviour
 {
     //MainGameÇ≈ê∂ê¨Ç∑ÇÈîzóÒÇÃóvëfêî
     public int objectCountToSet = 0;
+
+    public static int maxTurn = 0;
+
+    public static int maxLife = 0;
+
+    public static int maxPoint = 0;
     
     // Start is called before the first frame update
     void Start()
     {
-        objectCountToSet = 12;
-        DataManager.instance.objectCount = objectCountToSet;
+        maxLife = 1;
+
+        maxTurn = 3;
+
+        maxPoint = 10;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyUp(KeyCode.Space))
+        DataManager.Instance.objectCount = objectCountToSet;
+
+        if (Input.GetKeyUp(KeyCode.Space))
         {
             SceneManager.LoadScene("SampleScene");
         }

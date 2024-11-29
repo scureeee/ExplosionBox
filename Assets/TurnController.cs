@@ -18,10 +18,10 @@ public class TurnController : MonoBehaviour
     public float radius = 10f;
 
     // 生成したオブジェクトの配列
-    private GameObject[] objectArray;
+    public GameObject[] objectArray;
 
     // 各オブジェクトの一意の番号を格納する辞書
-    private Dictionary<GameObject, int> objectNumberMapping;
+    public Dictionary<GameObject, int> objectNumberMapping;
 
     public GameObject playerObject;
 
@@ -29,12 +29,34 @@ public class TurnController : MonoBehaviour
 
     public GameObject randomObject;
 
+    [SerializeField] private TextMeshProUGUI turnText;
+
+    [SerializeField] private TextMeshProUGUI lifeText;
+
+    [SerializeField]private TextMeshProUGUI pointText;
+
+    public int playerLife = 0;
+
+    public int enemyLife = 0;
+
+    public int playerPoint = 0;
+
+    public int enemyPoint = 0;
+
+    private bool playerTurn = false;
+
+    private bool enemyTurn = false;
+
     void Start()
     {
         turnCount = 0f;
 
+        playerLife = OptionController.maxLife;
+
+        enemyLife = OptionController.maxLife;
+
         // DataManagerから設定されたオブジェクト数を取得
-        int numberOfObjects = DataManager.instance.objectCount;
+        int numberOfObjects = DataManager.Instance.objectCount;
         Debug.Log($"DataManager.instance.objectCount: {numberOfObjects}");
 
         if (numberOfObjects <= 0)
@@ -53,6 +75,20 @@ public class TurnController : MonoBehaviour
         // ターンの決定
         Debug.Log("オブジェクト生成が完了しました。DecideFirstTurnを実行します。");
         DecideFirstTurn();
+    }
+
+    private void Update()
+    {
+        pointText.text = enemyPoint + "点";
+
+        turnText.text = turnCount + "ターン";
+        if(playerTurn == true)
+        {
+            lifeText.text = "Player Life:" + playerLife;
+        }else if(enemyTurn == true)
+        {
+            lifeText.text = "CPU Life:" + enemyLife;
+        }
     }
 
     void GenerateObjectsInCircle(int numberOfObjects)
@@ -126,25 +162,28 @@ public class TurnController : MonoBehaviour
         EnemyBombSite();
     }
 
-    void PlayerBombSite()
-    {
-        enemyObject.SetActive(false);
-    }
-
     public void NumberRandom()
     {
         // ランダムにオブジェクトを選択
         int randomIndex = Random.Range(0, objectArray.Length);
         randomObject = objectArray[randomIndex];
+
+        Debug.Log($"Enemyがランダムで{randomObject.name}");
     }
 
     void EnemyBombSite()
     {
+        enemyTurn = true;
+
+        playerTurn = false;
+
         Debug.Log("BombSite");
 
         // プレイヤーオブジェクトを非アクティブ化
         if (playerObject != null)
         {
+            enemyObject.SetActive(true);
+
             playerObject.SetActive(false);
             Debug.Log("Player object deactivated.");
         }
@@ -165,7 +204,7 @@ public class TurnController : MonoBehaviour
 
         // 選ばれたオブジェクトのタグを変更
         randomObject.tag = "Explosion";
-        Debug.Log($"オブジェクト {randomObject.name} のタグを 'Explosion' に変更しました。");
+        Debug.Log($"Enemyがオブジェクト {randomObject.name} のタグを 'Explosion' に変更しました。");
 
         //相手のターン移る
         turnCount = turnCount + 0.5f;
@@ -177,6 +216,10 @@ public class TurnController : MonoBehaviour
 
     public void EnemyBoxChoice()
     {
+        enemyTurn = true;
+
+        playerTurn = false;
+
         playerObject.SetActive(false );
 
         enemyObject.SetActive(true);
@@ -186,17 +229,48 @@ public class TurnController : MonoBehaviour
 
         if(randomObject.tag == "Cube")
         {
+            Debug.Log("Enemyがcubeを触った");
 
-        }else if(randomObject.tag == "Explosion")
+            enemyPoint = enemyPoint + objectNumberMapping[randomObject] + 1;
+
+            randomObject.SetActive(false);
+
+            // 配列から削除
+            //配列からlistに変え配列の要素数を削除できるようにする
+            List<GameObject> tempList = new List<GameObject>(objectArray);
+            tempList.Remove(randomObject);
+            objectArray = tempList.ToArray();
+
+            Debug.Log(enemyPoint);
+
+            EnemyBombSite();
+
+            turnCount = turnCount + 0.5f;
+        }
+        else if(randomObject.tag == "Explosion")
         {
+            turnCount = turnCount + 0.5f;
 
+            playerLife = playerLife - 1;
+
+            enemyPoint = 0;
+
+            Debug.Log("EnemyがExplosionを触った");
+
+            EnemyBombSite();
         }
     }
 
     void PlayerTurn()
     {
+        playerTurn = true;
+
+        enemyTurn = false;
+
         playerObject.SetActive(true);
 
         enemyObject.SetActive(false);
     }
+
+
 }

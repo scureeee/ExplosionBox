@@ -69,6 +69,30 @@ public class CollisionController : MonoBehaviour
 
             turnController.randomObject.tag = "Cube";
 
+            // オブジェクトの番号を取得
+            // オブジェクトの番号取得
+            int assignedNumber = turnController.objectNumberMapping[this.gameObject];
+
+            // 番号+1をポイントに加算
+            turnController.playerPoint += assignedNumber + 1;
+
+            Debug.Log(turnController.playerPoint);
+            // 選択したオブジェクトをリストから削除
+            List<GameObject> tempList = new List<GameObject>(turnController.objectArray);
+
+            if (tempList.Contains(this.gameObject))
+            {
+                tempList.Remove(this.gameObject);  // リストから削除
+                turnController.objectArray = tempList.ToArray();  // 配列に戻す
+
+                // オブジェクトを非アクティブ化する
+                this.gameObject.SetActive(false);
+
+                Debug.Log($"{this.gameObject.name} を配列から削除しました。");
+            }
+
+
+
             BottonInbisible();
 
             //ターンを進める
@@ -79,6 +103,8 @@ public class CollisionController : MonoBehaviour
         else if (this.gameObject.tag == "Explosion")
         {
             //Debug.Log("Explosionだよ");
+
+            turnController.playerLife = turnController.playerLife - 1;
 
             this.gameObject.tag = "Cube";
 
