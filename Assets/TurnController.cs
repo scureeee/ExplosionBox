@@ -79,9 +79,11 @@ public class TurnController : MonoBehaviour
 
     private void Update()
     {
-        pointText.text = enemyPoint + "点";
 
-        turnText.text = turnCount + "ターン";
+
+        pointText.text = playerPoint + "点";
+
+        turnText.text = turnCount /2 + "ターン";
         if(playerTurn == true)
         {
             lifeText.text = "Player Life:" + playerLife;
@@ -131,7 +133,7 @@ public class TurnController : MonoBehaviour
 
     void DecideFirstTurn()
     {
-        firstTurn = Random.Range(2, 3);
+        firstTurn = Random.Range(0, 2);
 
         if (firstTurn == 0)
         {
@@ -194,20 +196,26 @@ public class TurnController : MonoBehaviour
             return;
         }
 
-        NumberRandom();
+        if (turnCount < OptionController.maxTurn)
+        {
+            NumberRandom();
 
-        // 対応する番号を辞書から取得
-        int assignedNumber = objectNumberMapping[randomObject];
+            // 対応する番号を辞書から取得
+            int assignedNumber = objectNumberMapping[randomObject];
 
-        // ランダムに選ばれたオブジェクトの情報を表示
-        Debug.Log($"ランダムに選ばれたオブジェクト: {randomObject.name}, 割り当て番号: {assignedNumber}");
+            // ランダムに選ばれたオブジェクトの情報を表示
+            Debug.Log($"ランダムに選ばれたオブジェクト: {randomObject.name}, 割り当て番号: {assignedNumber}");
 
-        // 選ばれたオブジェクトのタグを変更
-        randomObject.tag = "Explosion";
-        Debug.Log($"Enemyがオブジェクト {randomObject.name} のタグを 'Explosion' に変更しました。");
+            // 選ばれたオブジェクトのタグを変更
+            randomObject.tag = "Explosion";
+            Debug.Log($"Enemyがオブジェクト {randomObject.name} のタグを 'Explosion' に変更しました。");
+        }
 
-        //相手のターン移る
-        turnCount = turnCount + 0.5f;
+        if (turnCount < OptionController.maxTurn)
+        {
+            //ターンを進める
+            turnCount = turnCount + 0.5f;
+        }
 
         Debug.Log(turnCount);
 
@@ -243,21 +251,46 @@ public class TurnController : MonoBehaviour
 
             Debug.Log(enemyPoint);
 
-            EnemyBombSite();
+            if (turnCount < OptionController.maxTurn)
+            {
+                EnemyBombSite();
+            }
 
-            turnCount = turnCount + 0.5f;
+            if (turnCount < OptionController.maxTurn)
+            {
+                //ターンを進める
+                turnCount = turnCount + 0.5f;
+            }
+
+            if (tempList.Contains(this.gameObject))
+            {
+                tempList.Remove(this.gameObject);  // リストから削除
+                objectArray = tempList.ToArray();  // 配列に戻す
+
+                // オブジェクトを非アクティブ化する
+                this.gameObject.SetActive(false);
+
+                Debug.Log($"{this.gameObject.name} を配列から削除しました。");
+            }
         }
         else if(randomObject.tag == "Explosion")
         {
-            turnCount = turnCount + 0.5f;
+            if (turnCount < OptionController.maxTurn)
+            {
+                //ターンを進める
+                turnCount = turnCount + 0.5f;
+            }
 
-            playerLife = playerLife - 1;
+            enemyLife = enemyLife - 1;
 
             enemyPoint = 0;
 
             Debug.Log("EnemyがExplosionを触った");
 
-            EnemyBombSite();
+            if (turnCount < OptionController.maxTurn)
+            {
+                EnemyBombSite();
+            }
         }
     }
 

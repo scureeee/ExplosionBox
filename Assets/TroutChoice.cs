@@ -41,15 +41,15 @@ public class TroutChoice : MonoBehaviour
 
         if (turnChoice.value == 0)
         {
-            OptionController.maxTurn = 1;
+            OptionController.maxTurn = 2;
         }
         else if(turnChoice.value == 1)
         {
-            OptionController.maxTurn = 2;
+            OptionController.maxTurn = 4;
         }
         else if(turnChoice.value == 2)
         {
-            OptionController.maxTurn = 3;
+            OptionController.maxTurn = 6;
         }
     }
 }

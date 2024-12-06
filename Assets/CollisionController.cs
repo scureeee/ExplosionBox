@@ -101,10 +101,11 @@ public class CollisionController : MonoBehaviour
 
             BottonInbisible();
 
-            //ターンを進める
-            turnController.turnCount = turnController.turnCount + 0.5f;
-
-
+            if (turnController.turnCount < OptionController.maxTurn)
+            {
+                //ターンを進める
+                turnController.turnCount = turnController.turnCount + 0.5f;
+            }
         }
         else if (this.gameObject.tag == "Explosion")
         {
@@ -114,10 +115,13 @@ public class CollisionController : MonoBehaviour
 
             this.gameObject.tag = "Cube";
 
-            BottonInbisible();
+            if (turnController.turnCount < OptionController.maxTurn)
+            {
+                //ターンを進める
+                turnController.turnCount = turnController.turnCount + 0.5f;
+            }
 
-            //ターンを進める
-            turnController.turnCount = turnController.turnCount + 0.5f;
+            BottonInbisible();           
         }
     }
 }

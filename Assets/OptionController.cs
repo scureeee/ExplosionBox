@@ -17,7 +17,7 @@ public class OptionController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        maxLife = 1;
+        maxLife = 7;
 
         maxTurn = 10;
 
