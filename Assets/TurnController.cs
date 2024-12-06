@@ -97,7 +97,7 @@ public class TurnController : MonoBehaviour
         {
             // 配置角度を計算
             float angle = i * Mathf.PI * 2 / numberOfObjects;
-            Vector3 position = new Vector3(Mathf.Cos(angle) * radius, 0, Mathf.Sin(angle) * radius);
+            Vector3 position = new Vector3(Mathf.Cos(-angle) * radius, 0, Mathf.Sin(-angle) * radius);
 
             // オブジェクト生成
             GameObject obj = Instantiate(objectPrefab, position, Quaternion.identity, transform);
