@@ -19,7 +19,7 @@ public class OptionController : MonoBehaviour
     {
         maxLife = 1;
 
-        maxTurn = 3;
+        maxTurn = 10;
 
         maxPoint = 10;
     }

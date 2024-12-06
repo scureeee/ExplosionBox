@@ -6,7 +6,9 @@ using TMPro;
 
 public class TroutChoice : MonoBehaviour
 {
-    [SerializeField] private TMP_Dropdown dropdown;
+    [SerializeField] private TMP_Dropdown boxChoice;
+
+    [SerializeField] private TMP_Dropdown turnChoice;
 
     private OptionController optionController;
 
@@ -19,22 +21,35 @@ public class TroutChoice : MonoBehaviour
     void Update()
     {
         //Dropdown‚ÌValue‚ª0‚Ì‚Æ‚«
-        if (dropdown.value == 0)
+        if (boxChoice.value == 0)
         {
             optionController.objectCountToSet = 8;
             //Debug.Log($"{optionController.objectCountToSet}ŒÂ");
         }
         //Dropdown‚ÌValue‚ª1‚Ì‚Æ‚«
-        else if (dropdown.value == 1)
+        else if (boxChoice.value == 1)
         {
             optionController.objectCountToSet = 6;
             //Debug.Log($"{optionController.objectCountToSet}ŒÂ");
         }
         //Dropdown‚ÌValue‚ª2‚Ì‚Æ‚«
-        else if (dropdown.value == 2)
+        else if (boxChoice.value == 2)
         {
             optionController.objectCountToSet = 4;
             //Debug.Log($"{optionController.objectCountToSet}ŒÂ");
+        }
+
+        if (turnChoice.value == 0)
+        {
+            OptionController.maxTurn = 1;
+        }
+        else if(turnChoice.value == 1)
+        {
+            OptionController.maxTurn = 2;
+        }
+        else if(turnChoice.value == 2)
+        {
+            OptionController.maxTurn = 3;
         }
     }
 }

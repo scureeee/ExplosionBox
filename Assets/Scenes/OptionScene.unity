@@ -286,7 +286,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 6.8999634, y: 17.5}
+  m_AnchoredPosition: {x: 6.9, y: 94}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &144188420
@@ -1798,7 +1798,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8a92677827644f46ba40d02484bf99b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dropdown: {fileID: 144188420}
+  boxChoice: {fileID: 144188420}
+  turnChoice: {fileID: 2043198648}
 --- !u!1 &1488467359
 GameObject:
   m_ObjectHideFlags: 0
@@ -2656,7 +2657,7 @@ GameObject:
   - component: {fileID: 2043198649}
   - component: {fileID: 2043198648}
   m_Layer: 5
-  m_Name: Dropdown
+  m_Name: turnController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
