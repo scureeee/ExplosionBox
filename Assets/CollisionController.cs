@@ -15,9 +15,14 @@ public class CollisionController : MonoBehaviour
 
     private ClickController clickController;
 
+    //アニメーターコンポーネント
+    public Animator animator;
+
     // Start is called before the first frame update
     void Start()
     {
+        animator = GetComponent<Animator>();
+
         clickController = FindObjectOfType<ClickController>();  
         
         turnController = FindObjectOfType<TurnController>();
@@ -49,6 +54,7 @@ public class CollisionController : MonoBehaviour
 
     public void BottonInbisible()
     {
+
         openBotton.SetActive(false);
 
         openCamera.SetActive(false);
@@ -58,17 +64,24 @@ public class CollisionController : MonoBehaviour
         turnController.playerObject.SetActive(true);
     }
 
-    public void BottonEmerge()
+    IEnumerator WaitForAnimationAndExecute()
     {
-        openBotton.SetActive(true);
+        // アニメーションのトリガーを設定
+        animator.SetTrigger("Open");
 
-        buckBotton.SetActive(true);
-        
-        openCamera.SetActive(true);
-    }
+        // アニメーションが終了するまで待機
+        while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 3f)
+        {
+            // アニメーションが再生中の場合は待機
+            yield return null;
+        }
 
-    public void boxOpen()
-    {
+        // アニメーション終了後に行いたい処理
+        Debug.Log("アニメーション終了！");
+
+        // ここにアニメーション終了後に行いたい処理を記述
+        BottonInbisible();
+
         if (this.gameObject.tag == "Cube")
         {
             //Debug.Log("cubeだよ");
@@ -98,8 +111,8 @@ public class CollisionController : MonoBehaviour
             }
 
 
-
-            BottonInbisible();
+            //StartCoroutine(WaitForAnimationAndExecute());
+            //BottonInbisible();
 
             if (turnController.turnCount < OptionController.maxTurn)
             {
@@ -121,8 +134,28 @@ public class CollisionController : MonoBehaviour
                 turnController.turnCount = turnController.turnCount + 0.5f;
             }
 
+            //StartCoroutine(WaitForAnimationAndExecute());
             BottonInbisible();           
         }
+    }
+
+    public void BottonEmerge()
+    {
+        openBotton.SetActive(true);
+
+        buckBotton.SetActive(true);
+        
+        openCamera.SetActive(true);
+    }
+
+    public void boxOpen()
+    {
+        //animator.SetBool("bounce", true);
+        //animator.SetBool("open", true);
+
+
+        StartCoroutine(WaitForAnimationAndExecute());
+
     }
 }
 
