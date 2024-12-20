@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,10 +12,6 @@ public class CollisionController : MonoBehaviour
     public GameObject buckBotton;
 
     public GameObject openCamera;
-
-    public GameObject SM_Bomb_01;
-
-    public GameObject Explosion;
 
     private ClickController clickController;
 
@@ -31,10 +26,6 @@ public class CollisionController : MonoBehaviour
         clickController = FindObjectOfType<ClickController>();  
         
         turnController = FindObjectOfType<TurnController>();
-
-        SM_Bomb_01.SetActive(true);
-
-        Explosion.SetActive(false);
     }
 
     // Update is called once per frame
@@ -60,7 +51,6 @@ public class CollisionController : MonoBehaviour
             BottonEmerge();
         }
     }
-    
 
     public void BottonInbisible()
     {
@@ -90,11 +80,8 @@ public class CollisionController : MonoBehaviour
         Debug.Log("アニメーション終了！");
 
         // ここにアニメーション終了後に行いたい処理を記述
-        
-         Explosion.SetActive(true);
-        
-         BottonEmerge();
-        
+        BottonInbisible();
+
         if (this.gameObject.tag == "Cube")
         {
             //Debug.Log("cubeだよ");
