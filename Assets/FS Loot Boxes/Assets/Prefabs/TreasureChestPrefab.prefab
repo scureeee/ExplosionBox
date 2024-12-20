@@ -896,6 +896,7 @@ Transform:
   - {fileID: 1228784198233523398}
   - {fileID: 2258276773110089868}
   - {fileID: 7259766432105529326}
+  - {fileID: 1914959370334821168}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
 --- !u!95 &3471643304249230964
@@ -982,6 +983,7 @@ MonoBehaviour:
   openBotton: {fileID: 3795170117301752542}
   buckBotton: {fileID: 9045194425755220438}
   openCamera: {fileID: 3002384078343587009}
+  warpPoint: {fileID: 1914959370334821168}
   animator: {fileID: 3471643304249230964}
 --- !u!1 &3795170117301752542
 GameObject:
@@ -1106,7 +1108,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 597703935569213659}
         m_TargetAssemblyTypeName: CollisionController, Assembly-CSharp
-        m_MethodName: boxOpen
+        m_MethodName: OpenAnimation
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1918,6 +1920,37 @@ Transform:
   - {fileID: 292700205058274783}
   - {fileID: 4434063181083587888}
   - {fileID: 10943843979160444}
+  m_Father: {fileID: 3471643304242014600}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8648780427496293568
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1914959370334821168}
+  m_Layer: 0
+  m_Name: WarpPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1914959370334821168
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8648780427496293568}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -1.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
   m_Father: {fileID: 3471643304242014600}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8951277777250216635

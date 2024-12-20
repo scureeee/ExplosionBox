@@ -33,7 +33,7 @@ public class TurnController : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI lifeText;
 
-    [SerializeField]private TextMeshProUGUI pointText;
+    [SerializeField] private TextMeshProUGUI pointText;
 
     public int playerLife = 0;
 
@@ -83,11 +83,12 @@ public class TurnController : MonoBehaviour
 
         pointText.text = playerPoint + "点";
 
-        turnText.text = turnCount /2 + "ターン";
-        if(playerTurn == true)
+        turnText.text = turnCount / 2 + "ターン";
+        if (playerTurn == true)
         {
             lifeText.text = "Player Life:" + playerLife;
-        }else if(enemyTurn == true)
+        }
+        else if (enemyTurn == true)
         {
             lifeText.text = "CPU Life:" + enemyLife;
         }
@@ -102,8 +103,7 @@ public class TurnController : MonoBehaviour
             Vector3 position = new Vector3(Mathf.Cos(-angle) * radius, 0, Mathf.Sin(-angle) * radius);
 
             // オブジェクト生成
-            Quaternion rot = Quaternion.Euler(0, 0, 0);
-            GameObject obj = Instantiate(objectPrefab, position, rot);
+            GameObject obj = Instantiate(objectPrefab, position, Quaternion.identity, transform);
             objectArray[i] = obj;
 
             // 各オブジェクトに一意の番号を割り当て
@@ -123,7 +123,7 @@ public class TurnController : MonoBehaviour
             //番号を+1して表示
             tmp.text = (i + 1).ToString();
             tmp.fontSize = 10;
-            tmp.alignment =TextAlignmentOptions.Center;
+            tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = Color.red;
 
 
@@ -151,6 +151,8 @@ public class TurnController : MonoBehaviour
     void StartPlayerTurn()
     {
         Debug.Log("Player turn started.");
+
+        PlayerTurn();
     }
 
     void StartEnemyTurn()
@@ -229,14 +231,14 @@ public class TurnController : MonoBehaviour
 
         playerTurn = false;
 
-        playerObject.SetActive(false );
+        playerObject.SetActive(false);
 
         enemyObject.SetActive(true);
 
         //Enemyがboxを選択する
         NumberRandom();
 
-        if(randomObject.tag == "Cube")
+        if (randomObject.tag == "Cube")
         {
             Debug.Log("Enemyがcubeを触った");
 
@@ -274,7 +276,7 @@ public class TurnController : MonoBehaviour
                 Debug.Log($"{this.gameObject.name} を配列から削除しました。");
             }
         }
-        else if(randomObject.tag == "Explosion")
+        else if (randomObject.tag == "Explosion")
         {
             if (turnCount < OptionController.maxTurn)
             {

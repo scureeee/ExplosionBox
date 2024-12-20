@@ -15,6 +15,8 @@ public class CollisionController : MonoBehaviour
 
     private ClickController clickController;
 
+    public Transform warpPoint;
+
     //アニメーターコンポーネント
     public Animator animator;
 
@@ -31,7 +33,11 @@ public class CollisionController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        //new
+        if(openBotton.activeSelf)
+        {
+            Debug.Log("pooon");
+        }
     }
 
     void OnTriggerStay(Collider other)
@@ -40,16 +46,22 @@ public class CollisionController : MonoBehaviour
         {
             //Debug.Log("playerが");
 
-            turnController.playerObject.SetActive(false);
+            //turnController.playerObject.SetActive(false);
 
             clickController.isMoving = false; // フラグをリセット
             clickController.animator.SetBool("Bool Walk", false);
 
             //目的地に移動し終えたplayerを元の場所に戻す
-            turnController.playerObject.transform.position = Vector3.zero;
+            turnController.playerObject.transform.position = warpPoint.transform.position;
 
             BottonEmerge();
         }
+    }
+
+    public void OpenAnimation()
+    {
+        //Animation Eventを使ってboxOpenを行う
+        animator.SetBool("open", true);
     }
 
     public void BottonInbisible()
@@ -60,27 +72,20 @@ public class CollisionController : MonoBehaviour
         openCamera.SetActive(false);
 
         buckBotton.SetActive(false);
-
-        turnController.playerObject.SetActive(true);
     }
 
-    IEnumerator WaitForAnimationAndExecute()
+    public void BottonEmerge()
     {
-        // アニメーションのトリガーを設定
-        animator.SetTrigger("Open");
+        openBotton.SetActive(true);
 
-        // アニメーションが終了するまで待機
-        while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 3f)
-        {
-            // アニメーションが再生中の場合は待機
-            yield return null;
-        }
+        buckBotton.SetActive(true);
+        
+        openCamera.SetActive(true);
+    }
 
-        // アニメーション終了後に行いたい処理
-        Debug.Log("アニメーション終了！");
+    public void boxOpen()
+    {
 
-        // ここにアニメーション終了後に行いたい処理を記述
-        BottonInbisible();
 
         if (this.gameObject.tag == "Cube")
         {
@@ -110,9 +115,7 @@ public class CollisionController : MonoBehaviour
                 Debug.Log($"{this.gameObject.name} を配列から削除しました。");
             }
 
-
-            //StartCoroutine(WaitForAnimationAndExecute());
-            //BottonInbisible();
+            BottonInbisible();
 
             if (turnController.turnCount < OptionController.maxTurn)
             {
@@ -133,29 +136,10 @@ public class CollisionController : MonoBehaviour
                 //ターンを進める
                 turnController.turnCount = turnController.turnCount + 0.5f;
             }
+            animator.SetBool("open", false);
 
-            //StartCoroutine(WaitForAnimationAndExecute());
-            BottonInbisible();           
+            BottonInbisible();
         }
-    }
-
-    public void BottonEmerge()
-    {
-        openBotton.SetActive(true);
-
-        buckBotton.SetActive(true);
-        
-        openCamera.SetActive(true);
-    }
-
-    public void boxOpen()
-    {
-        //animator.SetBool("bounce", true);
-        //animator.SetBool("open", true);
-
-
-        StartCoroutine(WaitForAnimationAndExecute());
-
     }
 }
 
