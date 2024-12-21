@@ -59,8 +59,6 @@ public class ClickController : MonoBehaviour
                         turnController.turnCount += 0.5f;
 
                         turnController.EnemyBoxChoice();
-
-                        //turnController.choiceTrigger = false;
                     }
                 }
                 else
