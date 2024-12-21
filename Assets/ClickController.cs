@@ -13,7 +13,7 @@ public class ClickController : MonoBehaviour
     public float moveSpeed = 5f;
 
     //移動先のターゲット位置
-    private Vector3 targetPosition;
+    public Vector3 targetPosition;
 
     //プレイヤーが移動中かどうか
     public bool isMoving = false;
@@ -56,9 +56,11 @@ public class ClickController : MonoBehaviour
 
                         Debug.Log($"オブジェクト{hit.collider.gameObject.name}のタグを'Explosion'に変更しました。");
 
-                        turnController.turnCount = turnController.turnCount + 0.5f;
+                        turnController.turnCount += 0.5f;
 
                         turnController.EnemyBoxChoice();
+
+                        //turnController.choiceTrigger = false;
                     }
                 }
                 else
@@ -72,7 +74,10 @@ public class ClickController : MonoBehaviour
                         //プレイヤーをcubeに移動させる
                         targetPosition = hit.point;
 
-                        isMoving = true; // フラグを有効化
+                        turnController.choiceTrigger = false;
+
+                        // フラグを有効化
+                        isMoving = true;
                     }
                 }
             }

@@ -9,6 +9,8 @@ public class TurnController : MonoBehaviour
 {
     private int firstTurn;
 
+    private ClickController clickController;
+
     public float turnCount = 0f;
 
     // 生成するオブジェクトのPrefab
@@ -47,6 +49,9 @@ public class TurnController : MonoBehaviour
 
     private bool enemyTurn = false;
 
+    public bool choiceTrigger = false;
+
+    private float choiceTime;
     void Start()
     {
         turnCount = 0f;
@@ -54,6 +59,8 @@ public class TurnController : MonoBehaviour
         playerLife = OptionController.maxLife;
 
         enemyLife = OptionController.maxLife;
+
+        clickController = FindObjectOfType<ClickController>();
 
         // DataManagerから設定されたオブジェクト数を取得
         int numberOfObjects = DataManager.Instance.objectCount;
@@ -79,7 +86,49 @@ public class TurnController : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log(choiceTime);
+        //時間制限で箱をランダムで選択
+        if (choiceTrigger == true)
+        {
+            //待機時間
+            choiceTime += Time.deltaTime;
 
+            if(choiceTime >= 8f)
+            {
+
+                choiceTime = 0f;
+
+                choiceTrigger = false;
+
+                NumberRandom();
+
+                //turnCountが整数か判別
+                if ((int)turnCount == turnCount)
+                {
+                    if (randomObject.CompareTag("Cube"))
+                    {
+                        randomObject.gameObject.tag = "Explosion";
+
+                        Debug.Log($"オブジェクト{randomObject.gameObject.name}のタグを'Explosion'に変更しました。");
+
+                        turnCount += 0.5f;
+
+                        EnemyBoxChoice();
+                    }
+                }
+                else
+                {
+                    Debug.Log("きたぞー");
+
+
+
+                    clickController.targetPosition = randomObject.transform.position;
+
+                    // フラグを有効化
+                    clickController.isMoving = true;
+                }
+            }
+        }
 
         pointText.text = playerPoint + "点";
 
@@ -173,7 +222,7 @@ public class TurnController : MonoBehaviour
         int randomIndex = Random.Range(0, objectArray.Length);
         randomObject = objectArray[randomIndex];
 
-        Debug.Log($"Enemyがランダムで{randomObject.name}");
+        Debug.Log($"ランダムで{randomObject.name}を抽選");
     }
 
     void EnemyBombSite()
@@ -204,10 +253,10 @@ public class TurnController : MonoBehaviour
             NumberRandom();
 
             // 対応する番号を辞書から取得
-            int assignedNumber = objectNumberMapping[randomObject];
+            //int assignedNumber = objectNumberMapping[randomObject];
 
             // ランダムに選ばれたオブジェクトの情報を表示
-            Debug.Log($"ランダムに選ばれたオブジェクト: {randomObject.name}, 割り当て番号: {assignedNumber}");
+            //Debug.Log($"ランダムに選ばれたオブジェクト: {randomObject.name}, 割り当て番号: {assignedNumber}");
 
             // 選ばれたオブジェクトのタグを変更
             randomObject.tag = "Explosion";
@@ -217,11 +266,10 @@ public class TurnController : MonoBehaviour
         if (turnCount < OptionController.maxTurn)
         {
             //ターンを進める
-            turnCount = turnCount + 0.5f;
+            turnCount += 0.5f;
         }
-
-        Debug.Log(turnCount);
-
+        Debug.Log("ぶぶ");
+         
         PlayerTurn();
     }
 
@@ -242,7 +290,7 @@ public class TurnController : MonoBehaviour
         {
             Debug.Log("Enemyがcubeを触った");
 
-            enemyPoint = enemyPoint + objectNumberMapping[randomObject] + 1;
+            enemyPoint += objectNumberMapping[randomObject] + 1;
 
             randomObject.SetActive(false);
 
@@ -262,7 +310,7 @@ public class TurnController : MonoBehaviour
             if (turnCount < OptionController.maxTurn)
             {
                 //ターンを進める
-                turnCount = turnCount + 0.5f;
+                turnCount += 0.5f;
             }
 
             if (tempList.Contains(this.gameObject))
@@ -270,7 +318,7 @@ public class TurnController : MonoBehaviour
                 tempList.Remove(this.gameObject);  // リストから削除
                 objectArray = tempList.ToArray();  // 配列に戻す
 
-                // オブジェクトを非アクティブ化する
+                //cubeだった箱を消す
                 this.gameObject.SetActive(false);
 
                 Debug.Log($"{this.gameObject.name} を配列から削除しました。");
@@ -281,12 +329,13 @@ public class TurnController : MonoBehaviour
             if (turnCount < OptionController.maxTurn)
             {
                 //ターンを進める
-                turnCount = turnCount + 0.5f;
+                turnCount += 0.5f;
             }
 
-            enemyLife = enemyLife - 1;
+            enemyLife -= 1;
 
             enemyPoint = 0;
+
 
             Debug.Log("EnemyがExplosionを触った");
 
@@ -299,6 +348,8 @@ public class TurnController : MonoBehaviour
 
     void PlayerTurn()
     {
+        choiceTrigger = true;
+
         playerTurn = true;
 
         enemyTurn = false;
@@ -307,6 +358,4 @@ public class TurnController : MonoBehaviour
 
         enemyObject.SetActive(false);
     }
-
-
 }

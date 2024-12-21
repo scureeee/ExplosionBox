@@ -17,12 +17,16 @@ public class CollisionController : MonoBehaviour
 
     public Transform warpPoint;
 
+    private float openTime;
+
     //アニメーターコンポーネント
     public Animator animator;
 
     // Start is called before the first frame update
     void Start()
     {
+        openTime = 0f;
+
         animator = GetComponent<Animator>();
 
         clickController = FindObjectOfType<ClickController>();  
@@ -33,10 +37,18 @@ public class CollisionController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //new
+        //Debug.Log($"open"+openTime);
+
+        //openBottonが有ったら
         if(openBotton.activeSelf)
         {
-            Debug.Log("pooon");
+            //時間経過でアニメーションが自動で実行
+            openTime += Time.deltaTime;
+            if(openTime >= 7f)
+            {
+                //Animation Eventを使ってboxOpenを行う
+                animator.SetBool("open", true);
+            }
         }
     }
 
@@ -72,6 +84,10 @@ public class CollisionController : MonoBehaviour
         openCamera.SetActive(false);
 
         buckBotton.SetActive(false);
+
+        openTime = 0f;
+
+        turnController.choiceTrigger = true;
     }
 
     public void BottonEmerge()
@@ -120,21 +136,21 @@ public class CollisionController : MonoBehaviour
             if (turnController.turnCount < OptionController.maxTurn)
             {
                 //ターンを進める
-                turnController.turnCount = turnController.turnCount + 0.5f;
+                turnController.turnCount += 0.5f;
             }
         }
         else if (this.gameObject.tag == "Explosion")
         {
             //Debug.Log("Explosionだよ");
 
-            turnController.playerLife = turnController.playerLife - 1;
+            turnController.playerLife -= 1;
 
             this.gameObject.tag = "Cube";
 
             if (turnController.turnCount < OptionController.maxTurn)
             {
                 //ターンを進める
-                turnController.turnCount = turnController.turnCount + 0.5f;
+                turnController.turnCount += 0.5f;
             }
             animator.SetBool("open", false);
 
