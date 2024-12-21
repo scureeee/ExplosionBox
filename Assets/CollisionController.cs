@@ -5,6 +5,7 @@ using UnityEngine.UIElements;
 
 public class CollisionController : MonoBehaviour
 {
+
     private TurnController turnController;
 
     public GameObject openBotton;
@@ -13,70 +14,102 @@ public class CollisionController : MonoBehaviour
 
     public GameObject openCamera;
 
-    public GameObject Bomb;
-
-    public GameObject Explosion;
-
     private ClickController clickController;
+
+    public Transform warpPoint;
 
     private float openTime;
 
-    //�A�j���[�^�[�R���|�[�l���g
+    //アニメーターコンポーネント
+
     public Animator animator;
 
     // Start is called before the first frame update
+
     void Start()
+
     {
+
         openTime = 0f;
 
         animator = GetComponent<Animator>();
 
-        clickController = FindObjectOfType<ClickController>();  
-        
+        clickController = FindObjectOfType<ClickController>();
+
         turnController = FindObjectOfType<TurnController>();
 
-        Bomb.SetActive(true);
-
-        Explosion.SetActive(false);
     }
 
     // Update is called once per frame
+
     void Update()
+
     {
+
         //Debug.Log($"open"+openTime);
 
-        //openBotton���L������
-        if(openBotton.activeSelf)
+        //openBottonが有ったら
+
+        if (openBotton.activeSelf)
+
         {
-            //���Ԍo�߂ŃA�j���[�V�����������Ŏ��s
+
+            //時間経過でアニメーションが自動で実行
+
             openTime += Time.deltaTime;
-            if(openTime >= 7f)
+
+            if (openTime >= 7f)
+
             {
-                //Animation Event���g����boxOpen���s��
+
+                //Animation Eventを使ってboxOpenを行う
+
                 animator.SetBool("open", true);
+
             }
+
         }
+
     }
 
     void OnTriggerStay(Collider other)
+
     {
+
         if (other.gameObject.tag == "Player")
+
         {
-            //Debug.Log("player��");
 
-            turnController.playerObject.SetActive(false);
+            //Debug.Log("playerが");
 
-            clickController.isMoving = false; // �t���O�����Z�b�g
+            //turnController.playerObject.SetActive(false);
+
+            clickController.isMoving = false; // フラグをリセット
+
             clickController.animator.SetBool("Bool Walk", false);
 
-            //�ړI�n�Ɉړ����I����player�����̏ꏊ�ɖ߂�
-            turnController.playerObject.transform.position = Vector3.zero;
+            //目的地に移動し終えたplayerを元の場所に戻す
+
+            turnController.playerObject.transform.position = warpPoint.transform.position;
 
             BottonEmerge();
+
         }
+
+    }
+
+    public void OpenAnimation()
+
+    {
+
+        //Animation Eventを使ってboxOpenを行う
+
+        animator.SetBool("open", true);
+
     }
 
     public void BottonInbisible()
+
     {
 
         openBotton.SetActive(false);
@@ -88,103 +121,107 @@ public class CollisionController : MonoBehaviour
         openTime = 0f;
 
         turnController.choiceTrigger = true;
+
     }
 
-    IEnumerator WaitForAnimationAndExecute()
+    public void BottonEmerge()
+
     {
-        // �A�j���[�V�����̃g���K�[��ݒ�
-        animator.SetTrigger("Open");
 
-        // �A�j���[�V�������I������܂őҋ@
-        while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 3f)
-        {
-            // �A�j���[�V�������Đ����̏ꍇ�͑ҋ@
-            yield return null;
-        }
+        openBotton.SetActive(true);
 
-        // �A�j���[�V�����I����ɍs����������
-        Debug.Log("�A�j���[�V�����I���I");
+        buckBotton.SetActive(true);
 
-        // �����ɃA�j���[�V�����I����ɍs�������������L�q
+        openCamera.SetActive(true);
 
-        Explosion.SetActive(true);
+    }
 
-        BottonInbisible();
+    public void boxOpen()
+
+    {
+
 
         if (this.gameObject.tag == "Cube")
+
         {
-            //Debug.Log("cube����");
+
+            //Debug.Log("cubeだよ");
 
             turnController.randomObject.tag = "Cube";
 
-            // �I�u�W�F�N�g�̔ԍ����擾
-            // �I�u�W�F�N�g�̔ԍ��擾
+            // オブジェクトの番号を取得
+
+            // オブジェクトの番号取得
+
             int assignedNumber = turnController.objectNumberMapping[this.gameObject];
 
-            // �ԍ�+1���|�C���g�ɉ��Z
+            // 番号+1をポイントに加算
+
             turnController.playerPoint += assignedNumber + 1;
 
             Debug.Log(turnController.playerPoint);
-            // �I�������I�u�W�F�N�g�����X�g����폜
+
+            // 選択したオブジェクトをリストから削除
+
             List<GameObject> tempList = new List<GameObject>(turnController.objectArray);
 
             if (tempList.Contains(this.gameObject))
-            {
-                tempList.Remove(this.gameObject);  // ���X�g����폜
-                turnController.objectArray = tempList.ToArray();  // �z��ɖ߂�
 
-                // �I�u�W�F�N�g���A�N�e�B�u������
+            {
+
+                tempList.Remove(this.gameObject);  // リストから削除
+
+                turnController.objectArray = tempList.ToArray();  // 配列に戻す
+
+                // オブジェクトを非アクティブ化する
+
                 this.gameObject.SetActive(false);
 
-                Debug.Log($"{this.gameObject.name} ��z�񂩂�폜���܂����B");
+                Debug.Log($"{this.gameObject.name} を配列から削除しました。");
+
             }
 
-
-            //StartCoroutine(WaitForAnimationAndExecute());
-            //BottonInbisible();
+            BottonInbisible();
 
             if (turnController.turnCount < OptionController.maxTurn)
+
             {
-                //�^�[����i�߂�
+
+                //ターンを進める
+
                 turnController.turnCount += 0.5f;
+
             }
+
         }
+
         else if (this.gameObject.tag == "Explosion")
+
         {
-            //Debug.Log("Explosion����");
+
+            //Debug.Log("Explosionだよ");
 
             turnController.playerLife -= 1;
 
             this.gameObject.tag = "Cube";
 
             if (turnController.turnCount < OptionController.maxTurn)
+
             {
-                //�^�[����i�߂�
+
+                //ターンを進める
+
                 turnController.turnCount += 0.5f;
+
             }
 
-            //StartCoroutine(WaitForAnimationAndExecute());
-            BottonInbisible();           
+            animator.SetBool("open", false);
+
+            BottonInbisible();
+
         }
-    }
-
-    public void BottonEmerge()
-    {
-        openBotton.SetActive(true);
-
-        buckBotton.SetActive(true);
-        
-        openCamera.SetActive(true);
-    }
-
-    public void boxOpen()
-    {
-        //animator.SetBool("bounce", true);
-        //animator.SetBool("open", true);
-
-
-        StartCoroutine(WaitForAnimationAndExecute());
 
     }
+
 }
 

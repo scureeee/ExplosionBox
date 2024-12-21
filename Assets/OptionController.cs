@@ -13,7 +13,6 @@ public class OptionController : MonoBehaviour
     public static int maxLife = 0;
 
     public static int maxPoint = 0;
-    
     // Start is called before the first frame update
     void Start()
     {

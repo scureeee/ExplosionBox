@@ -93,7 +93,7 @@ public class TurnController : MonoBehaviour
             //待機時間
             choiceTime += Time.deltaTime;
 
-            if(choiceTime >= 8f)
+            if (choiceTime >= 8f)
             {
 
                 choiceTime = 0f;
@@ -119,7 +119,6 @@ public class TurnController : MonoBehaviour
                 else
                 {
                     Debug.Log("きたぞー");
-
 
 
                     clickController.targetPosition = randomObject.transform.position;
@@ -268,7 +267,6 @@ public class TurnController : MonoBehaviour
             //ターンを進める
             turnCount += 0.5f;
         }
-         
         PlayerTurn();
     }
 
