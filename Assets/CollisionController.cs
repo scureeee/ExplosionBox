@@ -13,6 +13,10 @@ public class CollisionController : MonoBehaviour
 
     public GameObject openCamera;
 
+    public GameObject Bomb;
+
+    public GameObject Explosion;
+
     private ClickController clickController;
 
     //アニメーターコンポーネント
@@ -26,6 +30,10 @@ public class CollisionController : MonoBehaviour
         clickController = FindObjectOfType<ClickController>();  
         
         turnController = FindObjectOfType<TurnController>();
+
+        Bomb.SetActive(true);
+
+        Explosion.SetActive(false);
     }
 
     // Update is called once per frame
@@ -80,6 +88,9 @@ public class CollisionController : MonoBehaviour
         Debug.Log("アニメーション終了！");
 
         // ここにアニメーション終了後に行いたい処理を記述
+
+        Explosion.SetActive(true);
+
         BottonInbisible();
 
         if (this.gameObject.tag == "Cube")

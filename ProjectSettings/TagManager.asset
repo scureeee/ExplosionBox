@@ -10,6 +10,7 @@ TagManager:
   - Enemy
   - Collide
   - Bomb
+  - Coin
   layers:
   - Default
   - TransparentFX
