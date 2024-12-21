@@ -268,7 +268,6 @@ public class TurnController : MonoBehaviour
             //ターンを進める
             turnCount += 0.5f;
         }
-        Debug.Log("ぶぶ");
          
         PlayerTurn();
     }
