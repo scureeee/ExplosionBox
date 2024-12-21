@@ -8,6 +8,9 @@ TagManager:
   - Base
   - Explosion
   - Enemy
+  - Collide
+  - Bomb
+  - Coin
   layers:
   - Default
   - TransparentFX

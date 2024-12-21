@@ -13,13 +13,15 @@ public class CollisionController : MonoBehaviour
 
     public GameObject openCamera;
 
-    private ClickController clickController;
+    public GameObject Bomb;
 
-    public Transform warpPoint;
+    public GameObject Explosion;
+
+    private ClickController clickController;
 
     private float openTime;
 
-    //ƒAƒjƒ[ƒ^[ƒRƒ“ƒ|[ƒlƒ“ƒg
+    //ï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½^ï¿½[ï¿½Rï¿½ï¿½ï¿½|ï¿½[ï¿½lï¿½ï¿½ï¿½g
     public Animator animator;
 
     // Start is called before the first frame update
@@ -32,6 +34,10 @@ public class CollisionController : MonoBehaviour
         clickController = FindObjectOfType<ClickController>();  
         
         turnController = FindObjectOfType<TurnController>();
+
+        Bomb.SetActive(true);
+
+        Explosion.SetActive(false);
     }
 
     // Update is called once per frame
@@ -39,14 +45,14 @@ public class CollisionController : MonoBehaviour
     {
         //Debug.Log($"open"+openTime);
 
-        //openBotton‚ª—L‚Á‚½‚ç
+        //openBottonï¿½ï¿½ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if(openBotton.activeSelf)
         {
-            //ŠÔŒo‰ß‚ÅƒAƒjƒ[ƒVƒ‡ƒ“‚ª©“®‚ÅÀs
+            //ï¿½ï¿½ï¿½ÔŒoï¿½ß‚ÅƒAï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åï¿½ï¿½s
             openTime += Time.deltaTime;
             if(openTime >= 7f)
             {
-                //Animation Event‚ğg‚Á‚ÄboxOpen‚ğs‚¤
+                //Animation Eventï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½boxOpenï¿½ï¿½ï¿½sï¿½ï¿½
                 animator.SetBool("open", true);
             }
         }
@@ -56,24 +62,18 @@ public class CollisionController : MonoBehaviour
     {
         if (other.gameObject.tag == "Player")
         {
-            //Debug.Log("player‚ª");
+            //Debug.Log("playerï¿½ï¿½");
 
-            //turnController.playerObject.SetActive(false);
+            turnController.playerObject.SetActive(false);
 
-            clickController.isMoving = false; // ƒtƒ‰ƒO‚ğƒŠƒZƒbƒg
+            clickController.isMoving = false; // ï¿½tï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½bï¿½g
             clickController.animator.SetBool("Bool Walk", false);
 
-            //–Ú“I’n‚ÉˆÚ“®‚µI‚¦‚½player‚ğŒ³‚ÌêŠ‚É–ß‚·
-            turnController.playerObject.transform.position = warpPoint.transform.position;
+            //ï¿½Ú“Iï¿½nï¿½ÉˆÚ“ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½playerï¿½ï¿½ï¿½ï¿½ï¿½ÌêŠï¿½É–ß‚ï¿½
+            turnController.playerObject.transform.position = Vector3.zero;
 
             BottonEmerge();
         }
-    }
-
-    public void OpenAnimation()
-    {
-        //Animation Event‚ğg‚Á‚ÄboxOpen‚ğs‚¤
-        animator.SetBool("open", true);
     }
 
     public void BottonInbisible()
@@ -90,6 +90,84 @@ public class CollisionController : MonoBehaviour
         turnController.choiceTrigger = true;
     }
 
+    IEnumerator WaitForAnimationAndExecute()
+    {
+        // ï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Ìƒgï¿½ï¿½ï¿½Kï¿½[ï¿½ï¿½İ’ï¿½
+        animator.SetTrigger("Open");
+
+        // ï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚Å‘Ò‹@
+        while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 3f)
+        {
+            // ï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½Ìê‡ï¿½Í‘Ò‹@
+            yield return null;
+        }
+
+        // ï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½Ésï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        Debug.Log("ï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½I");
+
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ÉƒAï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½Ésï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½q
+
+        Explosion.SetActive(true);
+
+        BottonInbisible();
+
+        if (this.gameObject.tag == "Cube")
+        {
+            //Debug.Log("cubeï¿½ï¿½ï¿½ï¿½");
+
+            turnController.randomObject.tag = "Cube";
+
+            // ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½Ì”Ôï¿½ï¿½ï¿½ï¿½æ“¾
+            // ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½Ì”Ôï¿½ï¿½æ“¾
+            int assignedNumber = turnController.objectNumberMapping[this.gameObject];
+
+            // ï¿½Ôï¿½+1ï¿½ï¿½ï¿½|ï¿½Cï¿½ï¿½ï¿½gï¿½É‰ï¿½ï¿½Z
+            turnController.playerPoint += assignedNumber + 1;
+
+            Debug.Log(turnController.playerPoint);
+            // ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½íœ
+            List<GameObject> tempList = new List<GameObject>(turnController.objectArray);
+
+            if (tempList.Contains(this.gameObject))
+            {
+                tempList.Remove(this.gameObject);  // ï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½íœ
+                turnController.objectArray = tempList.ToArray();  // ï¿½zï¿½ï¿½É–ß‚ï¿½
+
+                // ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½Aï¿½Nï¿½eï¿½Bï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                this.gameObject.SetActive(false);
+
+                Debug.Log($"{this.gameObject.name} ï¿½ï¿½zï¿½ñ‚©‚ï¿½íœï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B");
+            }
+
+
+            //StartCoroutine(WaitForAnimationAndExecute());
+            //BottonInbisible();
+
+            if (turnController.turnCount < OptionController.maxTurn)
+            {
+                //ï¿½^ï¿½[ï¿½ï¿½ï¿½ï¿½iï¿½ß‚ï¿½
+                turnController.turnCount += 0.5f;
+            }
+        }
+        else if (this.gameObject.tag == "Explosion")
+        {
+            //Debug.Log("Explosionï¿½ï¿½ï¿½ï¿½");
+
+            turnController.playerLife -= 1;
+
+            this.gameObject.tag = "Cube";
+
+            if (turnController.turnCount < OptionController.maxTurn)
+            {
+                //ï¿½^ï¿½[ï¿½ï¿½ï¿½ï¿½iï¿½ß‚ï¿½
+                turnController.turnCount += 0.5f;
+            }
+
+            //StartCoroutine(WaitForAnimationAndExecute());
+            BottonInbisible();           
+        }
+    }
+
     public void BottonEmerge()
     {
         openBotton.SetActive(true);
@@ -101,61 +179,12 @@ public class CollisionController : MonoBehaviour
 
     public void boxOpen()
     {
+        //animator.SetBool("bounce", true);
+        //animator.SetBool("open", true);
 
 
-        if (this.gameObject.tag == "Cube")
-        {
-            //Debug.Log("cube‚¾‚æ");
+        StartCoroutine(WaitForAnimationAndExecute());
 
-            turnController.randomObject.tag = "Cube";
-
-            // ƒIƒuƒWƒFƒNƒg‚Ì”Ô†‚ğæ“¾
-            // ƒIƒuƒWƒFƒNƒg‚Ì”Ô†æ“¾
-            int assignedNumber = turnController.objectNumberMapping[this.gameObject];
-
-            // ”Ô†+1‚ğƒ|ƒCƒ“ƒg‚É‰ÁZ
-            turnController.playerPoint += assignedNumber + 1;
-
-            Debug.Log(turnController.playerPoint);
-            // ‘I‘ğ‚µ‚½ƒIƒuƒWƒFƒNƒg‚ğƒŠƒXƒg‚©‚çíœ
-            List<GameObject> tempList = new List<GameObject>(turnController.objectArray);
-
-            if (tempList.Contains(this.gameObject))
-            {
-                tempList.Remove(this.gameObject);  // ƒŠƒXƒg‚©‚çíœ
-                turnController.objectArray = tempList.ToArray();  // ”z—ñ‚É–ß‚·
-
-                // ƒIƒuƒWƒFƒNƒg‚ğ”ñƒAƒNƒeƒBƒu‰»‚·‚é
-                this.gameObject.SetActive(false);
-
-                Debug.Log($"{this.gameObject.name} ‚ğ”z—ñ‚©‚çíœ‚µ‚Ü‚µ‚½B");
-            }
-
-            BottonInbisible();
-
-            if (turnController.turnCount < OptionController.maxTurn)
-            {
-                //ƒ^[ƒ“‚ği‚ß‚é
-                turnController.turnCount += 0.5f;
-            }
-        }
-        else if (this.gameObject.tag == "Explosion")
-        {
-            //Debug.Log("Explosion‚¾‚æ");
-
-            turnController.playerLife -= 1;
-
-            this.gameObject.tag = "Cube";
-
-            if (turnController.turnCount < OptionController.maxTurn)
-            {
-                //ƒ^[ƒ“‚ği‚ß‚é
-                turnController.turnCount += 0.5f;
-            }
-            animator.SetBool("open", false);
-
-            BottonInbisible();
-        }
     }
 }
 
