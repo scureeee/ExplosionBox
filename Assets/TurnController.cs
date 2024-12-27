@@ -177,7 +177,7 @@ public class TurnController : MonoBehaviour
             tmp.color = Color.red;
 
 
-            Debug.Log($"Object created: {obj.name}, Assigned Number: {i}");
+            //Debug.Log($"Object created: {obj.name}, Assigned Number: {i}");
         }
         Debug.Log($"Total objects generated: {objectArray.Length}");
     }

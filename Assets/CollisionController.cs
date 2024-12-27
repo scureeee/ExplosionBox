@@ -14,6 +14,8 @@ public class CollisionController : MonoBehaviour
 
     public GameObject openCamera;
 
+    public GameObject particle;
+
     public GameObject bomb;
 
     private ClickController clickController;
@@ -29,6 +31,8 @@ public class CollisionController : MonoBehaviour
     // パーティクルシステムの参照
     public new ParticleSystem particleSystem;
 
+    private bool isExplosion = false;
+
     // Start is called before the first frame update
 
     void Start()
@@ -42,7 +46,7 @@ public class CollisionController : MonoBehaviour
 
         turnController = FindObjectOfType<TurnController>();
 
-        particleSystem = bomb.GetComponent<ParticleSystem>();
+        particleSystem = particle.GetComponent<ParticleSystem>();
 
     }
 
@@ -70,14 +74,22 @@ public class CollisionController : MonoBehaviour
 
                 //Animation Eventを使ってboxOpenを行う
 
-                animator.SetBool("open", true);
+                //改善中
+                //animator.SetBool("open", true);
 
             }
 
         }
-        if (particleSystem != null && !particleSystem.IsAlive())
+
+        if(isExplosion == true)
         {
-            BottonInbisible();
+            if (particleSystem != null && !particleSystem.IsAlive())
+            {
+                bomb.SetActive(false);
+
+                Debug.Log("届いてる");
+                BottonInbisible();
+            }
         }
     }
 
@@ -108,13 +120,9 @@ public class CollisionController : MonoBehaviour
     }
 
     public void OpenAnimation()
-
     {
-
         //Animation Eventを使ってboxOpenを行う
-
         animator.SetBool("open", true);
-
     }
 
     public void BottonInbisible()
@@ -127,11 +135,13 @@ public class CollisionController : MonoBehaviour
 
         buckBotton.SetActive(false);
 
-        bomb.SetActive(false);
+        particle.SetActive(false);
 
         openTime = 0f;
 
         turnController.choiceTrigger = true;
+
+        isExplosion = false;
 
     }
 
@@ -149,13 +159,11 @@ public class CollisionController : MonoBehaviour
     public void boxOpen()
 
     {
-
-
         if (this.gameObject.tag == "Cube")
 
         {
 
-            //Debug.Log("cubeだよ");
+            Debug.Log("cubeだよ");
 
             turnController.randomObject.tag = "Cube";
 
@@ -208,13 +216,17 @@ public class CollisionController : MonoBehaviour
         else if (this.gameObject.tag == "Explosion")
         {
 
-            //Debug.Log("Explosionだよ");
+            Debug.Log("Explosionだよ");
 
             bomb.SetActive(true);
+
+            particle.SetActive(true);
 
             turnController.playerLife -= 1;
 
             turnController.playerPoint = 0;
+
+            isExplosion = true;
 
             this.gameObject.tag = "Cube";
 
@@ -227,7 +239,6 @@ public class CollisionController : MonoBehaviour
                 turnController.turnCount += 0.5f;
 
             }
-
             animator.SetBool("open", false);
         }
 
