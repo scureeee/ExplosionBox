@@ -4,6 +4,7 @@ using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq.Expressions;
 
 public class TurnController : MonoBehaviour
 {
@@ -86,7 +87,8 @@ public class TurnController : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(choiceTime);
+        //Debug.Log(objectArray.Length);
+        //Debug.Log(choiceTime);
         //時間制限で箱をランダムで選択
         if (choiceTrigger == true)
         {
@@ -297,6 +299,14 @@ public class TurnController : MonoBehaviour
             tempList.Remove(randomObject);
             objectArray = tempList.ToArray();
 
+            GameObject[] objectsWithTag = GameObject.FindGameObjectsWithTag("Explosion");
+
+            foreach (GameObject obj in objectsWithTag)
+            {
+                // タグを新しいタグに変更
+                obj.tag = "Cube";
+            }
+
             Debug.Log(enemyPoint);
 
             if (turnCount < OptionController.maxTurn)
@@ -332,6 +342,8 @@ public class TurnController : MonoBehaviour
             enemyLife -= 1;
 
             enemyPoint = 0;
+
+            randomObject.tag = "Cube";
 
 
             Debug.Log("EnemyがExplosionを触った");

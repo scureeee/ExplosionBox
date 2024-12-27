@@ -27,7 +27,6 @@ public class CollisionController : MonoBehaviour
     // Start is called before the first frame update
 
     void Start()
-
     {
 
         openTime = 0f;
@@ -202,6 +201,8 @@ public class CollisionController : MonoBehaviour
             //Debug.Log("Explosionだよ");
 
             turnController.playerLife -= 1;
+
+            turnController.playerPoint = 0;
 
             this.gameObject.tag = "Cube";
 

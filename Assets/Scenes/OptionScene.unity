@@ -1786,6 +1786,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectCount: 0
+  destroyInScenes:
+  - OptionScene
+  - SampleScene
+  - ResultScene
 --- !u!114 &1463633528
 MonoBehaviour:
   m_ObjectHideFlags: 0
