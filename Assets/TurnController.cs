@@ -93,7 +93,7 @@ public class TurnController : MonoBehaviour
         if (choiceTrigger == true)
         {
             //待機時間
-            choiceTime += Time.deltaTime;
+            //choiceTime += Time.deltaTime;
 
             if (choiceTime >= 8f)
             {

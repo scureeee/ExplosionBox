@@ -14,6 +14,8 @@ public class CollisionController : MonoBehaviour
 
     public GameObject openCamera;
 
+    public GameObject bomb;
+
     private ClickController clickController;
 
     public Transform warpPoint;
@@ -23,6 +25,9 @@ public class CollisionController : MonoBehaviour
     //アニメーターコンポーネント
 
     public Animator animator;
+
+    // パーティクルシステムの参照
+    public new ParticleSystem particleSystem;
 
     // Start is called before the first frame update
 
@@ -36,6 +41,8 @@ public class CollisionController : MonoBehaviour
         clickController = FindObjectOfType<ClickController>();
 
         turnController = FindObjectOfType<TurnController>();
+
+        particleSystem = bomb.GetComponent<ParticleSystem>();
 
     }
 
@@ -68,7 +75,10 @@ public class CollisionController : MonoBehaviour
             }
 
         }
-
+        if (particleSystem != null && !particleSystem.IsAlive())
+        {
+            BottonInbisible();
+        }
     }
 
     void OnTriggerStay(Collider other)
@@ -117,6 +127,8 @@ public class CollisionController : MonoBehaviour
 
         buckBotton.SetActive(false);
 
+        bomb.SetActive(false);
+
         openTime = 0f;
 
         turnController.choiceTrigger = true;
@@ -132,7 +144,6 @@ public class CollisionController : MonoBehaviour
         buckBotton.SetActive(true);
 
         openCamera.SetActive(true);
-
     }
 
     public void boxOpen()
@@ -195,10 +206,11 @@ public class CollisionController : MonoBehaviour
         }
 
         else if (this.gameObject.tag == "Explosion")
-
         {
 
             //Debug.Log("Explosionだよ");
+
+            bomb.SetActive(true);
 
             turnController.playerLife -= 1;
 
@@ -217,9 +229,6 @@ public class CollisionController : MonoBehaviour
             }
 
             animator.SetBool("open", false);
-
-            BottonInbisible();
-
         }
 
     }
