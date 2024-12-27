@@ -10,6 +10,8 @@ public class TroutChoice : MonoBehaviour
 
     [SerializeField] private TMP_Dropdown turnChoice;
 
+    [SerializeField] private TMP_Dropdown lifeChoice;
+
     private OptionController optionController;
 
 
@@ -41,15 +43,28 @@ public class TroutChoice : MonoBehaviour
 
         if (turnChoice.value == 0)
         {
-            OptionController.maxTurn = 2;
+            OptionController.maxTurn = 6;
         }
         else if (turnChoice.value == 1)
         {
-            OptionController.maxTurn = 4;
+            OptionController.maxTurn = 10;
         }
         else if (turnChoice.value == 2)
         {
-            OptionController.maxTurn = 6;
+            OptionController.maxTurn = 14;
+        }
+
+        if (lifeChoice.value == 0)
+        {
+            OptionController.maxLife = 3;
+        }
+        else if (lifeChoice.value == 1)
+        {
+            OptionController.maxLife = 4;
+        }
+        else if (lifeChoice.value == 2)
+        {
+            OptionController.maxLife = 5;
         }
     }
 }

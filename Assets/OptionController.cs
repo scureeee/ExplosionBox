@@ -16,10 +16,6 @@ public class OptionController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        maxLife = 7;
-
-        maxTurn = 10;
-
         maxPoint = 10;
     }
 
@@ -27,10 +23,10 @@ public class OptionController : MonoBehaviour
     void Update()
     {
         DataManager.Instance.objectCount = objectCountToSet;
+    }
 
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
-            SceneManager.LoadScene("SampleScene");
-        }
+    public void SceneJump()
+    {
+        SceneManager.LoadScene("SampleScene");
     }
 }
