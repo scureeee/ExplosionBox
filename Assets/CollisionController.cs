@@ -53,30 +53,30 @@ public class CollisionController : MonoBehaviour
     // Update is called once per frame
 
     void Update()
-
     {
-
         //Debug.Log($"open"+openTime);
 
         //openBottonが有ったら
-
         if (openBotton.activeSelf)
-
         {
-
             //時間経過でアニメーションが自動で実行
-
-            openTime += Time.deltaTime;
+            //openTime += Time.deltaTime;
 
             if (openTime >= 7f)
-
             {
+
+
 
                 //Animation Eventを使ってboxOpenを行う
 
                 //改善中
-                //animator.SetBool("open", true);
+                animator.SetBool("open", true);
 
+                openBotton.SetActive(false);
+
+                buckBotton.SetActive(false);
+
+                openTime = 0f;
             }
 
         }
@@ -93,7 +93,7 @@ public class CollisionController : MonoBehaviour
         }
     }
 
-    void OnTriggerStay(Collider other)
+    void OnTriggerEnter(Collider other)
 
     {
 
@@ -123,17 +123,19 @@ public class CollisionController : MonoBehaviour
     {
         //Animation Eventを使ってboxOpenを行う
         animator.SetBool("open", true);
+
+        openBotton.SetActive(false);
+
+        buckBotton.SetActive(false);
+
+        openTime = 0f;
     }
 
     public void BottonInbisible()
 
     {
 
-        openBotton.SetActive(false);
-
         openCamera.SetActive(false);
-
-        buckBotton.SetActive(false);
 
         particle.SetActive(false);
 
@@ -143,6 +145,12 @@ public class CollisionController : MonoBehaviour
 
         isExplosion = false;
 
+        if (openBotton.activeSelf && buckBotton.activeSelf)
+        {
+            openBotton.SetActive(false);
+
+            buckBotton.SetActive(false);
+        }
     }
 
     public void BottonEmerge()
@@ -154,11 +162,17 @@ public class CollisionController : MonoBehaviour
         buckBotton.SetActive(true);
 
         openCamera.SetActive(true);
+
+        turnController.choiceTrigger = false;
+
+        turnController.choiceTime = 0f;
     }
 
     public void boxOpen()
 
     {
+
+
         if (this.gameObject.tag == "Cube")
 
         {

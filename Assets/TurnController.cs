@@ -52,7 +52,7 @@ public class TurnController : MonoBehaviour
 
     public bool choiceTrigger = false;
 
-    private float choiceTime;
+    public float choiceTime = 0f;
     void Start()
     {
         turnCount = 0f;
@@ -88,12 +88,12 @@ public class TurnController : MonoBehaviour
     private void Update()
     {
         //Debug.Log(objectArray.Length);
-        //Debug.Log(choiceTime);
+        Debug.Log("choice"+choiceTime);
         //時間制限で箱をランダムで選択
         if (choiceTrigger == true)
         {
             //待機時間
-            //choiceTime += Time.deltaTime;
+            choiceTime += Time.deltaTime;
 
             if (choiceTime >= 8f)
             {
@@ -357,6 +357,8 @@ public class TurnController : MonoBehaviour
 
     void PlayerTurn()
     {
+        Debug.Log("hiukuhjguigui");
+
         choiceTrigger = true;
 
         playerTurn = true;

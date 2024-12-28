@@ -59,6 +59,10 @@ public class ClickController : MonoBehaviour
                         turnController.turnCount += 0.5f;
 
                         turnController.EnemyBoxChoice();
+
+                        //turnController.choiceTrigger = false;
+
+                        turnController.choiceTime = 0f;
                     }
                 }
                 else
@@ -72,7 +76,9 @@ public class ClickController : MonoBehaviour
                         //プレイヤーをcubeに移動させる
                         targetPosition = hit.point;
 
-                        turnController.choiceTrigger = false;
+                        //turnController.choiceTrigger = false;
+
+                        turnController.choiceTime = 0f;
 
                         // フラグを有効化
                         isMoving = true;
