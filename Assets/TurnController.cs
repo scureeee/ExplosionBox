@@ -88,7 +88,7 @@ public class TurnController : MonoBehaviour
     private void Update()
     {
         //Debug.Log(objectArray.Length);
-        Debug.Log("choice"+choiceTime);
+        //Debug.Log("choice"+choiceTime);
         //時間制限で箱をランダムで選択
         if (choiceTrigger == true)
         {
@@ -184,7 +184,7 @@ public class TurnController : MonoBehaviour
 
     void DecideFirstTurn()
     {
-        firstTurn = Random.Range(0, 2);
+        firstTurn = Random.Range(1, 2);
 
         if (firstTurn == 0)
         {
@@ -303,7 +303,6 @@ public class TurnController : MonoBehaviour
 
             foreach (GameObject obj in objectsWithTag)
             {
-                // タグを新しいタグに変更
                 obj.tag = "Cube";
             }
 

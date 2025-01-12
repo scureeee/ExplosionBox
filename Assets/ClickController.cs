@@ -2,10 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
+using Unity.AI.Navigation;
+using UnityEngine.AI;
 
 public class ClickController : MonoBehaviour
 {
     [SerializeField] float smooth = 10f;
+
+    [SerializeField] private NavMeshSurface surface;
 
     public GameObject player;
 
@@ -23,6 +27,11 @@ public class ClickController : MonoBehaviour
 
     private TurnController turnController;
 
+    public NavMeshAgent agent;
+
+    // 再生成する NavMesh の範囲半径
+    public float navMeshUpdateRadius = 5f;
+
     //Start is called before the first frame update
     void Start()
     {
@@ -30,12 +39,25 @@ public class ClickController : MonoBehaviour
 
         turnController = FindObjectOfType<TurnController>();
 
+        agent = GetComponent<NavMeshAgent>();
+        if (agent == null)
+        {
+            Debug.LogError("NavMeshAgentがアタッチされていません！ プレイヤーオブジェクトにNavMeshAgentを追加してください。");
+            return;
+        }
+
+        agent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance; // 障害物回避設定
+        agent.avoidancePriority = 50; // 回避優先度
+        StartCoroutine(BuildNavMeshAsync());
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        // NavMeshAgentが存在しない場合は処理をスキップ
+        //if (agent == null) return;
+
+        if (Input.GetMouseButtonDown(0))
         {
             //Rayを生成
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -43,14 +65,16 @@ public class ClickController : MonoBehaviour
             RaycastHit hit;
 
             //Rayを投射
-            if(Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit))
             {
+                GameObject clickedObject = hit.collider.gameObject; // クリックしたオブジェクト
+
                 //turnCountが整数か判別
                 if ((int)turnController.turnCount == turnController.turnCount)
                 {
                     Debug.Log("整数");
 
-                    if(hit.collider.CompareTag("Cube"))
+                    if (hit.collider.CompareTag("Cube"))
                     {
                         hit.collider.gameObject.tag = "Explosion";
 
@@ -73,10 +97,17 @@ public class ClickController : MonoBehaviour
                     //explosionが付いていない
                     if (hit.collider.CompareTag("Cube") || hit.collider.CompareTag("Explosion"))
                     {
+                        // NavMeshの非同期構築を開始
+                        StartCoroutine(BuildNavMeshAsync());
+
+                        // クリックしたオブジェクト以外のコライダーを無効化
+                        DeactivateOtherColliders(clickedObject);
+
+                        // NavMeshAgentのdestinationを設定
+                        agent.destination = hit.point;
+
                         //プレイヤーをcubeに移動させる
                         targetPosition = hit.point;
-
-                        //turnController.choiceTrigger = false;
 
                         turnController.choiceTime = 0f;
 
@@ -92,6 +123,50 @@ public class ClickController : MonoBehaviour
         {
             MovePlayer();
         }
+    }
+
+    // クリックしたオブジェクト以外のコライダーを無効化するメソッド
+    void DeactivateOtherColliders(GameObject clickedObject)
+    {
+        foreach (GameObject obj in turnController.objectArray)
+        {
+            if (obj != clickedObject)
+            {
+                Collider collider = obj.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    collider.enabled = false; // コライダーを無効化
+                }
+            }
+        }
+
+        Debug.Log("クリックしたオブジェクト以外のコライダーを無効化しました。");
+    }
+
+    public void ActivateOtherColliders()
+    {
+        // "対象オブジェクト" を判定する条件に基づき取得する
+        // 必要に応じてタグや名前で絞り込む
+        foreach (GameObject obj in FindObjectsOfType<GameObject>())
+        {
+            Collider collider = obj.GetComponent<Collider>();
+            if (collider != null)
+            {
+                collider.enabled = true; // コライダーを有効化
+            }
+
+            obj.SetActive(true); // オブジェクト自体をアクティブ化
+        }
+
+        Debug.Log("シーン内のすべての対象オブジェクトをアクティブにしました。");
+    }
+
+    private IEnumerator BuildNavMeshAsync()
+    {
+        yield return new WaitForSeconds(0.1f); // NavMesh構築前に少し待機
+        surface.RemoveData(); // 古いデータを削除
+        surface.BuildNavMesh(); // NavMeshの構築
+        Debug.Log("NavMeshの構築が完了しました。");
     }
 
     private void MovePlayer()

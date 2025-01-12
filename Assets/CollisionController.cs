@@ -51,7 +51,6 @@ public class CollisionController : MonoBehaviour
     }
 
     // Update is called once per frame
-
     void Update()
     {
         //Debug.Log($"open"+openTime);
@@ -94,11 +93,9 @@ public class CollisionController : MonoBehaviour
     }
 
     void OnTriggerEnter(Collider other)
-
     {
 
         if (other.gameObject.tag == "Player")
-
         {
 
             //Debug.Log("playerが");
@@ -109,8 +106,11 @@ public class CollisionController : MonoBehaviour
 
             clickController.animator.SetBool("Bool Walk", false);
 
-            //目的地に移動し終えたplayerを元の場所に戻す
+            // NavMeshAgentの移動を完全に停止
+            clickController.agent.isStopped = true; // NavMeshAgentを停止
+            clickController.agent.velocity = Vector3.zero; // 移動速度をリセット
 
+            //目的地に移動し終えたplayerを元の場所に戻す
             turnController.playerObject.transform.position = warpPoint.transform.position;
 
             BottonEmerge();
@@ -145,6 +145,8 @@ public class CollisionController : MonoBehaviour
 
         isExplosion = false;
 
+        clickController.ActivateOtherColliders();
+
         if (openBotton.activeSelf && buckBotton.activeSelf)
         {
             openBotton.SetActive(false);
@@ -154,7 +156,6 @@ public class CollisionController : MonoBehaviour
     }
 
     public void BottonEmerge()
-
     {
 
         openBotton.SetActive(true);
