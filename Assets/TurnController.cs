@@ -38,6 +38,8 @@ public class TurnController : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI pointText;
 
+    [SerializeField] private TextMeshProUGUI NoticeText;
+
     public int playerLife = 0;
 
     public int enemyLife = 0;
@@ -47,8 +49,6 @@ public class TurnController : MonoBehaviour
     public int enemyPoint = 0;
 
     private bool playerTurn = false;
-
-    private bool enemyTurn = false;
 
     public bool choiceTrigger = false;
 
@@ -138,7 +138,7 @@ public class TurnController : MonoBehaviour
         {
             lifeText.text = "Player Life:" + playerLife;
         }
-        else if (enemyTurn == true)
+        else if (playerTurn == false)
         {
             lifeText.text = "CPU Life:" + enemyLife;
         }
@@ -228,8 +228,6 @@ public class TurnController : MonoBehaviour
 
     void EnemyBombSite()
     {
-        enemyTurn = true;
-
         playerTurn = false;
 
         Debug.Log("BombSite");
@@ -274,8 +272,6 @@ public class TurnController : MonoBehaviour
 
     public void EnemyBoxChoice()
     {
-        enemyTurn = true;
-
         playerTurn = false;
 
         playerObject.SetActive(false);
@@ -361,8 +357,6 @@ public class TurnController : MonoBehaviour
         choiceTrigger = true;
 
         playerTurn = true;
-
-        enemyTurn = false;
 
         playerObject.SetActive(true);
 
