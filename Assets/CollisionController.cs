@@ -12,8 +12,6 @@ public class CollisionController : MonoBehaviour
 
     public GameObject buckBotton;
 
-    public GameObject openCamera;
-
     public GameObject particle;
 
     public GameObject bomb;
@@ -98,10 +96,6 @@ public class CollisionController : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
 
-            //Debug.Log("playerが");
-
-            //turnController.playerObject.SetActive(false);
-
             clickController.isMoving = false; // フラグをリセット
 
             clickController.animator.SetBool("Bool Walk", false);
@@ -135,7 +129,7 @@ public class CollisionController : MonoBehaviour
 
     {
 
-        openCamera.SetActive(false);
+        //openCamera.SetActive(false);
 
         particle.SetActive(false);
 
@@ -162,7 +156,7 @@ public class CollisionController : MonoBehaviour
 
         buckBotton.SetActive(true);
 
-        openCamera.SetActive(true);
+        //openCamera.SetActive(true);
 
         turnController.choiceTrigger = false;
 

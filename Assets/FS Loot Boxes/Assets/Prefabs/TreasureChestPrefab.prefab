@@ -851,7 +851,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   openBotton: {fileID: 3749524858036392910}
   buckBotton: {fileID: 745802849093212444}
-  openCamera: {fileID: 8186657360220569987}
+  openCamera: {fileID: 0}
   particle: {fileID: 821746290695135865}
   bomb: {fileID: 1054647491916398433}
   warpPoint: {fileID: 2628061434538824980}
