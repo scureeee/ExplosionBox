@@ -45,17 +45,12 @@ public class ClickController : MonoBehaviour
             Debug.LogError("NavMeshAgentがアタッチされていません！ プレイヤーオブジェクトにNavMeshAgentを追加してください。");
             return;
         }
-
-        agent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance; // 障害物回避設定
-        agent.avoidancePriority = 50; // 回避優先度
         StartCoroutine(BuildNavMeshAsync());
     }
 
     // Update is called once per frame
     void Update()
     {
-        // NavMeshAgentが存在しない場合は処理をスキップ
-        //if (agent == null) return;
 
         if (Input.GetMouseButtonDown(0))
         {
