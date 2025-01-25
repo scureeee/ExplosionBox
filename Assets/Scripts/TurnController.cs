@@ -12,6 +12,8 @@ public class TurnController : MonoBehaviour
 
     private ClickController clickController;
 
+    private EnemyMoveController enemyMoveController;
+
     public float turnCount = 0f;
 
     // 生成するオブジェクトのPrefab
@@ -53,6 +55,14 @@ public class TurnController : MonoBehaviour
     public bool choiceTrigger = false;
 
     public float choiceTime = 0f;
+
+    public enum phaseState
+    { 
+        EnemyChoicePhase,
+        EnemySitePhase,
+        PlayerChoice,
+        PlayerSitePhase
+    }
     void Start()
     {
         turnCount = 0f;
@@ -62,6 +72,8 @@ public class TurnController : MonoBehaviour
         enemyLife = OptionController.maxLife;
 
         clickController = FindObjectOfType<ClickController>();
+
+        enemyMoveController = FindObjectOfType<EnemyMoveController>();
 
         // DataManagerから設定されたオブジェクト数を取得
         int numberOfObjects = DataManager.Instance.objectCount;
@@ -87,6 +99,8 @@ public class TurnController : MonoBehaviour
 
     private void Update()
     {
+
+        Debug.Log(enemyPoint);
         //Debug.Log(objectArray.Length);
         //Debug.Log("choice"+choiceTime);
         //時間制限で箱をランダムで選択
@@ -226,7 +240,7 @@ public class TurnController : MonoBehaviour
         Debug.Log($"ランダムで{randomObject.name}を抽選");
     }
 
-    void EnemyBombSite()
+    public void EnemyBombSite()
     {
         playerTurn = false;
 
@@ -281,73 +295,9 @@ public class TurnController : MonoBehaviour
         //Enemyがboxを選択する
         NumberRandom();
 
-        if (randomObject.tag == "Cube")
-        {
-            Debug.Log("Enemyがcubeを触った");
+        enemyMoveController.enemyTarget = randomObject.transform.position;
 
-            enemyPoint += objectNumberMapping[randomObject] + 1;
-
-            randomObject.SetActive(false);
-
-            // 配列から削除
-            //配列からlistに変え配列の要素数を削除できるようにする
-            List<GameObject> tempList = new List<GameObject>(objectArray);
-            tempList.Remove(randomObject);
-            objectArray = tempList.ToArray();
-
-            GameObject[] objectsWithTag = GameObject.FindGameObjectsWithTag("Explosion");
-
-            foreach (GameObject obj in objectsWithTag)
-            {
-                obj.tag = "Cube";
-            }
-
-            Debug.Log(enemyPoint);
-
-            if (turnCount < OptionController.maxTurn)
-            {
-                EnemyBombSite();
-            }
-
-            if (turnCount < OptionController.maxTurn)
-            {
-                //ターンを進める
-                turnCount += 0.5f;
-            }
-
-            if (tempList.Contains(this.gameObject))
-            {
-                tempList.Remove(this.gameObject);  // リストから削除
-                objectArray = tempList.ToArray();  // 配列に戻す
-
-                //cubeだった箱を消す
-                this.gameObject.SetActive(false);
-
-                Debug.Log($"{this.gameObject.name} を配列から削除しました。");
-            }
-        }
-        else if (randomObject.tag == "Explosion")
-        {
-            if (turnCount < OptionController.maxTurn)
-            {
-                //ターンを進める
-                turnCount += 0.5f;
-            }
-
-            enemyLife -= 1;
-
-            enemyPoint = 0;
-
-            randomObject.tag = "Cube";
-
-
-            Debug.Log("EnemyがExplosionを触った");
-
-            if (turnCount < OptionController.maxTurn)
-            {
-                EnemyBombSite();
-            }
-        }
+        enemyMoveController.enemyMoving = true;
     }
 
     void PlayerTurn()
