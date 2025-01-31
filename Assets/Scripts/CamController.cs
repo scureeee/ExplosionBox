@@ -25,7 +25,7 @@ public class CamController : MonoBehaviour
     // カメラの移動速度
     public float cameraMoveSpeed = 2f;
 
-
+    public GameObject PlayerSetPanel;
 
     //フェードイン・フェードアウト
 
