@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &237934059
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1454,6 +1454,9 @@ MonoBehaviour:
   cameraStartPosition: {x: 0, y: 0, z: 0}
   targetObject: {fileID: 0}
   cameraMoveSpeed: 2
+  srider: {fileID: 1499165779}
+  playerSet: {fileID: 0}
+  enemyOpen: {fileID: 0}
   panelFade: {fileID: 803140043}
 --- !u!1 &968742700
 GameObject:
@@ -1946,7 +1949,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1499165778
 RectTransform:
   m_ObjectHideFlags: 0
