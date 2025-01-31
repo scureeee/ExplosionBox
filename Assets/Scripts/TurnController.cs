@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq.Expressions;
+using JetBrains.Annotations;
 
 public class TurnController : MonoBehaviour
 {
@@ -50,23 +51,66 @@ public class TurnController : MonoBehaviour
 
     public int enemyPoint = 0;
 
+    //消すかも
     private bool playerTurn = false;
-
-    public bool choiceTrigger = false;
 
     public float choiceTime = 0f;
 
-    public enum phaseState
-    { 
-        EnemyChoicePhase,
-        EnemySitePhase,
-        PlayerChoice,
-        PlayerSitePhase
+    private int currentIndex;
+
+    public enum PhaseState
+    {
+        EnemyChoiceToSetBomb,
+        EnemyMoveToSetBox,
+        EnemySetBomb,
+        PlayerChoiceToOpenBox,
+        PlayerMoveToChoiceBox,
+        PlayerOpenBox,
+        PlayerChoiceToSetBomb,
+        PlayerMoveToSetBox,
+        PlayerSetBomb,
+        EnemyChoiceToOpenBox,
+        EnemyMoveToChoiceBox,
+        EnemyOpenBox
     }
+
+    //あとでアクセッサ入れる
+    public Dictionary<int, PhaseState> currentState;
+
+    private Dictionary<int, PhaseState> firstEnemyState = new Dictionary<int, PhaseState>
+    {
+        {0,PhaseState.EnemyChoiceToSetBomb},
+        {1,PhaseState.EnemyMoveToSetBox},
+        {2,PhaseState.EnemySetBomb},
+        {3,PhaseState.PlayerChoiceToOpenBox},
+        {4,PhaseState.PlayerMoveToChoiceBox},
+        {5,PhaseState.PlayerOpenBox},
+        {6,PhaseState.PlayerChoiceToSetBomb},
+        {7,PhaseState.PlayerMoveToSetBox},
+        {8,PhaseState.PlayerSetBomb},
+        {9,PhaseState.EnemyChoiceToOpenBox},
+        {10,PhaseState.EnemyMoveToChoiceBox},
+        {11,PhaseState.EnemyOpenBox},
+    };
+
+    private Dictionary<int, PhaseState> firstPlayerState = new Dictionary<int, PhaseState>
+    {
+        {0,PhaseState.PlayerChoiceToSetBomb},
+        {1,PhaseState.PlayerMoveToSetBox},
+        {2,PhaseState.PlayerSetBomb},
+        {3,PhaseState.EnemyChoiceToOpenBox},
+        {4,PhaseState.EnemyMoveToChoiceBox},
+        {5,PhaseState.EnemyOpenBox},
+        {6,PhaseState.EnemyChoiceToSetBomb},
+        {7,PhaseState.EnemyMoveToSetBox},
+        {8,PhaseState.EnemySetBomb},
+        {9,PhaseState.PlayerChoiceToOpenBox},
+        {10,PhaseState.PlayerMoveToChoiceBox},
+        {11,PhaseState.PlayerOpenBox},
+    };
+
     void Start()
     {
-        turnCount = 0f;
-
         playerLife = OptionController.maxLife;
 
         enemyLife = OptionController.maxLife;
@@ -74,6 +118,14 @@ public class TurnController : MonoBehaviour
         clickController = FindObjectOfType<ClickController>();
 
         enemyMoveController = FindObjectOfType<EnemyMoveController>();
+
+        SetFirstPlayerOrder(true);
+
+        // サンプル：現在の順序をデバッグ出力
+        foreach (var pair in currentState)
+        {
+            Debug.Log($"Index: {pair.Key}, State: {pair.Value}");
+        }
 
         // DataManagerから設定されたオブジェクト数を取得
         int numberOfObjects = DataManager.Instance.objectCount;
@@ -99,12 +151,16 @@ public class TurnController : MonoBehaviour
 
     private void Update()
     {
+        PhaseState currentState = GetCurrentState();
 
-        Debug.Log(enemyPoint);
+        //Debug.Log(currentIndex);
+
+        //Debug.Log(turnCount);
+        //Debug.Log(enemyPoint);
         //Debug.Log(objectArray.Length);
         //Debug.Log("choice"+choiceTime);
         //時間制限で箱をランダムで選択
-        if (choiceTrigger == true)
+        if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.PlayerChoiceToOpenBox)
         {
             //待機時間
             choiceTime += Time.deltaTime;
@@ -114,12 +170,10 @@ public class TurnController : MonoBehaviour
 
                 choiceTime = 0f;
 
-                choiceTrigger = false;
-
                 NumberRandom();
 
-                //turnCountが整数か判別
-                if ((int)turnCount == turnCount)
+                //Phaseを確認
+                if (currentState == PhaseState.PlayerChoiceToSetBomb)
                 {
                     if (randomObject.CompareTag("Cube"))
                     {
@@ -127,12 +181,20 @@ public class TurnController : MonoBehaviour
 
                         Debug.Log($"オブジェクト{randomObject.gameObject.name}のタグを'Explosion'に変更しました。");
 
-                        turnCount += 0.5f;
+                        clickController.targetPosition = randomObject.transform.position;
 
-                        EnemyBoxChoice();
+                        // フラグを有効化
+                        clickController.isMoving = true;
+
+                        choiceTime = 0f;
+
+                        NextState();
+
+                        // クリックしたオブジェクト以外のコライダーを無効化
+                        clickController.DeactivateOtherColliders(randomObject);
                     }
                 }
-                else
+                else if(currentState == PhaseState.PlayerChoiceToOpenBox)
                 {
                     Debug.Log("きたぞー");
 
@@ -141,13 +203,20 @@ public class TurnController : MonoBehaviour
 
                     // フラグを有効化
                     clickController.isMoving = true;
+
+                    choiceTime = 0f;
+
+                    NextState();
+
+                    // クリックしたオブジェクト以外のコライダーを無効化
+                    clickController.DeactivateOtherColliders(randomObject);
                 }
             }
         }
 
         pointText.text = playerPoint + "点";
 
-        turnText.text = turnCount / 2 + "ターン";
+        turnText.text = turnCount +"ターン";
         if (playerTurn == true)
         {
             lifeText.text = "Player Life:" + playerLife;
@@ -198,37 +267,58 @@ public class TurnController : MonoBehaviour
 
     void DecideFirstTurn()
     {
-        firstTurn = Random.Range(1, 2);
+        firstTurn = Random.Range(0, 1);
 
         if (firstTurn == 0)
         {
             Debug.Log("プレイヤーが先行です");
-            StartPlayerTurn();
+            SetFirstPlayerOrder(true);
+            PlayerTurn();
         }
         else
         {
             Debug.Log("敵が先行です");
-            StartEnemyTurn();
+            SetFirstPlayerOrder(false);
+            EnemyBombSet();
         }
     }
 
-    void StartPlayerTurn()
+    /// <summary>
+    /// 先攻/後攻の順序を切り替える
+    /// </summary>
+    /// <param name="isFirst">trueならplayerが先攻、falseならplayerが後攻</param>
+    public void SetFirstPlayerOrder(bool isFirst)
     {
-        Debug.Log("Player turn started.");
-
-        PlayerTurn();
+        currentState = isFirst ? firstPlayerState : firstEnemyState;
     }
 
-    void StartEnemyTurn()
+    // 現在のstateを取得する
+    public PhaseState GetCurrentState()
     {
-        Debug.Log("Enemy turn started.");
-        if (objectArray == null || objectArray.Length == 0)
+        return currentState[currentIndex];
+    }
+
+    public void NextState()
+    {
+        // 次のインデックスに進む
+        currentIndex++;
+
+        // インデックスが順序の範囲外ならリセット
+        if (currentIndex >= currentState.Count)
         {
-            Debug.LogWarning("EnemyBombSiteを実行する前に配列が空です。生成が完了しているか確認してください。");
-            return;
+            currentIndex = 0; // 最初の状態に戻る場合
+                              // または、進行終了なら以下のコードにする
+                              // Debug.Log("すべての状態が終了しました。");
+                              // return;
         }
 
-        EnemyBombSite();
+        if ((currentIndex + 1) % 6 == 0)
+        {
+            turnCount++;
+        }
+
+        // 現在の状態をログ出力
+        Debug.Log($"今の状態: {currentState[currentIndex]}");
     }
 
     public void NumberRandom()
@@ -240,8 +330,9 @@ public class TurnController : MonoBehaviour
         Debug.Log($"ランダムで{randomObject.name}を抽選");
     }
 
-    public void EnemyBombSite()
+    public void EnemyBombSet()
     {
+
         playerTurn = false;
 
         Debug.Log("BombSite");
@@ -265,23 +356,13 @@ public class TurnController : MonoBehaviour
         {
             NumberRandom();
 
-            // 対応する番号を辞書から取得
-            //int assignedNumber = objectNumberMapping[randomObject];
+            enemyMoveController.enemyTarget = randomObject.transform.position;
+
+            enemyMoveController.enemyMoving = true;
 
             // ランダムに選ばれたオブジェクトの情報を表示
             //Debug.Log($"ランダムに選ばれたオブジェクト: {randomObject.name}, 割り当て番号: {assignedNumber}");
-
-            // 選ばれたオブジェクトのタグを変更
-            randomObject.tag = "Explosion";
-            Debug.Log($"Enemyがオブジェクト {randomObject.name} のタグを 'Explosion' に変更しました。");
         }
-
-        if (turnCount < OptionController.maxTurn)
-        {
-            //ターンを進める
-            turnCount += 0.5f;
-        }
-        PlayerTurn();
     }
 
     public void EnemyBoxChoice()
@@ -295,16 +376,16 @@ public class TurnController : MonoBehaviour
         //Enemyがboxを選択する
         NumberRandom();
 
+        NextState();
+
         enemyMoveController.enemyTarget = randomObject.transform.position;
 
         enemyMoveController.enemyMoving = true;
     }
 
-    void PlayerTurn()
+   public void PlayerTurn()
     {
         Debug.Log("hiukuhjguigui");
-
-        choiceTrigger = true;
 
         playerTurn = true;
 

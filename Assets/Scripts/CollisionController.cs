@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static TurnController;
 
 public class CollisionController : MonoBehaviour
 {
@@ -46,8 +47,6 @@ public class CollisionController : MonoBehaviour
 
         animator = GetComponent<Animator>();
 
-        clickController = FindObjectOfType<ClickController>();
-
         turnController = FindObjectOfType<TurnController>();
 
         camController = FindObjectOfType<CamController>();
@@ -76,7 +75,7 @@ public class CollisionController : MonoBehaviour
         if (openBotton.activeSelf)
         {
             //時間経過でアニメーションが自動で実行
-            //openTime += Time.deltaTime;
+            openTime += Time.deltaTime;
 
             if (openTime >= 7f)
             {
@@ -108,51 +107,95 @@ public class CollisionController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        // 現在のstateを取得
+        TurnController.PhaseState currentState = turnController.GetCurrentState();
+
         //start時に読み込めないのでここに置く
         enemyMoveController = FindObjectOfType<EnemyMoveController>();
 
+        //playerが消えた時再度読み込まなくてはならないのでここに置く
+        clickController = FindObjectOfType<ClickController>();
+
         if (other.gameObject.tag == "Player")
         {
+            if(currentState == PhaseState.PlayerMoveToChoiceBox)
+            {
+                clickController.isMoving = false; // フラグをリセット
 
-            clickController.isMoving = false; // フラグをリセット
+                clickController.animator.SetBool("Bool Walk", false);
 
-            clickController.animator.SetBool("Bool Walk", false);
+                // NavMeshAgentの移動を完全に停止
+                clickController.agent.isStopped = true; // NavMeshAgentを停止
+                clickController.agent.velocity = Vector3.zero; // 移動速度をリセット
 
-            // NavMeshAgentの移動を完全に停止
-            clickController.agent.isStopped = true; // NavMeshAgentを停止
-            clickController.agent.velocity = Vector3.zero; // 移動速度をリセット
+                //目的地に移動し終えたplayerを定位置に移動させる
+                turnController.playerObject.transform.position = warpPoint.transform.position;
 
-            //目的地に移動し終えたplayerを元の場所に戻す
-            turnController.playerObject.transform.position = warpPoint.transform.position;
+                // カメラを当たったオブジェクトに近づける処理を開始
+                camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
+                camController.isCameraMoving = true; // カメラ移動を開始
 
+                turnController.NextState();
 
-            // カメラを当たったオブジェクトに近づける処理を開始
-            camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
-            camController.isCameraMoving = true; // カメラ移動を開始
+                BottonEmerge();
+            }
+            else if(currentState == PhaseState.PlayerMoveToSetBox)
+            {
+                clickController.isMoving = false; // フラグをリセット
 
+                clickController.animator.SetBool("Bool Walk", false);
 
-            BottonEmerge();
+                // NavMeshAgentの移動を完全に停止
+                clickController.agent.isStopped = true; // NavMeshAgentを停止
+                clickController.agent.velocity = Vector3.zero; // 移動速度をリセット
 
+                //目的地に移動し終えたplayerを定位置に移動させる
+                turnController.playerObject.transform.position = warpPoint.transform.position;
+
+                clickController.ActivateOtherColliders();
+
+                turnController.NextState();
+            }
         }
         else if (other.gameObject.tag == "Enemy")
         {
-            enemyMoveController.enemyMoving = false;
-
-            enemyMoveController.enemyAnimator.SetBool("Bool Walk", false);
-
-            turnController.enemyObject.transform.position = warpPoint.transform.position;
-
-            camController.targetObject = other.transform;
-            camController.isCameraMoving = true;
-
-            if(camController.targetObject = other.transform)
+            if(currentState == PhaseState.EnemyMoveToChoiceBox)
             {
-                Debug.Log("疲れた");
+                enemyMoveController.enemyMoving = false;
 
-                //Animation Eventを使ってboxOpenを行う
-                animator.SetBool("open", true);
+                enemyMoveController.enemyAnimator.SetBool("Bool Walk", false);
 
-                enemyOpen = true;
+                turnController.enemyObject.transform.position = warpPoint.transform.position;
+
+                camController.targetObject = other.transform;
+                camController.isCameraMoving = true;
+
+                if (camController.targetObject = other.transform)
+                {
+                    Debug.Log("疲れた");
+
+                    //Animation Eventを使ってboxOpenを行う
+                    animator.SetBool("open", true);
+
+                    enemyOpen = true;
+
+                    turnController.NextState();
+                }
+            }
+            else if(currentState == PhaseState.EnemyMoveToSetBox)
+            {
+                enemyMoveController.enemyMoving = false;
+
+                enemyMoveController.enemyAnimator.SetBool("Bool Walk", false);
+
+                turnController.enemyObject.transform.position = warpPoint.transform.position;
+
+                turnController.NextState();
+
+                turnController.randomObject.tag = "Explosion";
+                Debug.Log($"Enemyがオブジェクト {turnController.randomObject.name} のタグを 'Explosion' に変更しました。");
+
+                turnController.PlayerTurn();
             }
         }
 
@@ -178,15 +221,13 @@ public class CollisionController : MonoBehaviour
 
         openTime = 0f;
 
-        turnController.choiceTrigger = true;
-
         isExplosion = false;
 
         clickController.ActivateOtherColliders();
 
-        camController.isCameraMoving = false;
+        camController.MotionAids();
 
-        camController.CameraBack();
+        camController.isCameraMoving = false;
 
         if (openBotton.activeSelf && buckBotton.activeSelf)
         {
@@ -203,18 +244,15 @@ public class CollisionController : MonoBehaviour
 
         buckBotton.SetActive(true);
 
-        //openCamera.SetActive(true);
-
-        turnController.choiceTrigger = false;
-
         turnController.choiceTime = 0f;
     }
 
     public void boxOpen()
     {
-        
         if(enemyOpen == false)
         {
+            camController.MotionAids();
+
             if (this.gameObject.tag == "Cube")
             {
 
@@ -252,20 +290,11 @@ public class CollisionController : MonoBehaviour
 
                     Debug.Log($"{this.gameObject.name} を配列から削除しました。");
 
+                    turnController.NextState();
+
                 }
 
                 BottonInbisible();
-
-                if (turnController.turnCount < OptionController.maxTurn)
-
-                {
-
-                    //ターンを進める
-
-                    turnController.turnCount += 0.5f;
-
-                }
-
             }
             else if (this.gameObject.tag == "Explosion")
             {
@@ -284,23 +313,19 @@ public class CollisionController : MonoBehaviour
 
                 this.gameObject.tag = "Cube";
 
-                if (turnController.turnCount < OptionController.maxTurn)
-
-                {
-
-                    //ターンを進める
-
-                    turnController.turnCount += 0.5f;
-
-                }
                 animator.SetBool("open", false);
+
+                camController.isCameraMoving = false;
+
+                turnController.NextState();
             }
         }
         else
         {
+            //変える
             enemyOpen = false;
 
-            camController.CameraBack();
+            camController.MotionAids();
 
             camController.isCameraMoving = false;
 
@@ -329,13 +354,7 @@ public class CollisionController : MonoBehaviour
 
                 if (turnController.turnCount < OptionController.maxTurn)
                 {
-                    turnController.EnemyBombSite();
-                }
-
-                if (turnController.turnCount < OptionController.maxTurn)
-                {
-                    //ターンを進める
-                    turnController.turnCount += 0.5f;
+                    turnController.NextState();
                 }
 
                 if (tempList.Contains(this.gameObject))
@@ -351,11 +370,9 @@ public class CollisionController : MonoBehaviour
             }
             else if (turnController.randomObject.tag == "Explosion")
             {
-                if (turnController.turnCount < OptionController.maxTurn)
-                {
-                    //ターンを進める
-                    turnController.turnCount += 0.5f;
-                }
+                bomb.SetActive(true);
+
+                particle.SetActive(true);
 
                 turnController.enemyLife -= 1;
 
@@ -363,12 +380,14 @@ public class CollisionController : MonoBehaviour
 
                 turnController.randomObject.tag = "Cube";
 
+                //Animation Eventを使ってboxOpenを行う
+                animator.SetBool("open", false);
 
                 Debug.Log("EnemyがExplosionを触った");
 
                 if (turnController.turnCount < OptionController.maxTurn)
                 {
-                    turnController.EnemyBombSite();
+                    turnController.NextState();
                 }
             }
         }

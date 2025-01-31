@@ -328,7 +328,7 @@ Transform:
   m_GameObject: {fileID: 1047782944088900197}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.05, y: 0, z: -2.08}
+  m_LocalPosition: {x: -0.05, y: 0, z: -1.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -851,7 +851,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   openBotton: {fileID: 3749524858036392910}
   buckBotton: {fileID: 745802849093212444}
-  openCamera: {fileID: 0}
   particle: {fileID: 821746290695135865}
   bomb: {fileID: 1054647491916398433}
   warpPoint: {fileID: 2628061434538824980}

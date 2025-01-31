@@ -4,6 +4,7 @@ using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
+using static TurnController;
 
 public class ClickController : MonoBehaviour
 {
@@ -35,6 +36,8 @@ public class ClickController : MonoBehaviour
     //Start is called before the first frame update
     void Start()
     {
+        isMoving = false;
+
         animator = GetComponent<Animator>();
 
         turnController = FindObjectOfType<TurnController>();
@@ -52,6 +55,9 @@ public class ClickController : MonoBehaviour
     void Update()
     {
 
+        // 現在のstateを取得
+        TurnController.PhaseState currentState = turnController.GetCurrentState();
+
         if (Input.GetMouseButtonDown(0))
         {
             //Rayを生成
@@ -65,27 +71,36 @@ public class ClickController : MonoBehaviour
                 GameObject clickedObject = hit.collider.gameObject; // クリックしたオブジェクト
 
                 //turnCountが整数か判別
-                if ((int)turnController.turnCount == turnController.turnCount)
+                if (currentState == PhaseState.PlayerChoiceToSetBomb)
                 {
-                    Debug.Log("整数");
-
                     if (hit.collider.CompareTag("Cube"))
                     {
                         hit.collider.gameObject.tag = "Explosion";
 
                         Debug.Log($"オブジェクト{hit.collider.gameObject.name}のタグを'Explosion'に変更しました。");
 
-                        turnController.turnCount += 0.5f;
+                        // NavMeshの非同期構築を開始
+                        StartCoroutine(BuildNavMeshAsync());
 
-                        turnController.EnemyBoxChoice();
+                        // クリックしたオブジェクト以外のコライダーを無効化
+                        DeactivateOtherColliders(clickedObject);
+
+                        // NavMeshAgentのdestinationを設定
+                        agent.destination = hit.point;
+
+                        targetPosition = hit.point;
 
                         turnController.choiceTime = 0f;
+
+                        // フラグを有効化
+                        isMoving = true;
+
+                        turnController.NextState();
                     }
                 }
-                else
+                //後で変える
+                else if(currentState == PhaseState.PlayerChoiceToOpenBox)
                 {
-                    Debug.Log("非整数");
-
                     //タグを比較
                     //explosionが付いていない
                     if (hit.collider.CompareTag("Cube") || hit.collider.CompareTag("Explosion"))
@@ -99,13 +114,14 @@ public class ClickController : MonoBehaviour
                         // NavMeshAgentのdestinationを設定
                         agent.destination = hit.point;
 
-                        //プレイヤーをcubeに移動させる
                         targetPosition = hit.point;
 
                         turnController.choiceTime = 0f;
 
                         // フラグを有効化
                         isMoving = true;
+
+                        turnController.NextState();
                     }
                 }
             }
@@ -119,7 +135,7 @@ public class ClickController : MonoBehaviour
     }
 
     // クリックしたオブジェクト以外のコライダーを無効化するメソッド
-    void DeactivateOtherColliders(GameObject clickedObject)
+    public void DeactivateOtherColliders(GameObject clickedObject)
     {
         foreach (GameObject obj in turnController.objectArray)
         {
@@ -154,7 +170,7 @@ public class ClickController : MonoBehaviour
         Debug.Log("シーン内のすべての対象オブジェクトをアクティブにしました。");
     }
 
-    private IEnumerator BuildNavMeshAsync()
+    public IEnumerator BuildNavMeshAsync()
     {
         yield return new WaitForSeconds(0.1f); // NavMesh構築前に少し待機
         surface.RemoveData(); // 古いデータを削除
