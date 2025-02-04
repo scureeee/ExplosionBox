@@ -1055,7 +1055,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -150}
+  m_AnchoredPosition: {x: 0, y: -127}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &860654809
@@ -1157,6 +1157,7 @@ Transform:
   m_GameObject: {fileID: 860654809}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   m_LocalPosition: {x: -0.1, y: -0.81, z: 5}
@@ -1345,6 +1346,9 @@ Transform:
   m_LocalScale: {x: 8, y: 5, z: 8}
 =======
   m_LocalPosition: {x: -0.1, y: -0.9, z: -0.4}
+=======
+  m_LocalPosition: {x: -0.1, y: -0.81, z: -0.4}
+>>>>>>> parent of 4a8d442 (test)
   m_LocalScale: {x: 40, y: 1, z: 40}
 >>>>>>> 4a8d442d552d6da010a3752fbefb4251c382de05
 =======
@@ -2110,7 +2114,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.49996948, y: -150}
+  m_AnchoredPosition: {x: 0, y: -126}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1965087083

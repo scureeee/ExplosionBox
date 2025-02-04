@@ -6,7 +6,6 @@ using UnityEngine.UI;
 using TMPro;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
-using ImageSpace;
 
 public class TurnController : MonoBehaviour
 {
@@ -202,7 +201,7 @@ public class TurnController : MonoBehaviour
 
                         choiceTime = 60f;
 
-                        StartCoroutine(NextState());
+                        NextState();
 
                         // クリックしたオブジェクト以外のコライダーを無効化
                         clickController.DeactivateOtherColliders(randomObject);
@@ -220,7 +219,7 @@ public class TurnController : MonoBehaviour
 
                     choiceTime = 60f;
 
-                    StartCoroutine(NextState());
+                    NextState();
 
                     // クリックしたオブジェクト以外のコライダーを無効化
                     clickController.DeactivateOtherColliders(randomObject);
@@ -316,19 +315,7 @@ public class TurnController : MonoBehaviour
         return currentState[currentIndex];
     }
 
-    public IEnumerator NextState()
-    {
-        PhaseState currentState = GetCurrentState();
-
-        if (currentState == PhaseState.EnemyOpenBox || currentState == PhaseState.PlayerOpenBox)
-        {
-            yield return new WaitForSeconds(2f);
-        }
-
-        Next();
-    }
-
-    private void Next()
+    public void NextState()
     {
         // 次のインデックスに進む
         currentIndex++;
@@ -411,7 +398,7 @@ public class TurnController : MonoBehaviour
         //Enemyがboxを選択する
         NumberRandom();
 
-        StartCoroutine(NextState());
+        NextState();
 
         enemyMoveController.enemyTarget = randomObject.transform.position;
 
