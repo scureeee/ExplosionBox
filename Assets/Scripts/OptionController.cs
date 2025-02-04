@@ -18,9 +18,11 @@ public class OptionController : MonoBehaviour
     {
         maxPoint = 10;
 
-        maxTurn = 8;
+        maxTurn = 4;
 
         maxLife = 4;
+
+        objectCountToSet = 8;
     }
 
     // Update is called once per frame

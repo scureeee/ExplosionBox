@@ -11,54 +11,60 @@ public class ResultJudge : MonoBehaviour
     // Start is called before the first frame update
 
     void Start()
-
     {
-
         turnController = FindObjectOfType<TurnController>();
-
     }
 
     // Update is called once per frame
-
     void Update()
     {
-
-        if (turnController.playerLife == 0)
-
+        if (TurnController.playerLife == 0)
         {
             ResultText.resultNumber = 1;
-            Debug.Log("îsñkÇ≈Ç∑");
+            Debug.Log("LifeÇ»ÇµîsñkÇ≈Ç∑");
             SceneManager.LoadScene("ResultScene");
         }
 
-        if (turnController.enemyLife == 0)
-
+        if (TurnController.enemyLife == 0)
         {
             ResultText.resultNumber = 2;
-            Debug.Log("èüóòÇ≈Ç∑");
+            Debug.Log("LifeÇ»ÇµèüóòÇ≈Ç∑");
             SceneManager.LoadScene("ResultScene");
         }
+
+        if(TurnController.enemyPoint == OptionController.maxPoint)
+        {
+            ResultText.resultNumber = 3;
+            Debug.Log("Point You LOSE");
+            SceneManager.LoadScene("ResultScene");
+        }
+
+        if(TurnController.playerPoint == OptionController.maxPoint)
+        {
+            ResultText.resultNumber = 4;
+            Debug.Log("Point You WIN");
+            SceneManager.LoadScene("ResultScene");
+        }
+
         if(turnController.objectArray.Length == 1)
         {
-            if (turnController.playerPoint < turnController.enemyPoint)
-
+            if (TurnController.playerPoint < TurnController.enemyPoint)
             {
-                ResultText.resultNumber = 1;
-                Debug.Log("You LOSE");
+                ResultText.resultNumber = 5;
+                Debug.Log("Turn You LOSE");
                 SceneManager.LoadScene("ResultScene");
             }
 
-            else if (turnController.playerPoint > turnController.enemyPoint)
-
+            else if (TurnController.playerPoint > TurnController.enemyPoint)
             {
-                ResultText.resultNumber = 2;
-                Debug.Log("You WIN");
+                ResultText.resultNumber = 6;
+                Debug.Log("Turn You WIN");
                 SceneManager.LoadScene("ResultScene");
             }
 
-            else if (turnController.playerPoint == turnController.enemyPoint)
+            else if (TurnController.playerPoint == TurnController.enemyPoint)
             {
-                ResultText.resultNumber = 3;
+                ResultText.resultNumber = 7;
                 Debug.Log("Draw");
                 SceneManager.LoadScene("ResultScene");
             }
@@ -67,28 +73,27 @@ public class ResultJudge : MonoBehaviour
         if (turnController.turnCount == OptionController.maxTurn)
         {
 
-            if (turnController.playerPoint < turnController.enemyPoint)
+            if (TurnController.playerPoint < TurnController.enemyPoint)
             {
-                ResultText.resultNumber = 1;
-                Debug.Log("You LOSE");
+                ResultText.resultNumber = 5;
+                Debug.Log("Turn You LOSE");
                 SceneManager.LoadScene("ResultScene");
             }
 
-            else if (turnController.playerPoint > turnController.enemyPoint)
+            else if (TurnController.playerPoint > TurnController.enemyPoint)
             {
-                ResultText.resultNumber = 2;
-                Debug.Log("You WIN");
+                ResultText.resultNumber = 6;
+                Debug.Log("Turn You WIN");
                 SceneManager.LoadScene("ResultScene");
             }
 
-            else if (turnController.playerPoint == turnController.enemyPoint)
+            else if (TurnController.playerPoint == TurnController.enemyPoint)
             {
-                ResultText.resultNumber = 3;
+                ResultText.resultNumber = 7;
                 Debug.Log("Draw");
                 SceneManager.LoadScene("ResultScene");
 
             }
-
         }
 
     }

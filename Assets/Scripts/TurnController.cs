@@ -15,6 +15,8 @@ public class TurnController : MonoBehaviour
 
     private EnemyMoveController enemyMoveController;
 
+    private ImageController imageController;
+
     public float turnCount = 0f;
 
     // 生成するオブジェクトのPrefab
@@ -37,24 +39,25 @@ public class TurnController : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI turnText;
 
-    [SerializeField] private TextMeshProUGUI lifeText;
+    [SerializeField] private TextMeshProUGUI playerLifeText;
 
-    [SerializeField] private TextMeshProUGUI pointText;
+    [SerializeField] private TextMeshProUGUI playerPointText;
 
-    [SerializeField] private TextMeshProUGUI NoticeText;
+    [SerializeField] private TextMeshProUGUI enemyLifeText;
 
-    public int playerLife = 0;
+    [SerializeField] private TextMeshProUGUI enemyPointText;
 
-    public int enemyLife = 0;
+    [SerializeField] public TextMeshProUGUI countText;
 
-    public int playerPoint = 0;
+    public static int playerLife = 0;
 
-    public int enemyPoint = 0;
+    public static int enemyLife = 0;
 
-    //消すかも
-    private bool playerTurn = false;
+    public static int playerPoint = 0;
 
-    public float choiceTime = 0f;
+    public static int enemyPoint = 0;
+
+    public float choiceTime = 60f;
 
     private int currentIndex;
 
@@ -111,6 +114,10 @@ public class TurnController : MonoBehaviour
 
     void Start()
     {
+        playerPoint = 0;
+
+        enemyPoint = 0;
+
         playerLife = OptionController.maxLife;
 
         enemyLife = OptionController.maxLife;
@@ -118,6 +125,8 @@ public class TurnController : MonoBehaviour
         clickController = FindObjectOfType<ClickController>();
 
         enemyMoveController = FindObjectOfType<EnemyMoveController>();
+
+        imageController = FindObjectOfType<ImageController>();
 
         SetFirstPlayerOrder(true);
 
@@ -147,6 +156,8 @@ public class TurnController : MonoBehaviour
         // ターンの決定
         Debug.Log("オブジェクト生成が完了しました。DecideFirstTurnを実行します。");
         DecideFirstTurn();
+
+        choiceTime = 60f;
     }
 
     private void Update()
@@ -163,12 +174,14 @@ public class TurnController : MonoBehaviour
         if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.PlayerChoiceToOpenBox)
         {
             //待機時間
-            choiceTime += Time.deltaTime;
+            choiceTime -= Time.deltaTime;
 
-            if (choiceTime >= 8f)
+            if (choiceTime <= 0f)
             {
 
-                choiceTime = 0f;
+                choiceTime = 60f;
+
+                countText.enabled = false;
 
                 NumberRandom();
 
@@ -186,7 +199,7 @@ public class TurnController : MonoBehaviour
                         // フラグを有効化
                         clickController.isMoving = true;
 
-                        choiceTime = 0f;
+                        choiceTime = 60f;
 
                         NextState();
 
@@ -204,7 +217,7 @@ public class TurnController : MonoBehaviour
                     // フラグを有効化
                     clickController.isMoving = true;
 
-                    choiceTime = 0f;
+                    choiceTime = 60f;
 
                     NextState();
 
@@ -214,16 +227,20 @@ public class TurnController : MonoBehaviour
             }
         }
 
-        pointText.text = playerPoint + "点";
+        playerPointText.text = playerPoint + "点";
+
+        enemyPointText.text = enemyPoint + " 点";
 
         turnText.text = turnCount +"ターン";
-        if (playerTurn == true)
+
+        playerLifeText.text = "Player Life:" + playerLife;
+
+        enemyLifeText.text = "CPU Life:" + enemyLife;
+
+        if(choiceTime <= 30)
         {
-            lifeText.text = "Player Life:" + playerLife;
-        }
-        else if (playerTurn == false)
-        {
-            lifeText.text = "CPU Life:" + enemyLife;
+            countText.enabled = true;
+            countText.text = "" + choiceTime;
         }
     }
 
@@ -310,13 +327,23 @@ public class TurnController : MonoBehaviour
                               // または、進行終了なら以下のコードにする
                               // Debug.Log("すべての状態が終了しました。");
                               // return;
+            turnCount++;
         }
 
-        if ((currentIndex + 1) % 6 == 0)
+        if ((currentIndex + 1) % 7 == 0)
         {
             turnCount++;
         }
 
+        imageController.imageTrigger = true;
+
+        // 現在の状態をログ出力
+        Debug.Log($"今の状態: {currentState[currentIndex]}");
+    }
+
+    public void BuckState()
+    {
+        currentIndex = currentIndex - 2;
         // 現在の状態をログ出力
         Debug.Log($"今の状態: {currentState[currentIndex]}");
     }
@@ -332,9 +359,6 @@ public class TurnController : MonoBehaviour
 
     public void EnemyBombSet()
     {
-
-        playerTurn = false;
-
         Debug.Log("BombSite");
 
         // プレイヤーオブジェクトを非アクティブ化
@@ -367,8 +391,6 @@ public class TurnController : MonoBehaviour
 
     public void EnemyBoxChoice()
     {
-        playerTurn = false;
-
         playerObject.SetActive(false);
 
         enemyObject.SetActive(true);
@@ -386,8 +408,6 @@ public class TurnController : MonoBehaviour
    public void PlayerTurn()
     {
         Debug.Log("hiukuhjguigui");
-
-        playerTurn = true;
 
         playerObject.SetActive(true);
 

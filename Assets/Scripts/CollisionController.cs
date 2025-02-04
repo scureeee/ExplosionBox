@@ -9,6 +9,8 @@ public class CollisionController : MonoBehaviour
 
     private TurnController turnController;
 
+    private ImageController imageController;
+
     public GameObject openBotton;
 
     public GameObject buckBotton;
@@ -43,7 +45,7 @@ public class CollisionController : MonoBehaviour
     void Start()
     {
 
-        openTime = 0f;
+        openTime = 60f;
 
         animator = GetComponent<Animator>();
 
@@ -52,6 +54,8 @@ public class CollisionController : MonoBehaviour
         camController = FindObjectOfType<CamController>();
 
         particleSystem = particle.GetComponent<ParticleSystem>();
+
+        imageController = FindObjectOfType<ImageController>();
     }
 
     // Update is called once per frame
@@ -69,15 +73,15 @@ public class CollisionController : MonoBehaviour
         }
 
 
-        //Debug.Log($"open"+openTime);
+        Debug.Log($"open"+openTime);
 
         //openBottonが有ったら
         if (openBotton.activeSelf)
         {
             //時間経過でアニメーションが自動で実行
-            openTime += Time.deltaTime;
+            openTime -= Time.deltaTime;
 
-            if (openTime >= 7f)
+            if (openTime <= 0f)
             {
                 //Animation Eventを使ってboxOpenを行う
 
@@ -88,9 +92,18 @@ public class CollisionController : MonoBehaviour
 
                 buckBotton.SetActive(false);
 
-                openTime = 0f;
+                openTime = 60f;
+
+                turnController.countText.enabled = false;
             }
 
+
+            if(openTime <= 30f)
+            {
+                turnController.countText.enabled = true;
+
+                turnController.countText.text = "" + openTime;
+            }
         }
 
         if(isExplosion == true)
@@ -210,7 +223,7 @@ public class CollisionController : MonoBehaviour
 
         buckBotton.SetActive(false);
 
-        openTime = 0f;
+        openTime = 60f;
     }
 
     public void BottonInbisible()
@@ -219,7 +232,7 @@ public class CollisionController : MonoBehaviour
 
         particle.SetActive(false);
 
-        openTime = 0f;
+        openTime = 60f;
 
         isExplosion = false;
 
@@ -237,6 +250,11 @@ public class CollisionController : MonoBehaviour
         }
     }
 
+    public void Buck()
+    {
+        turnController.BuckState();
+    }
+
     public void BottonEmerge()
     {
 
@@ -244,13 +262,15 @@ public class CollisionController : MonoBehaviour
 
         buckBotton.SetActive(true);
 
-        turnController.choiceTime = 0f;
+        turnController.choiceTime = 60f;
     }
 
     public void boxOpen()
     {
         if(enemyOpen == false)
         {
+            turnController.countText.enabled = false;
+
             camController.MotionAids();
 
             if (this.gameObject.tag == "Cube")
@@ -268,16 +288,15 @@ public class CollisionController : MonoBehaviour
 
                 // 番号+1をポイントに加算
 
-                turnController.playerPoint += assignedNumber + 1;
+                playerPoint += assignedNumber + 1;
 
-                Debug.Log(turnController.playerPoint);
+                Debug.Log(playerPoint);
 
                 // 選択したオブジェクトをリストから削除
 
                 List<GameObject> tempList = new List<GameObject>(turnController.objectArray);
 
                 if (tempList.Contains(this.gameObject))
-
                 {
 
                     tempList.Remove(this.gameObject);  // リストから削除
@@ -293,6 +312,7 @@ public class CollisionController : MonoBehaviour
                     turnController.NextState();
 
                 }
+                imageController.Safe();
 
                 BottonInbisible();
             }
@@ -305,9 +325,9 @@ public class CollisionController : MonoBehaviour
 
                 particle.SetActive(true);
 
-                turnController.playerLife -= 1;
+                playerLife -= 1;
 
-                turnController.playerPoint = 0;
+                playerPoint = 0;
 
                 isExplosion = true;
 
@@ -318,6 +338,8 @@ public class CollisionController : MonoBehaviour
                 camController.isCameraMoving = false;
 
                 turnController.NextState();
+
+                StartCoroutine(imageController.ExplosionSwitch());
             }
         }
         else
@@ -333,7 +355,7 @@ public class CollisionController : MonoBehaviour
             {
                 Debug.Log("Enemyがcubeを触った");
 
-                turnController.enemyPoint += turnController.objectNumberMapping[turnController.randomObject] + 1;
+                enemyPoint += turnController.objectNumberMapping[turnController.randomObject] + 1;
 
                 turnController.randomObject.SetActive(false);
 
@@ -350,7 +372,7 @@ public class CollisionController : MonoBehaviour
                     obj.tag = "Cube";
                 }
 
-                Debug.Log(turnController.enemyPoint);
+                Debug.Log(enemyPoint);
 
                 if (turnController.turnCount < OptionController.maxTurn)
                 {
@@ -367,6 +389,7 @@ public class CollisionController : MonoBehaviour
 
                     Debug.Log($"{this.gameObject.name} を配列から削除しました。");
                 }
+                imageController.Safe();
             }
             else if (turnController.randomObject.tag == "Explosion")
             {
@@ -374,9 +397,9 @@ public class CollisionController : MonoBehaviour
 
                 particle.SetActive(true);
 
-                turnController.enemyLife -= 1;
+                enemyLife -= 1;
 
-                turnController.enemyPoint = 0;
+                enemyPoint = 0;
 
                 turnController.randomObject.tag = "Cube";
 
@@ -389,9 +412,9 @@ public class CollisionController : MonoBehaviour
                 {
                     turnController.NextState();
                 }
+                StartCoroutine(imageController.ExplosionSwitch());
             }
         }
     }
-
 }
 

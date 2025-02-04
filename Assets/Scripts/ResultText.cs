@@ -7,12 +7,31 @@ public class ResultText : MonoBehaviour
 {
     public static int resultNumber = 0;
 
-    [SerializeField] private TextMeshProUGUI resultText;
+    [SerializeField] GameObject lifeWin;
+
+    [SerializeField] GameObject lifeLose;
+
+    [SerializeField] GameObject pointWin;
+
+    [SerializeField] GameObject pointLose;
+
+    [SerializeField] GameObject turnWin;
+
+    [SerializeField] GameObject turnLose;
+
+    [SerializeField] GameObject draw;
+
+    [SerializeField] TextMeshProUGUI playerLifeText;
+
+    [SerializeField] TextMeshProUGUI enemyLifeText;
+
+    [SerializeField] TextMeshProUGUI playerPointText;
+
+    [SerializeField] TextMeshProUGUI enemyPointText;
 
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -20,15 +39,40 @@ public class ResultText : MonoBehaviour
     {
         if(resultNumber == 1)
         {
-            resultText.text = "You Lose";
+            lifeLose.SetActive(true);
         }
         else if(resultNumber == 2)
         {
-            resultText.text = "You Win";
+            lifeWin.SetActive(true);
         }
         else if( resultNumber == 3)
         {
-            resultText.text = "Draw";
+            pointLose.SetActive(true);
         }
+        else if (resultNumber == 4)
+        {
+            pointWin.SetActive(true);
+        }
+        else if(resultNumber == 5)
+        {
+            turnLose.SetActive(true);
+        }
+        else if(resultNumber == 6)
+        {
+            turnWin.SetActive(true);
+        }
+        else if(resultNumber == 7)
+        {
+            draw.SetActive(true);
+        }
+
+        //“r’†
+        playerLifeText.text = "PlayerLife: "  + TurnController.playerLife;
+
+        enemyLifeText.text = "EnemyLife: " + TurnController.enemyLife;
+
+        playerPointText.text = "PlayerPoint: " + TurnController.playerPoint;
+
+        enemyPointText.text = "EnemyPoint: " + TurnController.enemyPoint;
     }
 }

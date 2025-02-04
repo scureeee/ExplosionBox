@@ -25,16 +25,6 @@ public class CamController : MonoBehaviour
     // カメラの移動速度
     public float cameraMoveSpeed = 2f;
 
-    //カットイン用sprite
-
-    [SerializeField] Image srider;
-
-    [SerializeField] Sprite playerSet;
-
-    [SerializeField] Sprite enemyOpen;
-
-
-
     //フェードイン・フェードアウト
 
     //フェードイン・アウト用のパネル
@@ -55,10 +45,6 @@ public class CamController : MonoBehaviour
 
         // 初期カメラ位置を記録
         cameraStartPosition = mainCamera.transform.position;
-
-        srider = GameObject.Find("Image").GetComponent<Image>();
-
-        srider.enabled = false;
 
         //パネルのイメージ取得
         fadeAlpha = panelFade.GetComponent<Image>();
@@ -84,8 +70,6 @@ public class CamController : MonoBehaviour
         {
             FadeIn();
         }
-
-        StartCoroutine(CutIn());
     }
 
     public void MotionAids()
@@ -98,24 +82,6 @@ public class CamController : MonoBehaviour
     {
         yield return new WaitForSeconds(2f);
         mainCamera.transform.position = cameraStartPosition;
-    }
-
-    private IEnumerator CutIn()
-    {
-        srider.enabled = true;
-
-        // 現在のstateを取得
-        TurnController.PhaseState currentState = turnController.GetCurrentState();
-
-        if (currentState == PhaseState.PlayerChoiceToSetBomb)
-        {
-            srider.sprite = playerSet;
-        }else if(currentState == PhaseState.EnemyChoiceToOpenBox)
-        {
-            srider.sprite = enemyOpen;
-        }
-
-        yield return null;
     }
 
     public void FadeIn()

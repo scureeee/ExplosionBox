@@ -5,6 +5,7 @@ using static UnityEngine.GraphicsBuffer;
 using Unity.AI.Navigation;
 using UnityEngine.AI;
 using static TurnController;
+using static UnityEditor.Timeline.TimelinePlaybackControls;
 
 public class ClickController : MonoBehaviour
 {
@@ -90,10 +91,12 @@ public class ClickController : MonoBehaviour
 
                         targetPosition = hit.point;
 
-                        turnController.choiceTime = 0f;
+                        turnController.choiceTime = 60f;
 
                         // フラグを有効化
                         isMoving = true;
+
+                        turnController.countText.enabled = false;
 
                         turnController.NextState();
                     }
@@ -116,10 +119,12 @@ public class ClickController : MonoBehaviour
 
                         targetPosition = hit.point;
 
-                        turnController.choiceTime = 0f;
+                        turnController.choiceTime = 60f;
 
                         // フラグを有効化
                         isMoving = true;
+
+                        turnController.countText.enabled = false;
 
                         turnController.NextState();
                     }
