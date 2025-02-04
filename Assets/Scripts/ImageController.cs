@@ -83,7 +83,7 @@ public class ImageController : MonoBehaviour
     public IEnumerator ExplosionSwitch()
     {
         explosion.SetActive(true);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(7f);
         explosion.SetActive(false);
     }
 
@@ -94,7 +94,7 @@ public class ImageController : MonoBehaviour
     private IEnumerator SafeSwitch()
     {
         safe.SetActive(true);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(7f);
         safe.SetActive(false);
     }
 }
