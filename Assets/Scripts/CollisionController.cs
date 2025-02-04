@@ -137,10 +137,6 @@ public class CollisionController : MonoBehaviour
 
                 clickController.animator.SetBool("Bool Walk", false);
 
-                // NavMeshAgentの移動を完全に停止
-                clickController.agent.isStopped = true; // NavMeshAgentを停止
-                clickController.agent.velocity = Vector3.zero; // 移動速度をリセット
-
                 //目的地に移動し終えたplayerを定位置に移動させる
                 turnController.playerObject.transform.position = warpPoint.transform.position;
 
@@ -158,9 +154,6 @@ public class CollisionController : MonoBehaviour
 
                 clickController.animator.SetBool("Bool Walk", false);
 
-                // NavMeshAgentの移動を完全に停止
-                clickController.agent.isStopped = true; // NavMeshAgentを停止
-                clickController.agent.velocity = Vector3.zero; // 移動速度をリセット
 
                 //目的地に移動し終えたplayerを定位置に移動させる
                 turnController.playerObject.transform.position = warpPoint.transform.position;
