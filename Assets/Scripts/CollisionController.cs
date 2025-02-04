@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static TurnController;
-using ImageSpace;
 
 public class CollisionController : MonoBehaviour
 {
@@ -74,7 +73,7 @@ public class CollisionController : MonoBehaviour
         }
 
 
-        //Debug.Log($"open"+openTime);
+        Debug.Log($"open"+openTime);
 
         //openBottonが有ったら
         if (openBotton.activeSelf)
@@ -149,7 +148,7 @@ public class CollisionController : MonoBehaviour
                 camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
                 camController.isCameraMoving = true; // カメラ移動を開始
 
-                StartCoroutine(turnController.NextState());
+                turnController.NextState();
 
                 BottonEmerge();
             }
@@ -168,7 +167,7 @@ public class CollisionController : MonoBehaviour
 
                 clickController.ActivateOtherColliders();
 
-                StartCoroutine(turnController.NextState());
+                turnController.NextState();
             }
         }
         else if (other.gameObject.tag == "Enemy")
@@ -193,7 +192,7 @@ public class CollisionController : MonoBehaviour
 
                     enemyOpen = true;
 
-                    StartCoroutine(turnController.NextState());
+                    turnController.NextState();
                 }
             }
             else if(currentState == PhaseState.EnemyMoveToSetBox)
@@ -204,7 +203,7 @@ public class CollisionController : MonoBehaviour
 
                 turnController.enemyObject.transform.position = warpPoint.transform.position;
 
-                StartCoroutine(turnController.NextState());
+                turnController.NextState();
 
                 turnController.randomObject.tag = "Explosion";
                 Debug.Log($"Enemyがオブジェクト {turnController.randomObject.name} のタグを 'Explosion' に変更しました。");
@@ -310,7 +309,7 @@ public class CollisionController : MonoBehaviour
 
                     Debug.Log($"{this.gameObject.name} を配列から削除しました。");
 
-                    //StartCoroutine(turnController.NextState());
+                    turnController.NextState();
 
                 }
                 imageController.Safe();
@@ -338,7 +337,7 @@ public class CollisionController : MonoBehaviour
 
                 camController.isCameraMoving = false;
 
-                //StartCoroutine(turnController.NextState());
+                turnController.NextState();
 
                 StartCoroutine(imageController.ExplosionSwitch());
             }
@@ -377,7 +376,7 @@ public class CollisionController : MonoBehaviour
 
                 if (turnController.turnCount < OptionController.maxTurn)
                 {
-                    //StartCoroutine(turnController.NextState());
+                    turnController.NextState();
                 }
 
                 if (tempList.Contains(this.gameObject))
@@ -411,7 +410,7 @@ public class CollisionController : MonoBehaviour
 
                 if (turnController.turnCount < OptionController.maxTurn)
                 {
-                    //StartCoroutine(turnController.NextState());
+                    turnController.NextState();
                 }
                 StartCoroutine(imageController.ExplosionSwitch());
             }
