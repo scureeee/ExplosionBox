@@ -74,21 +74,14 @@ public class CamController : MonoBehaviour
 
     public void MotionAids()
     {
-        // åªç›ÇÃstateÇéÊìæ
-        TurnController.PhaseState currentState = turnController.GetCurrentState();
-
         Debug.Log("âìÇ≠");
+        StartCoroutine(turnController.NextState());
         StartCoroutine(CameraBack());
-
-        if(currentState == PhaseState.EnemyOpenBox || currentState == PhaseState.PlayerOpenBox)
-        {
-            turnController.Next();
-        }
     }
 
     public IEnumerator CameraBack()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(3f);
         mainCamera.transform.position = cameraStartPosition;
     }
 
@@ -115,7 +108,7 @@ public class CamController : MonoBehaviour
             }
             else if(currentState == PhaseState.EnemySetBomb)
             {
-                turnController.Next();
+                StartCoroutine(turnController.NextState());
             }
         }
     }
@@ -133,7 +126,7 @@ public class CamController : MonoBehaviour
         {
             if(currentState == PhaseState.PlayerSetBomb)
             {
-                turnController.Next();
+                StartCoroutine(turnController.NextState());
 
                 fadeInTrigger = true;
 
@@ -142,8 +135,8 @@ public class CamController : MonoBehaviour
             {
                 Debug.Log("enemyà√Ç≠");
 
-                turnController.Next();
-
+                StartCoroutine(turnController.NextState());
+                
                 turnController.EnemyBombSet();
             }
         }

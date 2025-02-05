@@ -4,8 +4,9 @@ using UnityEngine;
 
 namespace ImageSpace
 {
-    public class ConstantController : MonoBehaviour
+    public class ConstanceContrller : MonoBehaviour
     {
+        public float waitTime = 5f;
         // Start is called before the first frame update
         void Start()
         {
@@ -18,5 +19,4 @@ namespace ImageSpace
 
         }
     }
-
 }

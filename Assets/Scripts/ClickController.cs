@@ -11,6 +11,8 @@ public class ClickController : MonoBehaviour
 {
     [SerializeField] float smooth = 10f;
 
+    [SerializeField] private NavMeshSurface surface;
+
     public GameObject player;
 
     //プレイヤーの移動速度
@@ -27,6 +29,8 @@ public class ClickController : MonoBehaviour
 
     private TurnController turnController;
 
+    public NavMeshAgent agent;
+
     // 再生成する NavMesh の範囲半径
     public float navMeshUpdateRadius = 5f;
 
@@ -39,6 +43,12 @@ public class ClickController : MonoBehaviour
 
         turnController = FindObjectOfType<TurnController>();
 
+        agent = GetComponent<NavMeshAgent>();
+        if (agent == null)
+        {
+            Debug.LogError("NavMeshAgentがアタッチされていません！ プレイヤーオブジェクトにNavMeshAgentを追加してください。");
+            return;
+        }
         StartCoroutine(BuildNavMeshAsync());
     }
 
@@ -76,6 +86,8 @@ public class ClickController : MonoBehaviour
                         // クリックしたオブジェクト以外のコライダーを無効化
                         DeactivateOtherColliders(clickedObject);
 
+                        // NavMeshAgentのdestinationを設定
+                        agent.destination = hit.point;
 
                         targetPosition = hit.point;
 
@@ -86,7 +98,7 @@ public class ClickController : MonoBehaviour
 
                         turnController.countText.enabled = false;
 
-                        turnController.Next();
+                        StartCoroutine(turnController.NextState());
                     }
                 }
                 //後で変える
@@ -102,6 +114,9 @@ public class ClickController : MonoBehaviour
                         // クリックしたオブジェクト以外のコライダーを無効化
                         DeactivateOtherColliders(clickedObject);
 
+                        // NavMeshAgentのdestinationを設定
+                        agent.destination = hit.point;
+
                         targetPosition = hit.point;
 
                         turnController.choiceTime = 60f;
@@ -111,7 +126,7 @@ public class ClickController : MonoBehaviour
 
                         turnController.countText.enabled = false;
 
-                        turnController.Next();
+                        StartCoroutine(turnController.NextState());
                     }
                 }
             }
@@ -163,6 +178,8 @@ public class ClickController : MonoBehaviour
     public IEnumerator BuildNavMeshAsync()
     {
         yield return new WaitForSeconds(0.1f); // NavMesh構築前に少し待機
+        surface.RemoveData(); // 古いデータを削除
+        surface.BuildNavMesh(); // NavMeshの構築
         Debug.Log("NavMeshの構築が完了しました。");
     }
 
