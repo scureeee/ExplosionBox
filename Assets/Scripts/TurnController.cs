@@ -6,7 +6,6 @@ using UnityEngine.UI;
 using TMPro;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
-using ImageSpace;
 
 public class TurnController : MonoBehaviour
 {
@@ -202,7 +201,7 @@ public class TurnController : MonoBehaviour
 
                         choiceTime = 60f;
 
-                        StartCoroutine(NextState());
+                        NextState();
 
                         // クリックしたオブジェクト以外のコライダーを無効化
                         clickController.DeactivateOtherColliders(randomObject);
@@ -220,7 +219,7 @@ public class TurnController : MonoBehaviour
 
                     choiceTime = 60f;
 
-                    StartCoroutine(NextState());
+                    NextState();
 
                     // クリックしたオブジェクト以外のコライダーを無効化
                     clickController.DeactivateOtherColliders(randomObject);
@@ -316,19 +315,32 @@ public class TurnController : MonoBehaviour
         return currentState[currentIndex];
     }
 
+<<<<<<< HEAD
     public IEnumerator NextState()
     {
+        Debug.Log("state");
+
         PhaseState currentState = GetCurrentState();
-
-        if (currentState == PhaseState.EnemyOpenBox || currentState == PhaseState.PlayerOpenBox)
+        
+        if(currentState == PhaseState.EnemyOpenBox || currentState == PhaseState.PlayerOpenBox)
         {
-            yield return new WaitForSeconds(2f);
+            Debug.Log("松");
+            //yield return new WaitForSeconds(4f);
+            Next();
+            yield return null;
         }
-
-        Next();
+        else
+        {
+            Debug.Log("next");
+            Next();
+            yield return null;
+        }
     }
 
     private void Next()
+=======
+    public void NextState()
+>>>>>>> parent of 4a8d442 (test)
     {
         // 次のインデックスに進む
         currentIndex++;
@@ -349,6 +361,8 @@ public class TurnController : MonoBehaviour
         }
 
         imageController.imageTrigger = true;
+
+        Debug.Log("違法");
 
         // 現在の状態をログ出力
         Debug.Log($"今の状態: {currentState[currentIndex]}");
@@ -411,7 +425,7 @@ public class TurnController : MonoBehaviour
         //Enemyがboxを選択する
         NumberRandom();
 
-        StartCoroutine(NextState());
+        NextState();
 
         enemyMoveController.enemyTarget = randomObject.transform.position;
 
