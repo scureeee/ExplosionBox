@@ -115,7 +115,7 @@ public class CamController : MonoBehaviour
             }
             else if(currentState == PhaseState.EnemySetBomb)
             {
-                StartCoroutine(turnController.NextState());
+                turnController.NextState();
             }
         }
     }
@@ -133,7 +133,7 @@ public class CamController : MonoBehaviour
         {
             if(currentState == PhaseState.PlayerSetBomb)
             {
-                StartCoroutine(turnController.NextState());
+                turnController.NextState();
 
                 fadeInTrigger = true;
 
@@ -142,8 +142,16 @@ public class CamController : MonoBehaviour
             {
                 Debug.Log("enemyˆÃ‚­");
 
+<<<<<<< HEAD
                 StartCoroutine(turnController.NextState());
 
+<<<<<<< HEAD
+=======
+                turnController.NextState();
+                
+>>>>>>> parent of 4a8d442 (test)
+=======
+>>>>>>> 5391c6bd4acf43d10d8386a79a00d4b20d58b960
                 turnController.EnemyBombSet();
             }
         }

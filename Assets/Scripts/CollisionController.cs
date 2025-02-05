@@ -73,7 +73,7 @@ public class CollisionController : MonoBehaviour
         }
 
 
-        //Debug.Log($"open"+openTime);
+        Debug.Log($"open"+openTime);
 
         //openBottonが有ったら
         if (openBotton.activeSelf)
@@ -144,7 +144,7 @@ public class CollisionController : MonoBehaviour
                 camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
                 camController.isCameraMoving = true; // カメラ移動を開始
 
-                StartCoroutine(turnController.NextState());
+                turnController.NextState();
 
                 BottonEmerge();
             }
@@ -160,7 +160,7 @@ public class CollisionController : MonoBehaviour
 
                 clickController.ActivateOtherColliders();
 
-                StartCoroutine(turnController.NextState());
+                turnController.NextState();
             }
         }
         else if (other.gameObject.tag == "Enemy")
@@ -185,7 +185,7 @@ public class CollisionController : MonoBehaviour
 
                     enemyOpen = true;
 
-                    StartCoroutine(turnController.NextState());
+                    turnController.NextState();
                 }
             }
             else if(currentState == PhaseState.EnemyMoveToSetBox)
@@ -196,7 +196,7 @@ public class CollisionController : MonoBehaviour
 
                 turnController.enemyObject.transform.position = warpPoint.transform.position;
 
-                StartCoroutine(turnController.NextState());
+                turnController.NextState();
 
                 turnController.randomObject.tag = "Explosion";
                 Debug.Log($"Enemyがオブジェクト {turnController.randomObject.name} のタグを 'Explosion' に変更しました。");
@@ -301,6 +301,15 @@ public class CollisionController : MonoBehaviour
                     this.gameObject.SetActive(false);
 
                     Debug.Log($"{this.gameObject.name} を配列から削除しました。");
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+                    turnController.NextState();
+
+>>>>>>> parent of 4a8d442 (test)
+=======
+>>>>>>> 5391c6bd4acf43d10d8386a79a00d4b20d58b960
                 }
                 imageController.Safe();
 
@@ -327,6 +336,14 @@ public class CollisionController : MonoBehaviour
 
                 camController.isCameraMoving = false;
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                turnController.NextState();
+
+>>>>>>> parent of 4a8d442 (test)
+=======
+>>>>>>> 5391c6bd4acf43d10d8386a79a00d4b20d58b960
                 StartCoroutine(imageController.ExplosionSwitch());
             }
         }
@@ -362,6 +379,17 @@ public class CollisionController : MonoBehaviour
 
                 Debug.Log(enemyPoint);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                if (turnController.turnCount < OptionController.maxTurn)
+                {
+                    turnController.NextState();
+                }
+
+>>>>>>> parent of 4a8d442 (test)
+=======
+>>>>>>> 5391c6bd4acf43d10d8386a79a00d4b20d58b960
                 if (tempList.Contains(this.gameObject))
                 {
                     tempList.Remove(this.gameObject);  // リストから削除
@@ -390,6 +418,18 @@ public class CollisionController : MonoBehaviour
                 animator.SetBool("open", false);
 
                 Debug.Log("EnemyがExplosionを触った");
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+                if (turnController.turnCount < OptionController.maxTurn)
+                {
+                    turnController.NextState();
+                }
+                StartCoroutine(imageController.ExplosionSwitch());
+>>>>>>> parent of 4a8d442 (test)
+=======
+>>>>>>> 5391c6bd4acf43d10d8386a79a00d4b20d58b960
             }
         }
     }

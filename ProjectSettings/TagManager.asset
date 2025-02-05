@@ -3,14 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - Cube
-  - Base
-  - Explosion
-  - Enemy
-  - Collide
-  - Bomb
-  - Coin
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -18,7 +11,7 @@ TagManager:
   - 
   - Water
   - UI
-  - Exclusion
+  - 
   - 
   - 
   - 

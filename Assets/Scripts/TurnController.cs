@@ -201,7 +201,7 @@ public class TurnController : MonoBehaviour
 
                         choiceTime = 60f;
 
-                        StartCoroutine(NextState());
+                        NextState();
 
                         // クリックしたオブジェクト以外のコライダーを無効化
                         clickController.DeactivateOtherColliders(randomObject);
@@ -219,7 +219,7 @@ public class TurnController : MonoBehaviour
 
                     choiceTime = 60f;
 
-                    StartCoroutine(NextState());
+                    NextState();
 
                     // クリックしたオブジェクト以外のコライダーを無効化
                     clickController.DeactivateOtherColliders(randomObject);
@@ -315,6 +315,7 @@ public class TurnController : MonoBehaviour
         return currentState[currentIndex];
     }
 
+<<<<<<< HEAD
     public IEnumerator NextState()
     {
         Debug.Log("state");
@@ -337,6 +338,9 @@ public class TurnController : MonoBehaviour
     }
 
     private void Next()
+=======
+    public void NextState()
+>>>>>>> parent of 4a8d442 (test)
     {
         // 次のインデックスに進む
         currentIndex++;
@@ -421,7 +425,7 @@ public class TurnController : MonoBehaviour
         //Enemyがboxを選択する
         NumberRandom();
 
-        StartCoroutine(NextState());
+        NextState();
 
         enemyMoveController.enemyTarget = randomObject.transform.position;
 

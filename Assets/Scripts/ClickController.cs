@@ -86,7 +86,7 @@ public class ClickController : MonoBehaviour
 
                         turnController.countText.enabled = false;
 
-                        StartCoroutine(turnController.NextState());
+                        turnController.NextState();
                     }
                 }
                 //Œã‚Å•Ï‚¦‚é
@@ -111,7 +111,7 @@ public class ClickController : MonoBehaviour
 
                         turnController.countText.enabled = false;
 
-                        StartCoroutine(turnController.NextState());
+                        turnController.NextState();
                     }
                 }
             }
