@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using static TurnController;
-using ImageSpace;
 
 public class ImageController : MonoBehaviour
 {
@@ -13,8 +12,7 @@ public class ImageController : MonoBehaviour
     public Sprite enemySet;
     public Sprite enemyOpen;
 
-    // 色を変えるまでの遅延時間（秒）
-    private float delayTime = 1f;
+    private float delayTime = 1f; // 色を変えるまでの遅延時間（秒）
 
     public GameObject explosion;
 
@@ -25,13 +23,10 @@ public class ImageController : MonoBehaviour
 
     TurnController turnController;
 
-    ConstanceContrller constanceContrller;
-
     void Start()
     {
         imageTrigger = true;
         turnController = FindObjectOfType<TurnController>();
-        constanceContrller = FindObjectOfType<ConstanceContrller>();
     }
 
     void Update()
@@ -47,7 +42,7 @@ public class ImageController : MonoBehaviour
             // 指定した時間後に透明度を変更
             StartCoroutine(ChangeColorAfterDelay(delayTime));
         }
-        else if (currentState == PhaseState.PlayerChoiceToOpenBox && imageTrigger)
+        else if(currentState == PhaseState.PlayerChoiceToOpenBox && imageTrigger)
         {
             targetImage.sprite = playerOpen;
             targetImage.color = new Color(1f, 1f, 1f, 1f);
@@ -55,7 +50,7 @@ public class ImageController : MonoBehaviour
             // 指定した時間後に透明度を変更
             StartCoroutine(ChangeColorAfterDelay(delayTime));
         }
-        else if (currentState == PhaseState.EnemyChoiceToSetBomb && imageTrigger)
+        else if(currentState == PhaseState.EnemyChoiceToSetBomb && imageTrigger)
         {
             targetImage.sprite = enemySet;
             targetImage.color = new Color(1f, 1f, 1f, 1f);
@@ -63,7 +58,7 @@ public class ImageController : MonoBehaviour
             // 指定した時間後に透明度を変更
             StartCoroutine(ChangeColorAfterDelay(delayTime));
         }
-        else if (currentState == PhaseState.EnemyChoiceToOpenBox && imageTrigger)
+        else if(currentState == PhaseState.EnemyChoiceToOpenBox && imageTrigger)
         {
             targetImage.sprite = enemyOpen;
             targetImage.color = new Color(1f, 1f, 1f, 1f);
@@ -88,7 +83,7 @@ public class ImageController : MonoBehaviour
     public IEnumerator ExplosionSwitch()
     {
         explosion.SetActive(true);
-        yield return new WaitForSeconds(constanceContrller.waitTime);
+        yield return new WaitForSeconds(7f);
         explosion.SetActive(false);
     }
 
@@ -99,7 +94,7 @@ public class ImageController : MonoBehaviour
     private IEnumerator SafeSwitch()
     {
         safe.SetActive(true);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(7f);
         safe.SetActive(false);
     }
 }
