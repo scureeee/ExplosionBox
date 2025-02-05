@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static TurnController;
-using ImageSpace;
 
 public class CollisionController : MonoBehaviour
 {
@@ -138,10 +137,6 @@ public class CollisionController : MonoBehaviour
 
                 clickController.animator.SetBool("Bool Walk", false);
 
-                // NavMeshAgentの移動を完全に停止
-                clickController.agent.isStopped = true; // NavMeshAgentを停止
-                clickController.agent.velocity = Vector3.zero; // 移動速度をリセット
-
                 //目的地に移動し終えたplayerを定位置に移動させる
                 turnController.playerObject.transform.position = warpPoint.transform.position;
 
@@ -159,9 +154,6 @@ public class CollisionController : MonoBehaviour
 
                 clickController.animator.SetBool("Bool Walk", false);
 
-                // NavMeshAgentの移動を完全に停止
-                clickController.agent.isStopped = true; // NavMeshAgentを停止
-                clickController.agent.velocity = Vector3.zero; // 移動速度をリセット
 
                 //目的地に移動し終えたplayerを定位置に移動させる
                 turnController.playerObject.transform.position = warpPoint.transform.position;
@@ -309,9 +301,6 @@ public class CollisionController : MonoBehaviour
                     this.gameObject.SetActive(false);
 
                     Debug.Log($"{this.gameObject.name} を配列から削除しました。");
-
-                    //StartCoroutine(turnController.NextState());
-
                 }
                 imageController.Safe();
 
@@ -337,8 +326,6 @@ public class CollisionController : MonoBehaviour
                 animator.SetBool("open", false);
 
                 camController.isCameraMoving = false;
-
-                //StartCoroutine(turnController.NextState());
 
                 StartCoroutine(imageController.ExplosionSwitch());
             }
@@ -375,11 +362,6 @@ public class CollisionController : MonoBehaviour
 
                 Debug.Log(enemyPoint);
 
-                if (turnController.turnCount < OptionController.maxTurn)
-                {
-                    //StartCoroutine(turnController.NextState());
-                }
-
                 if (tempList.Contains(this.gameObject))
                 {
                     tempList.Remove(this.gameObject);  // リストから削除
@@ -408,12 +390,6 @@ public class CollisionController : MonoBehaviour
                 animator.SetBool("open", false);
 
                 Debug.Log("EnemyがExplosionを触った");
-
-                if (turnController.turnCount < OptionController.maxTurn)
-                {
-                    //StartCoroutine(turnController.NextState());
-                }
-                StartCoroutine(imageController.ExplosionSwitch());
             }
         }
     }
