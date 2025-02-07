@@ -81,7 +81,6 @@ public class ClickController : MonoBehaviour
                         // クリックしたオブジェクト以外のコライダーを無効化
                         DeactivateOtherColliders(clickedObject);
 
-
                         targetPosition = hit.point;
 
                         optionController.choiceTime = 60f;

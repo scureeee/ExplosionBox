@@ -158,7 +158,9 @@ public class CollisionController : MonoBehaviour
                 clickController.animator.SetBool("Bool Walk", false);
 
                 //目的地に移動し終えたplayerを定位置に移動させる
-                turnController.playerObject.transform.position = warpPoint.transform.position;
+                //turnController.playerObject.transform.position = warpPoint.transform.position;
+
+                StartCoroutine(MovePlayerToWarpPoint());
 
                 // カメラを当たったオブジェクトに近づける処理を開始
                 camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
@@ -191,7 +193,9 @@ public class CollisionController : MonoBehaviour
 
                 enemyMoveController.enemyAnimator.SetBool("Bool Walk", false);
 
-                turnController.enemyObject.transform.position = warpPoint.transform.position;
+                //turnController.enemyObject.transform.position = warpPoint.transform.position;
+
+                StartCoroutine(MoveEnemyToWarpPoint());
 
                 camController.targetObject = other.transform;
                 camController.isCameraMoving = true;
@@ -226,6 +230,43 @@ public class CollisionController : MonoBehaviour
         }
 
     }
+
+    private IEnumerator MovePlayerToWarpPoint()
+    {
+        float duration = 1.0f; // 移動時間（秒）
+        float elapsedTime = 0f;
+
+        Vector3 startPosition = turnController.playerObject.transform.position;
+        Vector3 targetPosition = warpPoint.transform.position;
+
+        while (elapsedTime < duration)
+        {
+            turnController.playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
+    }
+
+    private IEnumerator MoveEnemyToWarpPoint()
+    {
+        float duration = 1.0f; // 移動時間（秒）
+        float elapsedTime = 0f;
+
+        Vector3 startPosition = turnController.enemyObject.transform.position;
+        Vector3 targetPosition = warpPoint.transform.position;
+
+        while (elapsedTime < duration)
+        {
+            turnController.enemyObject.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        turnController.enemyObject.transform.position = targetPosition; // 最終位置を確定
+    }
+
 
     public void OpenAnimation()
     {

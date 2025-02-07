@@ -9,6 +9,10 @@ public class ResultJudge : MonoBehaviour
 
     private TurnController turnController;
 
+    public GameObject lastTurn;
+
+    private bool lastTrigger = true;
+
     // Start is called before the first frame update
 
     void Start()
@@ -97,5 +101,24 @@ public class ResultJudge : MonoBehaviour
             }
         }
 
+        if(lastTrigger == true)
+        {
+            if(turnController.turnCount == OptionController.maxTurn - 1)
+            {
+                lastTrigger = false;
+
+                StartCoroutine(Last());
+            }
+        }
+
+    }
+
+    IEnumerator Last()
+    {
+        lastTurn.SetActive(true);
+
+        yield return new WaitForSeconds(2f);
+
+        lastTurn.SetActive(false);
     }
 } 
