@@ -3,36 +3,54 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class OptionController : MonoBehaviour
+
+namespace optionSpace
 {
-    //MainGameで生成する配列の要素数
-    public int objectCountToSet = 0;
-
-    public static int maxTurn = 0;
-
-    public static int maxLife = 0;
-
-    public static int maxPoint = 0;
-    // Start is called before the first frame update
-    void Start()
+    public class OptionController : MonoBehaviour
     {
-        maxPoint = 10;
+        public static OptionController Instance {  get; private set; }
 
-        maxTurn = 4;
+        //MainGameで生成する配列の要素数
+        public int objectCountToSet = 0;
 
-        maxLife = 4;
+        public static int maxTurn = 0;
 
-        objectCountToSet = 8;
-    }
+        public static int maxLife = 0;
 
-    // Update is called once per frame
-    void Update()
-    {
-        DataManager.Instance.objectCount = objectCountToSet;
-    }
+        public static int maxPoint = 0;
 
-    public void SceneJump()
-    {
-        SceneManager.LoadScene("SampleScene");
+        public float choiceTime = 60f;
+
+        public float openTime = 60f;
+
+        public bool clickNext = false;
+        // Start is called before the first frame update
+        void Start()
+        {
+
+
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+
+            maxPoint = 10;
+
+            maxTurn = 4;
+
+            maxLife = 4;
+
+            objectCountToSet = 8;
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            DataManager.Instance.objectCount = objectCountToSet;
+        }
     }
 }

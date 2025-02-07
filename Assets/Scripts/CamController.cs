@@ -10,6 +10,8 @@ public class CamController : MonoBehaviour
 
     // カメラ関連
 
+    private CollisionController collisionController;
+
     // メインカメラをアサインする
     public Camera mainCamera;
 
@@ -41,6 +43,8 @@ public class CamController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        collisionController = FindObjectOfType<CollisionController>();
+
         turnController = FindObjectOfType<TurnController>();
 
         // 初期カメラ位置を記録
@@ -82,14 +86,19 @@ public class CamController : MonoBehaviour
 
         if(currentState == PhaseState.EnemyOpenBox || currentState == PhaseState.PlayerOpenBox)
         {
-            turnController.Next();
+            if(collisionController.cameraBuck == true)
+            {
+                StartCoroutine(turnController.NextState());
+            }
         }
     }
 
     public IEnumerator CameraBack()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(5f);
         mainCamera.transform.position = cameraStartPosition;
+
+        collisionController.cameraBuck = true;
     }
 
     public void FadeIn()
@@ -115,7 +124,7 @@ public class CamController : MonoBehaviour
             }
             else if(currentState == PhaseState.EnemySetBomb)
             {
-                turnController.Next();
+                StartCoroutine(turnController.NextState());
             }
         }
     }
@@ -133,7 +142,7 @@ public class CamController : MonoBehaviour
         {
             if(currentState == PhaseState.PlayerSetBomb)
             {
-                turnController.Next();
+                StartCoroutine(turnController.NextState());
 
                 fadeInTrigger = true;
 
@@ -142,7 +151,7 @@ public class CamController : MonoBehaviour
             {
                 Debug.Log("enemy暗く");
 
-                turnController.Next();
+                StartCoroutine(turnController.NextState());
 
                 turnController.EnemyBombSet();
             }

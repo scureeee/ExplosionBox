@@ -18,15 +18,19 @@ public class ImageController : MonoBehaviour
 
     public GameObject safe;
 
+    public AudioClip safeSound;
 
     public bool imageTrigger;
 
     TurnController turnController;
 
+    CollisionController collisionController;
+
     void Start()
     {
         imageTrigger = true;
         turnController = FindObjectOfType<TurnController>();
+        collisionController = FindObjectOfType<CollisionController>();
     }
 
     void Update()
@@ -38,52 +42,28 @@ public class ImageController : MonoBehaviour
         {
             targetImage.sprite = playerSet;
             targetImage.color = new Color(1f, 1f, 1f, 1f);
-
-            // 指定した時間後に透明度を変更
-            StartCoroutine(ChangeColorAfterDelay(delayTime));
         }
         else if(currentState == PhaseState.PlayerChoiceToOpenBox && imageTrigger)
         {
             targetImage.sprite = playerOpen;
             targetImage.color = new Color(1f, 1f, 1f, 1f);
-
-            // 指定した時間後に透明度を変更
-            StartCoroutine(ChangeColorAfterDelay(delayTime));
         }
         else if(currentState == PhaseState.EnemyChoiceToSetBomb && imageTrigger)
         {
             targetImage.sprite = enemySet;
             targetImage.color = new Color(1f, 1f, 1f, 1f);
-
-            // 指定した時間後に透明度を変更
-            StartCoroutine(ChangeColorAfterDelay(delayTime));
         }
         else if(currentState == PhaseState.EnemyChoiceToOpenBox && imageTrigger)
         {
             targetImage.sprite = enemyOpen;
             targetImage.color = new Color(1f, 1f, 1f, 1f);
-
-            // 指定した時間後に透明度を変更
-            StartCoroutine(ChangeColorAfterDelay(delayTime));
         }
-    }
-
-
-    // Coroutineを使って指定時間後に画像の色を変える
-    IEnumerator ChangeColorAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        imageTrigger = false;
-
-        // 2秒後に画像の透明度を変更
-        targetImage.color = new Color(1f, 1f, 1f, 0f); // 半透明に変更
     }
 
     public IEnumerator ExplosionSwitch()
     {
         explosion.SetActive(true);
-        yield return new WaitForSeconds(7f);
+        yield return new WaitForSeconds(5f);
         explosion.SetActive(false);
     }
 
@@ -93,8 +73,9 @@ public class ImageController : MonoBehaviour
     }
     private IEnumerator SafeSwitch()
     {
+        GetComponent<AudioSource>().PlayOneShot(safeSound);
         safe.SetActive(true);
-        yield return new WaitForSeconds(7f);
+        yield return new WaitForSeconds(5f);
         safe.SetActive(false);
     }
 }

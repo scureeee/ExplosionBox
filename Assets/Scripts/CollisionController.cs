@@ -1,3 +1,4 @@
+using optionSpace;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,15 +20,21 @@ public class CollisionController : MonoBehaviour
 
     public GameObject bomb;
 
+    public AudioClip openSound;
+
+    public AudioClip explsionSound;
+
+    public AudioClip canselSound;
+
     private ClickController clickController;
 
     private CamController camController;
 
     private EnemyMoveController enemyMoveController;
 
-    public Transform warpPoint;
+    private OptionController optionController;
 
-    private float openTime;
+    public Transform warpPoint;
 
     //アニメーターコンポーネント
 
@@ -40,14 +47,14 @@ public class CollisionController : MonoBehaviour
 
     private bool enemyOpen = false;
 
+    public bool cameraBuck = true;
     // Start is called before the first frame update
 
     void Start()
     {
-
-        openTime = 60f;
-
         animator = GetComponent<Animator>();
+
+        optionController = FindObjectOfType<OptionController>();
 
         turnController = FindObjectOfType<TurnController>();
 
@@ -61,6 +68,19 @@ public class CollisionController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (optionController.clickNext == true)
+            {
+                Debug.Log("押され");
+
+                optionController.clickNext = false;
+
+                StopCoroutine(BoxOpen());
+
+                camController.MotionAids();
+            }
+        }
 
         // カメラをターゲットに向けて移動
         if (camController.isCameraMoving && camController.targetObject != null)
@@ -73,15 +93,15 @@ public class CollisionController : MonoBehaviour
         }
 
 
-        //Debug.Log($"open"+openTime);
+        //Debug.Log($"open"+optionController.openTime);
 
         //openBottonが有ったら
         if (openBotton.activeSelf)
         {
             //時間経過でアニメーションが自動で実行
-            openTime -= Time.deltaTime;
+            optionController.openTime -= Time.deltaTime;
 
-            if (openTime <= 0f)
+            if (optionController.openTime <= 0f)
             {
                 //Animation Eventを使ってboxOpenを行う
 
@@ -92,17 +112,17 @@ public class CollisionController : MonoBehaviour
 
                 buckBotton.SetActive(false);
 
-                openTime = 60f;
+                optionController.openTime = 60f;
 
                 turnController.countText.enabled = false;
             }
 
 
-            if(openTime <= 30f)
+            if(optionController.openTime <= 30f)
             {
                 turnController.countText.enabled = true;
 
-                turnController.countText.text = "" + openTime;
+                turnController.countText.text = "" + optionController.openTime;
             }
         }
 
@@ -144,7 +164,7 @@ public class CollisionController : MonoBehaviour
                 camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
                 camController.isCameraMoving = true; // カメラ移動を開始
 
-                turnController.Next();
+                StartCoroutine(turnController.NextState());
 
                 BottonEmerge();
             }
@@ -160,7 +180,7 @@ public class CollisionController : MonoBehaviour
 
                 clickController.ActivateOtherColliders();
 
-                turnController.Next();
+                StartCoroutine(turnController.NextState());
             }
         }
         else if (other.gameObject.tag == "Enemy")
@@ -185,7 +205,7 @@ public class CollisionController : MonoBehaviour
 
                     enemyOpen = true;
 
-                    turnController.Next();
+                    StartCoroutine(turnController.NextState());
                 }
             }
             else if(currentState == PhaseState.EnemyMoveToSetBox)
@@ -196,7 +216,7 @@ public class CollisionController : MonoBehaviour
 
                 turnController.enemyObject.transform.position = warpPoint.transform.position;
 
-                turnController.Next();
+                StartCoroutine(turnController.NextState());
 
                 turnController.randomObject.tag = "Explosion";
                 Debug.Log($"Enemyがオブジェクト {turnController.randomObject.name} のタグを 'Explosion' に変更しました。");
@@ -216,16 +236,15 @@ public class CollisionController : MonoBehaviour
 
         buckBotton.SetActive(false);
 
-        openTime = 60f;
+        optionController.openTime = 60f;
     }
 
     public void BottonInbisible()
-
     {
 
         particle.SetActive(false);
 
-        openTime = 60f;
+        optionController.openTime = 60f;
 
         isExplosion = false;
 
@@ -245,7 +264,11 @@ public class CollisionController : MonoBehaviour
 
     public void Buck()
     {
+        GetComponent<AudioSource>().PlayOneShot(canselSound);
+
         turnController.BuckState();
+
+        cameraBuck = false;
     }
 
     public void BottonEmerge()
@@ -255,16 +278,21 @@ public class CollisionController : MonoBehaviour
 
         buckBotton.SetActive(true);
 
-        turnController.choiceTime = 60f;
+        optionController.choiceTime = 60f;
     }
 
-    public void boxOpen()
+    public void DeliveryBoxOpen()
     {
-        if(enemyOpen == false)
+        StartCoroutine(BoxOpen());
+
+        optionController.clickNext = true;
+    }
+
+    IEnumerator BoxOpen()
+    {
+        if (enemyOpen == false)
         {
             turnController.countText.enabled = false;
-
-            camController.MotionAids();
 
             if (this.gameObject.tag == "Cube")
             {
@@ -283,10 +311,13 @@ public class CollisionController : MonoBehaviour
 
                 playerPoint += assignedNumber + 1;
 
-                Debug.Log(playerPoint);
+                BottonInbisible();
+
+                imageController.Safe();
+
+                StopCoroutine(BoxOpen());
 
                 // 選択したオブジェクトをリストから削除
-
                 List<GameObject> tempList = new List<GameObject>(turnController.objectArray);
 
                 if (tempList.Contains(this.gameObject))
@@ -302,9 +333,8 @@ public class CollisionController : MonoBehaviour
 
                     Debug.Log($"{this.gameObject.name} を配列から削除しました。");
                 }
-                imageController.Safe();
 
-                BottonInbisible();
+                yield return null;
             }
             else if (this.gameObject.tag == "Explosion")
             {
@@ -328,14 +358,18 @@ public class CollisionController : MonoBehaviour
                 camController.isCameraMoving = false;
 
                 StartCoroutine(imageController.ExplosionSwitch());
+
+                GetComponent<AudioSource>().PlayOneShot(explsionSound);
+
+                StopCoroutine(BoxOpen());
+
+                yield return null;
             }
         }
         else
         {
             //変える
             enemyOpen = false;
-
-            camController.MotionAids();
 
             camController.isCameraMoving = false;
 
@@ -362,6 +396,10 @@ public class CollisionController : MonoBehaviour
 
                 Debug.Log(enemyPoint);
 
+                imageController.Safe();
+
+                StopCoroutine(BoxOpen());
+
                 if (tempList.Contains(this.gameObject))
                 {
                     tempList.Remove(this.gameObject);  // リストから削除
@@ -372,7 +410,8 @@ public class CollisionController : MonoBehaviour
 
                     Debug.Log($"{this.gameObject.name} を配列から削除しました。");
                 }
-                imageController.Safe();
+
+                yield return null;
             }
             else if (turnController.randomObject.tag == "Explosion")
             {
@@ -390,8 +429,19 @@ public class CollisionController : MonoBehaviour
                 animator.SetBool("open", false);
 
                 Debug.Log("EnemyがExplosionを触った");
+
+                GetComponent<AudioSource>().PlayOneShot(explsionSound);
+
+                StopCoroutine(BoxOpen());
+
+                yield return null;
             }
         }
+    }
+
+    private void OpenSe()
+    {
+        GetComponent<AudioSource>().PlayOneShot(openSound);
     }
 }
 

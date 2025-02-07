@@ -944,10 +944,10 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: a043ebc8-7266-4fcb-abc5-dcd990623fde
+  cloudProjectId: 7eb61658-c8c0-4ada-85ed-2dc75f7f851e
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: "\u7206\u7834\u30DE\u30B9\u30B2\u30FC\u30E0 2024-11-08_23-07-00"
+  projectName: ExplosionBox
   organizationId: sba2359g10002-edu-sba-ac-jp
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0

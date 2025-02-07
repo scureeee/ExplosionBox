@@ -6,6 +6,7 @@ using Unity.AI.Navigation;
 using UnityEngine.AI;
 using static TurnController;
 using static UnityEditor.Timeline.TimelinePlaybackControls;
+using optionSpace;
 
 public class ClickController : MonoBehaviour
 {
@@ -27,6 +28,8 @@ public class ClickController : MonoBehaviour
 
     private TurnController turnController;
 
+    private OptionController optionController;
+
     // 再生成する NavMesh の範囲半径
     public float navMeshUpdateRadius = 5f;
 
@@ -36,6 +39,8 @@ public class ClickController : MonoBehaviour
         isMoving = false;
 
         animator = GetComponent<Animator>();
+
+        optionController = FindObjectOfType<OptionController>();
 
         turnController = FindObjectOfType<TurnController>();
 
@@ -79,14 +84,14 @@ public class ClickController : MonoBehaviour
 
                         targetPosition = hit.point;
 
-                        turnController.choiceTime = 60f;
+                        optionController.choiceTime = 60f;
 
                         // フラグを有効化
                         isMoving = true;
 
                         turnController.countText.enabled = false;
 
-                        turnController.Next();
+                        StartCoroutine(turnController.NextState());
                     }
                 }
                 //後で変える
@@ -104,14 +109,14 @@ public class ClickController : MonoBehaviour
 
                         targetPosition = hit.point;
 
-                        turnController.choiceTime = 60f;
+                        optionController.choiceTime = 60f;
 
                         // フラグを有効化
                         isMoving = true;
 
                         turnController.countText.enabled = false;
 
-                        turnController.Next();
+                        StartCoroutine(turnController.NextState());
                     }
                 }
             }

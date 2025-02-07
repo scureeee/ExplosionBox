@@ -6,6 +6,9 @@ using UnityEngine.UI;
 using TMPro;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
+using Unity.VisualScripting;
+using optionSpace;
+using UnityEngine.SceneManagement;
 
 public class TurnController : MonoBehaviour
 {
@@ -16,6 +19,8 @@ public class TurnController : MonoBehaviour
     private EnemyMoveController enemyMoveController;
 
     private ImageController imageController;
+
+    private OptionController optionController;
 
     public float turnCount = 0f;
 
@@ -37,6 +42,14 @@ public class TurnController : MonoBehaviour
 
     public GameObject randomObject;
 
+    public GameObject turnPanel;
+
+    private Vector3 startPosition;
+
+    private Vector3 targetPosition;
+
+    private float duration = 1.0f; // 移動の時間
+
     [SerializeField] private TextMeshProUGUI turnText;
 
     [SerializeField] private TextMeshProUGUI playerLifeText;
@@ -57,9 +70,9 @@ public class TurnController : MonoBehaviour
 
     public static int enemyPoint = 0;
 
-    public float choiceTime = 60f;
-
     private int currentIndex;
+
+    private bool nextTrigger = true;
 
     public enum PhaseState
     {
@@ -122,6 +135,8 @@ public class TurnController : MonoBehaviour
 
         enemyLife = OptionController.maxLife;
 
+        optionController = FindObjectOfType<OptionController>();
+
         clickController = FindObjectOfType<ClickController>();
 
         enemyMoveController = FindObjectOfType<EnemyMoveController>();
@@ -157,7 +172,12 @@ public class TurnController : MonoBehaviour
         Debug.Log("オブジェクト生成が完了しました。DecideFirstTurnを実行します。");
         DecideFirstTurn();
 
-        choiceTime = 60f;
+        optionController.choiceTime = 60f;
+
+        startPosition = turnPanel.transform.position;
+        // 200px下に移動
+        targetPosition = new Vector3(startPosition.x, startPosition.y - 200, startPosition.z);
+        StartCoroutine(AnimatePanel());
     }
 
     private void Update()
@@ -169,17 +189,17 @@ public class TurnController : MonoBehaviour
         //Debug.Log(turnCount);
         //Debug.Log(enemyPoint);
         //Debug.Log(objectArray.Length);
-        //Debug.Log("choice"+choiceTime);
+        //Debug.Log("choice"+ optionController.choiceTime);
         //時間制限で箱をランダムで選択
         if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.PlayerChoiceToOpenBox)
         {
             //待機時間
-            choiceTime -= Time.deltaTime;
+            optionController.choiceTime -= Time.deltaTime;
 
-            if (choiceTime <= 0f)
+            if (optionController.choiceTime <= 0f)
             {
 
-                choiceTime = 60f;
+                optionController.choiceTime = 60f;
 
                 countText.enabled = false;
 
@@ -199,9 +219,9 @@ public class TurnController : MonoBehaviour
                         // フラグを有効化
                         clickController.isMoving = true;
 
-                        choiceTime = 60f;
+                        optionController.choiceTime = 60f;
 
-                        Next();
+                        StartCoroutine(NextState());
 
                         // クリックしたオブジェクト以外のコライダーを無効化
                         clickController.DeactivateOtherColliders(randomObject);
@@ -217,9 +237,11 @@ public class TurnController : MonoBehaviour
                     // フラグを有効化
                     clickController.isMoving = true;
 
-                    choiceTime = 60f;
+                    optionController.choiceTime = 60f;
 
-                    Next();
+                    optionController.openTime = 0f;
+
+                    StartCoroutine(NextState());
 
                     // クリックしたオブジェクト以外のコライダーを無効化
                     clickController.DeactivateOtherColliders(randomObject);
@@ -227,20 +249,20 @@ public class TurnController : MonoBehaviour
             }
         }
 
-        playerPointText.text = playerPoint + "点";
+        playerPointText.text = playerPoint + "";
 
-        enemyPointText.text = enemyPoint + " 点";
+        enemyPointText.text = enemyPoint + "";
 
-        turnText.text = turnCount +"ターン";
+        turnText.text = turnCount +"";
 
-        playerLifeText.text = "Player Life:" + playerLife;
+        playerLifeText.text = "" + playerLife;
 
-        enemyLifeText.text = "CPU Life:" + enemyLife;
+        enemyLifeText.text = "" + enemyLife;
 
-        if(choiceTime <= 30)
+        if(optionController.choiceTime <= 30)
         {
             countText.enabled = true;
-            countText.text = "" + choiceTime;
+            countText.text = "残り" + optionController.choiceTime;
         }
     }
 
@@ -314,7 +336,7 @@ public class TurnController : MonoBehaviour
     {
         return currentState[currentIndex];
     }
-    /*
+    
     public IEnumerator NextState()
     {
         Debug.Log("state");
@@ -323,9 +345,13 @@ public class TurnController : MonoBehaviour
         
         if(currentState == PhaseState.EnemyOpenBox || currentState == PhaseState.PlayerOpenBox)
         {
-            Debug.Log("松");
-            yield return new WaitForSeconds(3f);
-            Next();
+            if(nextTrigger == true)
+            {
+                nextTrigger = false;
+                Debug.Log("松");
+                yield return new WaitForSeconds(5f);
+                Next();
+            }
         }
         else
         {
@@ -334,8 +360,7 @@ public class TurnController : MonoBehaviour
             yield return null;
         }
     }
-    */
-
+    
     public void Next()
     {
         // 次のインデックスに進む
@@ -349,26 +374,58 @@ public class TurnController : MonoBehaviour
                               // Debug.Log("すべての状態が終了しました。");
                               // return;
             turnCount++;
+            StartCoroutine(AnimatePanel());
         }
 
         if ((currentIndex + 1) % 7 == 0)
         {
             turnCount++;
+
+            StartCoroutine(AnimatePanel());
         }
 
         imageController.imageTrigger = true;
+
+        nextTrigger = true;
 
         Debug.Log("違法");
 
         // 現在の状態をログ出力
         Debug.Log($"今の状態: {currentState[currentIndex]}");
+
+        optionController.clickNext = false;
     }
 
     public void BuckState()
     {
-        currentIndex = currentIndex - 2;
+        // インデックスを -2 する（ただし、範囲外にならないように調整）
+        currentIndex = Mathf.Max(0, currentIndex - 2);
+        Debug.Log("戻るよー");
         // 現在の状態をログ出力
         Debug.Log($"今の状態: {currentState[currentIndex]}");
+    }
+
+
+    IEnumerator AnimatePanel()
+    {
+        yield return StartCoroutine(ExpansionPanel(1f, 2f, startPosition, targetPosition, duration)); // 拡大しながら中央へ
+        yield return StartCoroutine(ExpansionPanel(2f, 1f, targetPosition, startPosition, duration)); // 縮小しながら元の位置へ
+    }
+
+    IEnumerator ExpansionPanel(float startScale, float endScale, Vector3 startPos, Vector3 endPos, float time)
+    {
+        float elapsedTime = 0f;
+        while (elapsedTime < time)
+        {
+            float t = elapsedTime / time;
+            turnPanel.transform.localScale = Vector3.Lerp(Vector3.one * startScale, Vector3.one * endScale, t);
+            turnPanel.transform.position = Vector3.Lerp(startPos, endPos, t);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        turnPanel.transform.localScale = Vector3.one * endScale;
+        turnPanel.transform.position = endPos;
     }
 
     public void NumberRandom()
@@ -421,7 +478,7 @@ public class TurnController : MonoBehaviour
         //Enemyがboxを選択する
         NumberRandom();
 
-        Next();
+        StartCoroutine(NextState());
 
         enemyMoveController.enemyTarget = randomObject.transform.position;
 
@@ -435,5 +492,10 @@ public class TurnController : MonoBehaviour
         playerObject.SetActive(true);
 
         enemyObject.SetActive(false);
+    }
+
+    public void Retirement()
+    {
+        SceneManager.LoadScene("OptionScene");
     }
 }

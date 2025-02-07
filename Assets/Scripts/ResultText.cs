@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ResultText : MonoBehaviour
 {
@@ -67,7 +68,6 @@ public class ResultText : MonoBehaviour
             draw.SetActive(true);
         }
 
-        //“r’†
         playerLifeText.text = "PlayerLife: "  + TurnController.playerLife;
 
         enemyLifeText.text = "EnemyLife: " + TurnController.enemyLife;
@@ -75,5 +75,10 @@ public class ResultText : MonoBehaviour
         playerPointText.text = "PlayerPoint: " + TurnController.playerPoint;
 
         enemyPointText.text = "EnemyPoint: " + TurnController.enemyPoint;
+    }
+
+    public void BuckTitle()
+    {
+        SceneManager.LoadScene("OptionScene");
     }
 }
