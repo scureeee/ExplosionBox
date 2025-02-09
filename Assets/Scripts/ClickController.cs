@@ -1,11 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
-using Unity.AI.Navigation;
-using UnityEngine.AI;
 using static TurnController;
-using static UnityEditor.Timeline.TimelinePlaybackControls;
 using optionSpace;
 
 public class ClickController : MonoBehaviour
