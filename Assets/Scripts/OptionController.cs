@@ -38,11 +38,11 @@ namespace optionSpace
                 Destroy(gameObject);
             }
 
-            maxPoint = 10;
+            maxPoint = 18;
 
-            maxTurn = 4;
+            maxTurn = 5;
 
-            maxLife = 4;
+            maxLife = 2;
 
             objectCountToSet = 8;
         }
