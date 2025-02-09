@@ -53,7 +53,7 @@ public class CollisionController : MonoBehaviour
 
     private Coroutine boxOpenCoroutine;
 
-    private bool isPaused = false;  // コルーチンの一時停止フラグ
+    public bool isPaused = false;  // コルーチンの一時停止フラグ
     // Start is called before the first frame update
     void Start()
     {
@@ -327,11 +327,16 @@ public class CollisionController : MonoBehaviour
     public void DeliveryBoxOpen()
     {
         Debug.Log("コルーチン開始！");
-        if (boxOpenCoroutine == null)  // コルーチンが開始されていない場合のみ開始
+
+        if (boxOpenCoroutine != null)  // 既存のコルーチンがある場合は停止
         {
-            isPaused = true;
-            boxOpenCoroutine = StartCoroutine(BoxOpen());
+            Debug.Log("既存のコルーチンを停止して再開します。");
+            StopCoroutine(boxOpenCoroutine);
+            boxOpenCoroutine = null;
         }
+
+        isPaused = true;
+        boxOpenCoroutine = StartCoroutine(BoxOpen());
     }
 
 
@@ -373,6 +378,10 @@ public class CollisionController : MonoBehaviour
                         turnController.objectArray = tempList.ToArray();
                         this.gameObject.SetActive(false);
                     }
+
+                    boxOpenCoroutine = null;  // コルーチンの参照をクリア
+
+                    yield break;
                 }
                 else if (this.gameObject.tag == "Explosion")
                 {
@@ -386,29 +395,34 @@ public class CollisionController : MonoBehaviour
 
                     isExplosion = true;
 
-                    this.gameObject.tag = "Cube";
                     animator.SetBool("open", false);
                     camController.isCameraMoving = false;
 
                     StartCoroutine(imageController.ExplosionSwitch());
                     GetComponent<AudioSource>().PlayOneShot(explsionSound);
 
+                    this.gameObject.tag = "Cube";
                     yield return new WaitForSeconds(1f);
+
+                    boxOpenCoroutine = null;  // コルーチンの参照をクリア
+
+                    yield break;
                 }
             }
             else
             {
+
                 enemyOpen = false;
                 camController.isCameraMoving = false;
-                if (turnController.randomObject.tag == "Cube")
+                if (this.gameObject.tag == "Cube")
                 {
-                    enemyPoint += turnController.objectNumberMapping[turnController.randomObject] + 1;
+                    enemyPoint += turnController.objectNumberMapping[this.gameObject] + 1;
                     imageController.Safe();
 
                     yield return new WaitForSeconds(1f);
-                    turnController.randomObject.SetActive(false);
+                    this.gameObject.SetActive(false);
                     List<GameObject> tempList = new List<GameObject>(turnController.objectArray);
-                    tempList.Remove(turnController.randomObject);
+                    tempList.Remove(this.gameObject);
                     turnController.objectArray = tempList.ToArray();
 
                     GameObject[] objectsWithTag = GameObject.FindGameObjectsWithTag("Explosion");
@@ -418,8 +432,12 @@ public class CollisionController : MonoBehaviour
                     }
 
                     Debug.Log(enemyPoint);
+
+                    boxOpenCoroutine = null;  // コルーチンの参照をクリア
+
+                    yield break;
                 }
-                else if (turnController.randomObject.tag == "Explosion")
+                else if (this.gameObject.tag == "Explosion")
                 {
 
                     bomb.SetActive(true);
@@ -430,8 +448,6 @@ public class CollisionController : MonoBehaviour
 
                     enemyPoint = 0;
 
-                    turnController.randomObject.tag = "Cube";
-
                     //Animation Eventを使ってboxOpenを行う
                     animator.SetBool("open", false);
 
@@ -439,11 +455,18 @@ public class CollisionController : MonoBehaviour
 
                     GetComponent<AudioSource>().PlayOneShot(explsionSound);
 
+                    this.gameObject.tag = "Cube";
                     yield return new WaitForSeconds(1f);
+
+                    boxOpenCoroutine = null;  // コルーチンの参照をクリア
+
+                    yield break;
                 }
             }
             yield return null;  // 次のフレームへ
         }
+        // ループを抜ける場合も `boxOpenCoroutine = null;` を実行
+        boxOpenCoroutine = null;
     }
 
     private void OpenSe()
