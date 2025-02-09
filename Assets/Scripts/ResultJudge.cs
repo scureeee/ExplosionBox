@@ -37,14 +37,14 @@ public class ResultJudge : MonoBehaviour
             SceneManager.LoadScene("ResultScene");
         }
 
-        if(TurnController.enemyPoint == OptionController.maxPoint)
+        if(TurnController.enemyPoint >= OptionController.maxPoint)
         {
             ResultText.resultNumber = 3;
             Debug.Log("Point You LOSE");
             SceneManager.LoadScene("ResultScene");
         }
 
-        if(TurnController.playerPoint == OptionController.maxPoint)
+        if(TurnController.playerPoint >= OptionController.maxPoint)
         {
             ResultText.resultNumber = 4;
             Debug.Log("Point You WIN");

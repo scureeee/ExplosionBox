@@ -68,13 +68,13 @@ public class ResultText : MonoBehaviour
             draw.SetActive(true);
         }
 
-        playerLifeText.text = "PlayerLife: "  + TurnController.playerLife;
+        playerLifeText.text = ""  + TurnController.playerLife;
 
-        enemyLifeText.text = "EnemyLife: " + TurnController.enemyLife;
+        enemyLifeText.text = "" + TurnController.enemyLife;
 
-        playerPointText.text = "PlayerPoint: " + TurnController.playerPoint;
+        playerPointText.text = "" + TurnController.playerPoint;
 
-        enemyPointText.text = "EnemyPoint: " + TurnController.enemyPoint;
+        enemyPointText.text = "" + TurnController.enemyPoint;
     }
 
     public void BuckTitle()
