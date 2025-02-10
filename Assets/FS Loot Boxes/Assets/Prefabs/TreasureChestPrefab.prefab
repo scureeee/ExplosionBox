@@ -773,7 +773,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
@@ -970,6 +970,7 @@ MonoBehaviour:
   animator: {fileID: 3471643304249230964}
   particleSystem: {fileID: 693930932380841069}
   cameraBuck: 1
+  isPaused: 0
 --- !u!135 &424312692020983575
 SphereCollider:
   m_ObjectHideFlags: 0

@@ -103,8 +103,6 @@ public class ClickController : MonoBehaviour
 
                         targetPosition = hit.point;
 
-                        optionController.choiceTime = 60f;
-
                         // ƒtƒ‰ƒO‚ð—LŒø‰»
                         isMoving = true;
 

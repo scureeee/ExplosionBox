@@ -40,7 +40,7 @@ namespace optionSpace
 
             maxPoint = 18;
 
-            maxTurn = 5;
+            maxTurn = 9;
 
             maxLife = 2;
 

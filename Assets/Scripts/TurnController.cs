@@ -74,6 +74,8 @@ public class TurnController : MonoBehaviour
 
     private bool nextTrigger = true;
 
+    public bool canselTriger = false;
+
     public enum PhaseState
     {
         EnemyChoiceToSetBomb,
@@ -189,12 +191,16 @@ public class TurnController : MonoBehaviour
         //Debug.Log(turnCount);
         //Debug.Log(enemyPoint);
         //Debug.Log(objectArray.Length);
-        //Debug.Log("choice"+ optionController.choiceTime);
+        Debug.Log("choice"+ optionController.choiceTime);
         //時間制限で箱をランダムで選択
         if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.PlayerChoiceToOpenBox)
         {
-            //待機時間
-            optionController.choiceTime -= Time.deltaTime;
+
+            if(!canselTriger)
+            {
+                //待機時間
+                optionController.choiceTime -= Time.deltaTime;
+            }
 
             if (optionController.choiceTime <= 0f)
             {
@@ -237,7 +243,7 @@ public class TurnController : MonoBehaviour
                     // フラグを有効化
                     clickController.isMoving = true;
 
-                    optionController.choiceTime = 60f;
+                    canselTriger = true;
 
                     optionController.openTime = 0f;
 
@@ -259,10 +265,13 @@ public class TurnController : MonoBehaviour
 
         enemyLifeText.text = "" + enemyLife;
 
-        if(optionController.choiceTime <= 30)
+        if (currentState == PhaseState.PlayerChoiceToOpenBox)
         {
-            countText.enabled = true;
-            countText.text = "残り" + optionController.choiceTime;
+            if (optionController.choiceTime <= 30)
+            {
+                countText.enabled = true;
+                countText.text = "残り" + optionController.choiceTime;
+            }
         }
     }
 

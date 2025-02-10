@@ -279,6 +279,8 @@ public class CollisionController : MonoBehaviour
 
         buckBotton.SetActive(false);
 
+        optionController.choiceTime = 60f;
+
         optionController.openTime = 60f;
     }
 
@@ -309,6 +311,8 @@ public class CollisionController : MonoBehaviour
     {
         GetComponent<AudioSource>().PlayOneShot(canselSound);
 
+        turnController.canselTriger = false;
+
         turnController.BuckState();
 
         cameraBuck = false;
@@ -320,8 +324,6 @@ public class CollisionController : MonoBehaviour
         openBotton.SetActive(true);
 
         buckBotton.SetActive(true);
-
-        optionController.choiceTime = 60f;
     }
 
     public void DeliveryBoxOpen()
@@ -453,6 +455,7 @@ public class CollisionController : MonoBehaviour
 
                     Debug.Log("EnemyがExplosionを触った");
 
+                    StartCoroutine(imageController.ExplosionSwitch());
                     GetComponent<AudioSource>().PlayOneShot(explsionSound);
 
                     this.gameObject.tag = "Cube";
