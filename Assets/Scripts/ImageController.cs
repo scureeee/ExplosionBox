@@ -12,8 +12,6 @@ public class ImageController : MonoBehaviour
     public Sprite enemySet;
     public Sprite enemyOpen;
 
-    private float delayTime = 1f; // F‚ğ•Ï‚¦‚é‚Ü‚Å‚Ì’x‰„ŠÔi•bj
-
     public GameObject explosion;
 
     public GameObject safe;

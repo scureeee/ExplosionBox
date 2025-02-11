@@ -272,7 +272,7 @@ public class TurnController : MonoBehaviour
             if (optionController.choiceTime <= 30)
             {
                 countText.enabled = true;
-                countText.text = "残り" + optionController.choiceTime;
+                countText.text = "" + optionController.choiceTime;
             }
         }
     }
