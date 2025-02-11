@@ -180,7 +180,7 @@ public class TurnController : MonoBehaviour
 
         startPosition = turnPanel.transform.position;
         // 200px下に移動
-        targetPosition = new Vector3(startPosition.x, startPosition.y - 200, startPosition.z);
+        targetPosition = new Vector3(startPosition.x, startPosition.y - 1, startPosition.z);
         StartCoroutine(AnimatePanel());
     }
 

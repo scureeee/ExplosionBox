@@ -147,7 +147,7 @@ public class CamController : MonoBehaviour
         // Œ»İ‚Ìstate‚ğæ“¾
         TurnController.PhaseState currentState = turnController.GetCurrentState();
 
-        alpha += 0.01f;
+        alpha += 1f;
 
         fadeAlpha.color = new Color(0,0,0,alpha);
 
