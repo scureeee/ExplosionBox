@@ -24,6 +24,8 @@ namespace optionSpace
         public float openTime = 60f;
 
         public bool clickNext = false;
+
+        public bool canselTime = false;
         // Start is called before the first frame update
         void Start()
         {
@@ -40,7 +42,7 @@ namespace optionSpace
 
             maxPoint = 18;
 
-            maxTurn = 9;
+            maxTurn = 10;
 
             maxLife = 2;
 

@@ -313,6 +313,8 @@ public class CollisionController : MonoBehaviour
 
         turnController.canselTriger = false;
 
+        optionController.canselTime = true;
+
         turnController.BuckState();
 
         cameraBuck = false;

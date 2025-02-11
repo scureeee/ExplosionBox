@@ -1,3 +1,4 @@
+using optionSpace;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,8 @@ public class CamController : MonoBehaviour
     // カメラ関連
 
     private CollisionController collisionController;
+
+    private OptionController optionController;
 
     // メインカメラをアサインする
     public Camera mainCamera;
@@ -46,6 +49,8 @@ public class CamController : MonoBehaviour
         collisionController = FindObjectOfType<CollisionController>();
 
         turnController = FindObjectOfType<TurnController>();
+
+        optionController = FindObjectOfType<OptionController>();
 
         // 初期カメラ位置を記録
         cameraStartPosition = mainCamera.transform.position;
@@ -95,7 +100,15 @@ public class CamController : MonoBehaviour
 
     public IEnumerator CameraBack()
     {
-        yield return new WaitForSeconds(5f);
+        if(optionController.canselTime == false)
+        {
+            yield return new WaitForSeconds(5f);
+        }
+        else if(optionController.canselTime == true)
+        {
+            optionController.canselTime = false;
+            yield return new WaitForSeconds(2f);
+        }
         mainCamera.transform.position = cameraStartPosition;
 
         collisionController.cameraBuck = true;

@@ -22,7 +22,7 @@ public class TurnController : MonoBehaviour
 
     private OptionController optionController;
 
-    public float turnCount = 0f;
+    public int turnCount;
 
     // 生成するオブジェクトのPrefab
     public GameObject objectPrefab;
@@ -129,6 +129,8 @@ public class TurnController : MonoBehaviour
 
     void Start()
     {
+        turnCount = 1;
+
         playerPoint = 0;
 
         enemyPoint = 0;
