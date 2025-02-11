@@ -317,7 +317,7 @@ public class TurnController : MonoBehaviour
 
     void DecideFirstTurn()
     {
-        firstTurn = Random.Range(0, 1);
+        firstTurn = Random.Range(0, 2);
 
         if (firstTurn == 0)
         {
