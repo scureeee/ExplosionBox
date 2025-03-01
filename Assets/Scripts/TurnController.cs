@@ -130,6 +130,8 @@ public class TurnController : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        Debug.Log("Startメソッドが実行された");
+
         turnCount = 1;
 
         playerPoint = 0;
@@ -280,6 +282,8 @@ public class TurnController : MonoBehaviourPunCallbacks
 
     void GenerateObjectsInCircle(int numberOfObjects)
     {
+        if (!PhotonNetwork.IsMasterClient) return; // マスタークライアントのみオブジェクト生成
+
         for (int i = 0; i < numberOfObjects; i++)
         {
             // 配置角度を計算
