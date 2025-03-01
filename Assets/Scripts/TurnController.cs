@@ -135,6 +135,7 @@ public class TurnController : MonoBehaviour
         photonView = GetComponent<PhotonView>();
 
         optionController = OptionController.Instance;
+        if (optionController == null) Debug.LogError("OptionController が見つかりません！");
     }
 
     void Start()
