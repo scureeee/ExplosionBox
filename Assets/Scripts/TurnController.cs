@@ -130,6 +130,10 @@ public class TurnController : MonoBehaviour
         {11,PhaseState.PlayerOpenBox},
     };
 
+    void Awake()
+    {
+        photonView = GetComponent<PhotonView>();
+    }
 
     void Start()
     {
@@ -139,7 +143,6 @@ public class TurnController : MonoBehaviour
         playerLife = OptionController.maxLife;
         enemyLife = OptionController.maxLife;
 
-        photonView = GetComponent<PhotonView>();
         optionController = FindObjectOfType<OptionController>();
         clickController = FindObjectOfType<ClickController>();
         enemyMoveController = FindObjectOfType<EnemyMoveController>();
