@@ -13,6 +13,8 @@ using Photon.Pun;
 
 public class TurnController : MonoBehaviour
 {
+    private PhotonView photonView;
+
     private int firstTurn;
 
     private ClickController clickController;
@@ -128,59 +130,38 @@ public class TurnController : MonoBehaviour
         {11,PhaseState.PlayerOpenBox},
     };
 
+
     void Start()
     {
         turnCount = 1;
-
         playerPoint = 0;
-
         enemyPoint = 0;
-
         playerLife = OptionController.maxLife;
-
         enemyLife = OptionController.maxLife;
 
+        photonView = GetComponent<PhotonView>();
         optionController = FindObjectOfType<OptionController>();
-
         clickController = FindObjectOfType<ClickController>();
-
         enemyMoveController = FindObjectOfType<EnemyMoveController>();
-
         imageController = FindObjectOfType<ImageController>();
 
-        SetFirstPlayerOrder(true);
-
-        // サンプル：現在の順序をデバッグ出力
-        foreach (var pair in currentState)
+        if (PhotonNetwork.IsMasterClient)  // マスタークライアントだけが実行
         {
-            Debug.Log($"Index: {pair.Key}, State: {pair.Value}");
+            SetFirstPlayerOrder(true);
+
+            int numberOfObjects = optionController.objectCountToSet;
+            if (numberOfObjects > 0)
+            {
+                objectArray = new GameObject[numberOfObjects];
+                objectNumberMapping = new Dictionary<GameObject, int>();
+                GenerateObjectsInCircle(numberOfObjects);
+            }
+
+            photonView.RPC("DecideFirstTurnRPC", RpcTarget.AllBuffered);
         }
-
-        // DataManagerから設定されたオブジェクト数を取得
-        int numberOfObjects = DataManager.Instance.objectCount;
-        Debug.Log($"DataManager.instance.objectCount: {numberOfObjects}");
-
-        if (numberOfObjects <= 0)
-        {
-            Debug.LogWarning("オブジェクト数が0または負の値です。生成をスキップします。");
-            return;
-        }
-
-        // 配列と辞書を初期化
-        objectArray = new GameObject[numberOfObjects];
-        objectNumberMapping = new Dictionary<GameObject, int>();
-
-        // オブジェクト生成
-        GenerateObjectsInCircle(numberOfObjects);
-
-        // ターンの決定
-        Debug.Log("オブジェクト生成が完了しました。DecideFirstTurnを実行します。");
-        DecideFirstTurn();
 
         optionController.choiceTime = 60f;
-
         startPosition = turnPanel.transform.position;
-        // 200px下に移動
         targetPosition = new Vector3(startPosition.x, startPosition.y - 1, startPosition.z);
         StartCoroutine(AnimatePanel());
     }
@@ -278,22 +259,36 @@ public class TurnController : MonoBehaviour
         }
     }
 
+    [PunRPC]
+    void SyncTurnData(int turn, int pLife, int eLife, int pPoint, int ePoint)
+    {
+        turnCount = turn;
+        playerLife = pLife;
+        enemyLife = eLife;
+        playerPoint = pPoint;
+        enemyPoint = ePoint;
+    }
+
     void GenerateObjectsInCircle(int numberOfObjects)
     {
         for (int i = 0; i < numberOfObjects; i++)
         {
-            // 配置角度を計算
             float angle = i * Mathf.PI * 2 / numberOfObjects;
             Vector3 position = new Vector3(Mathf.Cos(-angle) * radius, 0, Mathf.Sin(-angle) * radius);
 
-            // オブジェクト生成
-            GameObject obj = PhotonNetwork.Instantiate("TreasureChestPrefab", position, Quaternion.identity);
+            GameObject obj;
+            if (PhotonNetwork.IsMasterClient)
+            {
+                obj = PhotonNetwork.Instantiate("TreasureChestPrefab", position, Quaternion.identity);
+            }
+            else
+            {
+                obj = new GameObject("PlaceholderObject");
+                obj.transform.position = position;
+            }
+
             objectArray[i] = obj;
-
-            // 各オブジェクトに一意の番号を割り当て
             objectNumberMapping[obj] = i;
-
-            // オブジェクトの名前に番号を設定
             obj.name = $"Object_{i}";
 
             //TextMeshProの追加
@@ -309,13 +304,11 @@ public class TurnController : MonoBehaviour
             tmp.fontSize = 10;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = Color.red;
-
-
-            //Debug.Log($"Object created: {obj.name}, Assigned Number: {i}");
         }
-        Debug.Log($"Total objects generated: {objectArray.Length}");
     }
 
+    // マスタークライアントが決定したターン情報を全クライアントに共有
+    [PunRPC]
     void DecideFirstTurn()
     {
         firstTurn = Random.Range(0, 2);
@@ -348,31 +341,29 @@ public class TurnController : MonoBehaviour
     {
         return currentState[currentIndex];
     }
-    
+
     public IEnumerator NextState()
     {
-        Debug.Log("state");
+        if (!PhotonNetwork.IsMasterClient) yield break; // マスタークライアントのみが制御
 
         PhaseState currentState = GetCurrentState();
-        
-        if(currentState == PhaseState.EnemyOpenBox || currentState == PhaseState.PlayerOpenBox)
+
+        if (currentState == PhaseState.EnemyOpenBox || currentState == PhaseState.PlayerOpenBox)
         {
-            if(nextTrigger == true)
+            if (nextTrigger)
             {
                 nextTrigger = false;
-                Debug.Log("松");
                 yield return new WaitForSeconds(5f);
-                Next();
+                photonView.RPC("Next", RpcTarget.AllBuffered);
             }
         }
         else
         {
-            Debug.Log("next");
-            Next();
-            yield return null;
+            photonView.RPC("Next", RpcTarget.AllBuffered);
         }
     }
-    
+
+    [PunRPC]
     public void Next()
     {
         // 次のインデックスに進む

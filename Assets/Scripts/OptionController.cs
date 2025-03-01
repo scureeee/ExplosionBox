@@ -52,7 +52,7 @@ namespace optionSpace
         // Update is called once per frame
         void Update()
         {
-            DataManager.Instance.objectCount = objectCountToSet;
+            
         }
     }
 }
