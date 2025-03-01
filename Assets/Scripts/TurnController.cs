@@ -144,9 +144,16 @@ public class TurnController : MonoBehaviour
         enemyLife = OptionController.maxLife;
 
         optionController = FindObjectOfType<OptionController>();
+        if (optionController == null) Debug.LogError("OptionController が見つかりません！");
+
         clickController = FindObjectOfType<ClickController>();
+        if (clickController == null) Debug.LogError("ClickController が見つかりません！");
+
         enemyMoveController = FindObjectOfType<EnemyMoveController>();
+        if (enemyMoveController == null) Debug.LogError("EnemyMoveController が見つかりません！");
+
         imageController = FindObjectOfType<ImageController>();
+        if (imageController == null) Debug.LogError("ImageController が見つかりません！");
 
         if (PhotonNetwork.IsMasterClient)  // マスタークライアントだけが実行
         {
@@ -162,9 +169,20 @@ public class TurnController : MonoBehaviour
 
             photonView.RPC("DecideFirstTurnRPC", RpcTarget.AllBuffered);
         }
+        else
+        {
+            Debug.LogError("OptionController が見つかりません！ objectCountToSet にアクセスできません！");
+        }
 
         optionController.choiceTime = 60f;
-        startPosition = turnPanel.transform.position;
+        if (turnPanel == null)
+        {
+            Debug.LogError("turnPanel が設定されていません！");
+        }
+        else
+        {
+            startPosition = turnPanel.transform.position;
+        }
         targetPosition = new Vector3(startPosition.x, startPosition.y - 1, startPosition.z);
         StartCoroutine(AnimatePanel());
     }
@@ -342,6 +360,18 @@ public class TurnController : MonoBehaviour
     // 現在のstateを取得する
     public PhaseState GetCurrentState()
     {
+        if (currentState == null)
+        {
+            Debug.LogError("currentState が null です！");
+            return PhaseState.PlayerChoiceToSetBomb; // デフォルト値を返す
+        }
+
+        if (!currentState.ContainsKey(currentIndex))
+        {
+            Debug.LogError($"currentIndex({currentIndex}) が currentState の範囲外です！");
+            return PhaseState.PlayerChoiceToSetBomb; // デフォルト値を返す
+        }
+
         return currentState[currentIndex];
     }
 
