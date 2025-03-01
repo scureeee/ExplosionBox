@@ -161,7 +161,8 @@ PlayerSettings:
   resetResolutionOnWindowResize: 0
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
-  applicationIdentifier: {}
+  applicationIdentifier:
+    Standalone: com.DefaultCompany.---------------------
   buildNumber:
     Standalone: 0
     VisionOS: 0
@@ -835,7 +836,24 @@ PlayerSettings:
   webGLMemoryGeometricGrowthStep: 0.2
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Android: 
+    EmbeddedLinux: 
+    GameCoreScarlett: 
+    GameCoreXboxOne: 
+    LinuxHeadlessSimulation: 
+    Nintendo Switch: 
+    PS4: 
+    PS5: 
+    QNX: 
+    Stadia: 
+    Standalone: 
+    VisionOS: 
+    WebGL: 
+    Windows Store Apps: 
+    XboxOne: 
+    iPhone: 
+    tvOS: 
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
@@ -867,8 +885,8 @@ PlayerSettings:
   apiCompatibilityLevelPerPlatform: {}
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: "\u7206\u7834\u30DE\u30B9\u30B2\u30FC\u30E0"
-  metroPackageVersion: 
+  metroPackageName: 
+  metroPackageVersion: 1.0.0.0
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
@@ -876,7 +894,7 @@ PlayerSettings:
   metroCertificateNotAfter: 0000000000000000
   metroApplicationDescription: "\u7206\u7834\u30DE\u30B9\u30B2\u30FC\u30E0"
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: "\u7206\u7834\u30DE\u30B9\u30B2\u30FC\u30E0"
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0
@@ -944,10 +962,10 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: a043ebc8-7266-4fcb-abc5-dcd990623fde
+  cloudProjectId: 7eb61658-c8c0-4ada-85ed-2dc75f7f851e
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: "\u7206\u7834\u30DE\u30B9\u30B2\u30FC\u30E0 2024-11-08_23-07-00"
+  projectName: ExplosionBox
   organizationId: sba2359g10002-edu-sba-ac-jp
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
