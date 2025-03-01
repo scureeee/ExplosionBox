@@ -137,6 +137,7 @@ public class TurnController : MonoBehaviour
 
     void Start()
     {
+        int count = OptionController.Instance.objectCountToSet;
         turnCount = 1;
         playerPoint = 0;
         enemyPoint = 0;
@@ -159,7 +160,7 @@ public class TurnController : MonoBehaviour
         {
             SetFirstPlayerOrder(true);
 
-            int numberOfObjects = optionController.objectCountToSet;
+            int numberOfObjects = count;
             if (numberOfObjects > 0)
             {
                 objectArray = new GameObject[numberOfObjects];
@@ -171,7 +172,7 @@ public class TurnController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("OptionController が見つかりません！ objectCountToSet にアクセスできません！");
+            Debug.LogError("OptionController が見つかりません！ Count にアクセスできません！");
         }
 
         optionController.choiceTime = 60f;
