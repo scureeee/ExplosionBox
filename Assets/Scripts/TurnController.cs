@@ -156,7 +156,7 @@ public class TurnController : MonoBehaviour
         }
 
         // DataManagerから設定されたオブジェクト数を取得
-        int numberOfObjects = DataManager.Instance.objectCount;
+        int numberOfObjects = optionController.objectCountToSet;
         Debug.Log($"DataManager.instance.objectCount: {numberOfObjects}");
 
         if (numberOfObjects <= 0)

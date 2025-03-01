@@ -30,7 +30,10 @@ namespace optionSpace
         void Start()
         {
 
+        }
 
+        private void Awake()
+        {
             if (Instance == null)
             {
                 Instance = this;
@@ -47,12 +50,6 @@ namespace optionSpace
             maxLife = 2;
 
             objectCountToSet = 8;
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            DataManager.Instance.objectCount = objectCountToSet;
         }
     }
 }
