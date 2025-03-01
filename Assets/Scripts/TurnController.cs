@@ -133,20 +133,12 @@ public class TurnController : MonoBehaviour
     void Awake()
     {
         photonView = GetComponent<PhotonView>();
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+
+        optionController = OptionController.Instance;
     }
 
     void Start()
     {
-        int count = OptionController.Instance.objectCountToSet;
         turnCount = 1;
         playerPoint = 0;
         enemyPoint = 0;
@@ -155,6 +147,8 @@ public class TurnController : MonoBehaviour
 
         optionController = FindObjectOfType<OptionController>();
         if (optionController == null) Debug.LogError("OptionController が見つかりません！");
+
+        int count = OptionController.Instance.objectCountToSet;
 
         clickController = FindObjectOfType<ClickController>();
         if (clickController == null) Debug.LogError("ClickController が見つかりません！");
