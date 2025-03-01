@@ -9,8 +9,9 @@ using JetBrains.Annotations;
 using Unity.VisualScripting;
 using optionSpace;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 
-public class TurnController : MonoBehaviour
+public class TurnController : MonoBehaviourPunCallbacks
 {
     private int firstTurn;
 
@@ -286,7 +287,7 @@ public class TurnController : MonoBehaviour
             Vector3 position = new Vector3(Mathf.Cos(-angle) * radius, 0, Mathf.Sin(-angle) * radius);
 
             // オブジェクト生成
-            GameObject obj = Instantiate(objectPrefab, position, Quaternion.identity, transform);
+            GameObject obj = PhotonNetwork.Instantiate("TreasureChestPrefab", position, Quaternion.identity);
             objectArray[i] = obj;
 
             // 各オブジェクトに一意の番号を割り当て
