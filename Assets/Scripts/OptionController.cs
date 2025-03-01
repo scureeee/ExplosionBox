@@ -26,11 +26,6 @@ namespace optionSpace
         public bool clickNext = false;
 
         public bool canselTime = false;
-        // Start is called before the first frame update
-        void Start()
-        {
-
-        }
 
         private void Awake()
         {
