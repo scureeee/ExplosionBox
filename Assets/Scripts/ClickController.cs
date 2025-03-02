@@ -39,6 +39,13 @@ public class ClickController : MonoBehaviour
 
         turnController = FindObjectOfType<TurnController>();
 
+        StartCoroutine(WaitForTurnController());
+
+        if (turnController != null)
+        {
+            turnController.InitializeObjectArray();
+        }
+
         StartCoroutine(BuildNavMeshAsync());
     }
 
@@ -121,11 +128,40 @@ public class ClickController : MonoBehaviour
         }
     }
 
+    IEnumerator WaitForTurnController()
+    {
+        while (turnController == null || turnController.objectArray == null)
+        {
+            Debug.Log("WaitForTurnController: TurnController または objectArray が null です。待機中...");
+            yield return new WaitForSeconds(0.5f);
+            turnController = FindObjectOfType<TurnController>();
+        }
+        Debug.Log("WaitForTurnController: TurnController の準備完了！");
+    }
+
     // クリックしたオブジェクト以外のコライダーを無効化するメソッド
     public void DeactivateOtherColliders(GameObject clickedObject)
     {
+        if (turnController == null)
+        {
+            Debug.LogError("DeactivateOtherColliders: turnController が null です。");
+            return;
+        }
+
+        if (turnController.objectArray == null)
+        {
+            Debug.LogError("DeactivateOtherColliders: objectArray が null です。");
+            return;
+        }
+
         foreach (GameObject obj in turnController.objectArray)
         {
+            if (obj == null)
+            {
+                Debug.LogWarning("DeactivateOtherColliders: objectArray に null の要素があります。");
+                continue;
+            }
+
             if (obj != clickedObject)
             {
                 Collider collider = obj.GetComponent<Collider>();

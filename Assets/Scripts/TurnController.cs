@@ -280,6 +280,12 @@ public class TurnController : MonoBehaviourPunCallbacks
         }
     }
 
+    public void InitializeObjectArray()
+    {
+        objectArray = GameObject.FindGameObjectsWithTag("Cube");
+        Debug.Log($"objectArray を初期化しました。要素数: {objectArray.Length}");
+    }
+
     void GenerateObjectsInCircle(int numberOfObjects)
     {
         if (!PhotonNetwork.IsMasterClient) return; // マスタークライアントのみオブジェクト生成
