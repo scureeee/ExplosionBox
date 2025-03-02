@@ -202,7 +202,7 @@ public class TurnController : MonoBehaviourPunCallbacks
         //Debug.Log(turnCount);
         //Debug.Log(enemyPoint);
         //Debug.Log(objectArray.Length);
-        Debug.Log("choice"+ optionController.choiceTime);
+        //Debug.Log("choice"+ optionController.choiceTime);
         //時間制限で箱をランダムで選択
         if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.PlayerChoiceToOpenBox)
         {
