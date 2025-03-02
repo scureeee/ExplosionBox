@@ -185,6 +185,12 @@ public class TurnController : MonoBehaviourPunCallbacks
         // 200px下に移動
         targetPosition = new Vector3(startPosition.x, startPosition.y - 1, startPosition.z);
         StartCoroutine(AnimatePanel());
+
+        if (objectArray == null || objectArray.Length == 0)
+        {
+            Debug.LogWarning("Start: objectArray が空なので初期化します。");
+            objectArray = GameObject.FindGameObjectsWithTag("Cube");
+        }
     }
 
     private void Update()
@@ -450,13 +456,26 @@ public class TurnController : MonoBehaviourPunCallbacks
         turnPanel.transform.position = endPos;
     }
 
-    public void NumberRandom()
+    public int NumberRandom()
     {
+        if (objectArray == null || objectArray.Length == 0)
+        {
+            Debug.LogError("NumberRandom: objectArray が空です。ランダム選択ができません。");
+            return -1; // エラー値を返す
+        }
+
         // ランダムにオブジェクトを選択
         int randomIndex = Random.Range(0, objectArray.Length);
-        randomObject = objectArray[randomIndex];
+        //randomObject = objectArray[randomIndex];
 
-        Debug.Log($"ランダムで{randomObject.name}を抽選");
+        if (randomIndex < 0 || randomIndex >= objectArray.Length)
+        {
+            Debug.LogError($"NumberRandom: 無効なインデックス {randomIndex} が生成されました。");
+            return -1;
+        }
+
+        return randomIndex;
+        //Debug.Log($"ランダムで{randomObject.name}を抽選");
     }
 
     public void EnemyBombSet()
@@ -498,7 +517,22 @@ public class TurnController : MonoBehaviourPunCallbacks
         enemyObject.SetActive(true);
 
         //Enemyがboxを選択する
-        NumberRandom();
+        int choiceIndex = NumberRandom();
+
+        if (choiceIndex == -1)
+        {
+            Debug.LogWarning("EnemyBoxChoice: ランダム選択に失敗したため処理をスキップします。");
+            return;
+        }
+
+        GameObject selectedBox = objectArray[choiceIndex]; // 安全に取得
+        if (selectedBox == null)
+        {
+            Debug.LogWarning("EnemyBoxChoice: 選択されたオブジェクトが null です。");
+            return;
+        }
+
+        Debug.Log($"EnemyBoxChoice: {selectedBox.name} を選択しました。");
 
         StartCoroutine(NextState());
 
