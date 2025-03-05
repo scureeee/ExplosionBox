@@ -139,6 +139,10 @@ public class TurnController : MonoBehaviourPunCallbacks
         enemyLife = OptionController.maxLife;
 
         optionController = FindObjectOfType<OptionController>();
+        if (optionController == null)
+        {
+            Debug.LogError("OptionController が見つかりません！シーンに OptionController を配置してください。");
+        }
 
         clickController = FindObjectOfType<ClickController>();
 
