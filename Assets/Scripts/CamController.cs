@@ -132,8 +132,6 @@ public class CamController : MonoBehaviour
             if (currentState == PhaseState.EnemyChoiceToOpenBox)
             {
                 Debug.Log(",dak,lda,l");
-
-                turnController.EnemyBoxChoice();
             }
             else if(currentState == PhaseState.EnemySetBomb)
             {
@@ -165,8 +163,6 @@ public class CamController : MonoBehaviour
                 Debug.Log("enemyˆÃ‚­");
 
                 StartCoroutine(turnController.NextState());
-
-                turnController.EnemyBombSet();
             }
         }
     }

@@ -10,14 +10,13 @@ using Unity.VisualScripting;
 using optionSpace;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
+using UnityEngine.UIElements;
 
 public class TurnController : MonoBehaviourPunCallbacks
 {
     private int firstTurn;
 
     private ClickController clickController;
-
-    private EnemyMoveController enemyMoveController;
 
     private ImageController imageController;
 
@@ -38,8 +37,6 @@ public class TurnController : MonoBehaviourPunCallbacks
     public Dictionary<GameObject, int> objectNumberMapping;
 
     public GameObject playerObject;
-
-    public GameObject enemyObject;
 
     public GameObject randomObject;
 
@@ -93,7 +90,6 @@ public class TurnController : MonoBehaviourPunCallbacks
         EnemyOpenBox
     }
 
-    //あとでアクセッサ入れる
     public Dictionary<int, PhaseState> currentState;
 
     private Dictionary<int, PhaseState> firstEnemyState = new Dictionary<int, PhaseState>
@@ -146,11 +142,11 @@ public class TurnController : MonoBehaviourPunCallbacks
 
         clickController = FindObjectOfType<ClickController>();
 
-        enemyMoveController = FindObjectOfType<EnemyMoveController>();
-
         imageController = FindObjectOfType<ImageController>();
 
-        SetFirstPlayerOrder(true);
+        var position = new Vector3(0, 0, 0);
+
+        PhotonNetwork.Instantiate("Player",position,Quaternion.identity);
 
         // サンプル：現在の順序をデバッグ出力
         foreach (var pair in currentState)
@@ -174,10 +170,12 @@ public class TurnController : MonoBehaviourPunCallbacks
 
         // オブジェクト生成
         GenerateObjectsInCircle(numberOfObjects);
-
-        // ターンの決定
-        Debug.Log("オブジェクト生成が完了しました。DecideFirstTurnを実行します。");
-        DecideFirstTurn();
+        if(PhotonNetwork.IsMasterClient)
+        {
+            // ターンの決定
+            Debug.Log("オブジェクト生成が完了しました。DecideFirstTurnを実行します。");
+            DecideFirstTurn();
+        }
 
         optionController.choiceTime = 60f;
 
@@ -339,14 +337,14 @@ public class TurnController : MonoBehaviourPunCallbacks
         if (firstTurn == 0)
         {
             Debug.Log("プレイヤーが先行です");
-            SetFirstPlayerOrder(true);
-            PlayerTurn();
+            //SetFirstPlayerOrder(true);
+            photonView.RPC("SetFirstPlayerOrder_RPC", RpcTarget.All, true);
         }
         else
         {
             Debug.Log("敵が先行です");
-            SetFirstPlayerOrder(false);
-            EnemyBombSet();
+            //SetFirstPlayerOrder(false);
+            photonView.RPC("SetFirstPlayerOrder_RPC", RpcTarget.All, false);
         }
     }
 
@@ -354,9 +352,17 @@ public class TurnController : MonoBehaviourPunCallbacks
     /// 先攻/後攻の順序を切り替える
     /// </summary>
     /// <param name="isFirst">trueならplayerが先攻、falseならplayerが後攻</param>
+    [PunRPC]
     public void SetFirstPlayerOrder(bool isFirst)
     {
-        currentState = isFirst ? firstPlayerState : firstEnemyState;
+        if (isFirst)
+        {
+            currentState = new Dictionary<int, PhaseState>(firstPlayerState);
+        }
+        else
+        {
+            currentState = new Dictionary<int, PhaseState>(firstEnemyState);
+        }
     }
 
     // 現在のstateを取得する
@@ -478,76 +484,12 @@ public class TurnController : MonoBehaviourPunCallbacks
         //Debug.Log($"ランダムで{randomObject.name}を抽選");
     }
 
-    public void EnemyBombSet()
-    {
-        Debug.Log("BombSite");
-
-        // プレイヤーオブジェクトを非アクティブ化
-        if (playerObject != null)
-        {
-            enemyObject.SetActive(true);
-
-            playerObject.SetActive(false);
-            Debug.Log("Player object deactivated.");
-        }
-
-        if (objectArray == null || objectArray.Length == 0)
-        {
-            Debug.LogWarning("objectArray が空です！");
-            return;
-        }
-
-        if (turnCount < OptionController.maxTurn)
-        {
-            NumberRandom();
-
-            enemyMoveController.enemyTarget = randomObject.transform.position;
-
-            enemyMoveController.enemyMoving = true;
-
-            // ランダムに選ばれたオブジェクトの情報を表示
-            //Debug.Log($"ランダムに選ばれたオブジェクト: {randomObject.name}, 割り当て番号: {assignedNumber}");
-        }
-    }
-
-    public void EnemyBoxChoice()
-    {
-        playerObject.SetActive(false);
-
-        enemyObject.SetActive(true);
-
-        //Enemyがboxを選択する
-        int choiceIndex = NumberRandom();
-
-        if (choiceIndex == -1)
-        {
-            Debug.LogWarning("EnemyBoxChoice: ランダム選択に失敗したため処理をスキップします。");
-            return;
-        }
-
-        GameObject selectedBox = objectArray[choiceIndex]; // 安全に取得
-        if (selectedBox == null)
-        {
-            Debug.LogWarning("EnemyBoxChoice: 選択されたオブジェクトが null です。");
-            return;
-        }
-
-        Debug.Log($"EnemyBoxChoice: {selectedBox.name} を選択しました。");
-
-        StartCoroutine(NextState());
-
-        enemyMoveController.enemyTarget = randomObject.transform.position;
-
-        enemyMoveController.enemyMoving = true;
-    }
 
    public void PlayerTurn()
     {
         Debug.Log("hiukuhjguigui");
 
         playerObject.SetActive(true);
-
-        enemyObject.SetActive(false);
     }
 
     public void Retirement()
