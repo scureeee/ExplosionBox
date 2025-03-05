@@ -148,6 +148,9 @@ public class TurnController : MonoBehaviourPunCallbacks
 
         PhotonNetwork.Instantiate("Player",position,Quaternion.identity);
 
+        Debug.Log("TurnController Start called");
+        Debug.Log("currentState is " + (currentState == null ? "NULL" : "NOT NULL"));
+
         // サンプル：現在の順序をデバッグ出力
         foreach (var pair in currentState)
         {
@@ -338,13 +341,13 @@ public class TurnController : MonoBehaviourPunCallbacks
         {
             Debug.Log("プレイヤーが先行です");
             //SetFirstPlayerOrder(true);
-            photonView.RPC("SetFirstPlayerOrder_RPC", RpcTarget.All, true);
+            photonView.RPC("SetFirstPlayerOrder", RpcTarget.All, true);
         }
         else
         {
             Debug.Log("敵が先行です");
             //SetFirstPlayerOrder(false);
-            photonView.RPC("SetFirstPlayerOrder_RPC", RpcTarget.All, false);
+            photonView.RPC("SetFirstPlayerOrder", RpcTarget.All, false);
         }
     }
 
@@ -355,6 +358,7 @@ public class TurnController : MonoBehaviourPunCallbacks
     [PunRPC]
     public void SetFirstPlayerOrder(bool isFirst)
     {
+        Debug.Log("SetFirstPlayerOrder called, isFirst: " + isFirst);
         if (isFirst)
         {
             currentState = new Dictionary<int, PhaseState>(firstPlayerState);
@@ -363,6 +367,7 @@ public class TurnController : MonoBehaviourPunCallbacks
         {
             currentState = new Dictionary<int, PhaseState>(firstEnemyState);
         }
+        Debug.Log("currentState is now " + (currentState == null ? "NULL" : "NOT NULL"));
     }
 
     // 現在のstateを取得する
