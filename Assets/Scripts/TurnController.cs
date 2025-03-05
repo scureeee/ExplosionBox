@@ -144,9 +144,17 @@ public class TurnController : MonoBehaviourPunCallbacks
 
         imageController = FindObjectOfType<ImageController>();
 
+        // 仮の初期化
+        currentState = new Dictionary<int, PhaseState>(firstPlayerState);
+
+        Debug.Log("仮のcurrentStateを初期化しました。");
+
         var position = new Vector3(0, 0, 0);
 
         PhotonNetwork.Instantiate("Player",position,Quaternion.identity);
+
+        // currentStateの状態を確認
+        Debug.Log("currentState is " + (currentState == null ? "NULL" : "NOT NULL"));
 
         Debug.Log("TurnController Start called");
         Debug.Log("currentState is " + (currentState == null ? "NULL" : "NOT NULL"));
@@ -359,13 +367,10 @@ public class TurnController : MonoBehaviourPunCallbacks
     public void SetFirstPlayerOrder(bool isFirst)
     {
         Debug.Log("SetFirstPlayerOrder called, isFirst: " + isFirst);
-        if (isFirst)
+        if (currentState == null) // 既にセットされていたら上書きしない
         {
-            currentState = new Dictionary<int, PhaseState>(firstPlayerState);
-        }
-        else
-        {
-            currentState = new Dictionary<int, PhaseState>(firstEnemyState);
+            currentState = isFirst ? new Dictionary<int, PhaseState>(firstPlayerState)
+                                   : new Dictionary<int, PhaseState>(firstEnemyState);
         }
         Debug.Log("currentState is now " + (currentState == null ? "NULL" : "NOT NULL"));
     }
@@ -373,6 +378,18 @@ public class TurnController : MonoBehaviourPunCallbacks
     // 現在のstateを取得する
     public PhaseState GetCurrentState()
     {
+        if (currentState == null)
+        {
+            Debug.LogError("GetCurrentState: currentState is NULL!! 仮の初期化を行います。");
+            currentState = new Dictionary<int, PhaseState>(firstPlayerState);
+            return PhaseState.PlayerChoiceToSetBomb; // デフォルトのフェーズを返す
+        }
+
+        if (!currentState.ContainsKey(currentIndex))
+        {
+            Debug.LogError($"GetCurrentState: Index {currentIndex} が currentState に存在しません。");
+            return PhaseState.PlayerChoiceToSetBomb; // デフォルトのフェーズを返す
+        }
         return currentState[currentIndex];
     }
     
