@@ -10,6 +10,8 @@ public class SceneController : MonoBehaviourPunCallbacks
 {
     public TextMeshProUGUI connectText;
 
+    public GameObject matchingBottom;
+
     // ルームの最大人数を2人にする
     private const int MaxPlayerPerRoom = 2;
 
@@ -44,6 +46,8 @@ public class SceneController : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         Debug.Log("マスターに繋ぎました。");
+
+        matchingBottom.SetActive(true);
     }
 
     public override void OnDisconnected(DisconnectCause cause)

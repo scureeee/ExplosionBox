@@ -666,7 +666,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1617239303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -680,6 +680,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectText: {fileID: 1730595754}
+  matchingBottom: {fileID: 856429458}
 --- !u!4 &1617239304
 Transform:
   m_ObjectHideFlags: 0
