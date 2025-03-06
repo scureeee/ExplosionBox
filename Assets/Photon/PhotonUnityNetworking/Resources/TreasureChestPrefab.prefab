@@ -901,7 +901,7 @@ GameObject:
   - component: {fileID: 4656519548358706588}
   m_Layer: 6
   m_Name: TreasureChestPrefab
-  m_TagString: Cube
+  m_TagString: Explosion
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1106,7 +1106,7 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
-  OwnershipTransfer: 0
+  OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
   - {fileID: 4656519548358706588}

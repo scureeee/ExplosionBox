@@ -153,9 +153,7 @@ public class TurnController : MonoBehaviourPunCallbacks
 
         Debug.Log("仮のcurrentStateを初期化しました。");
 
-        var position = new Vector3(0, 0, 0);
-
-        PhotonNetwork.Instantiate("Player",position,Quaternion.identity);
+        StartCoroutine(DelayedSpawn());
 
         // currentStateの状態を確認
         Debug.Log("currentState is " + (currentState == null ? "NULL" : "NOT NULL"));
@@ -203,6 +201,15 @@ public class TurnController : MonoBehaviourPunCallbacks
         {
             Debug.LogWarning("Start: objectArray が空なので初期化します。");
             objectArray = GameObject.FindGameObjectsWithTag("Cube");
+        }
+    }
+
+    IEnumerator DelayedSpawn()
+    {
+        yield return new WaitForSeconds(2f); // 2秒待ってから実行
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Instantiate("TreasureChestPrefab", new Vector3(0, 0, 0), Quaternion.identity);
         }
     }
 
