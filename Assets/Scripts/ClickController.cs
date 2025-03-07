@@ -63,10 +63,14 @@ public class ClickController : MonoBehaviour
 
             RaycastHit hit;
 
+            Debug.Log("click");
+
             //Rayを投射
             if (Physics.Raycast(ray, out hit))
             {
                 GameObject clickedObject = hit.collider.gameObject; // クリックしたオブジェクト
+
+                Debug.Log("hit");
 
                 //turnCountが整数か判別
                 if (currentState == PhaseState.PlayerChoiceToSetBomb)
