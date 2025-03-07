@@ -181,6 +181,8 @@ public class TurnController : MonoBehaviourPunCallbacks
         objectArray = new GameObject[numberOfObjects];
         objectNumberMapping = new Dictionary<GameObject, int>();
 
+        Debug.Log($"オブジェクト生成完了: objectArray.Length = {objectArray.Length}");
+
         // オブジェクト生成
         GenerateObjectsInCircle(numberOfObjects);
         if(PhotonNetwork.IsMasterClient)
@@ -346,8 +348,10 @@ public class TurnController : MonoBehaviourPunCallbacks
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = Color.red;
 
+            Debug.Log($"オブジェクト生成: {obj.name}, 位置: {position}");
 
-            //Debug.Log($"Object created: {obj.name}, Assigned Number: {i}");
+            // タグの確認
+            Debug.Log($"Object_{i} のタグ: {obj.tag}");
         }
         Debug.Log($"Total objects generated: {objectArray.Length}");
     }
@@ -499,22 +503,20 @@ public class TurnController : MonoBehaviourPunCallbacks
     {
         if (objectArray == null || objectArray.Length == 0)
         {
-            Debug.LogError("NumberRandom: objectArray が空です。ランダム選択ができません。");
-            return -1; // エラー値を返す
+            Debug.LogWarning("objectArray が空なので再取得を試みます...");
+            objectArray = GameObject.FindGameObjectsWithTag("Cube");
+
+            Debug.Log($"再取得後の objectArray.Length = {objectArray.Length}");
         }
 
-        // ランダムにオブジェクトを選択
-        int randomIndex = Random.Range(0, objectArray.Length);
-        //randomObject = objectArray[randomIndex];
-
-        if (randomIndex < 0 || randomIndex >= objectArray.Length)
+        if (objectArray == null || objectArray.Length == 0)
         {
-            Debug.LogError($"NumberRandom: 無効なインデックス {randomIndex} が生成されました。");
+            Debug.LogError("NumberRandom: objectArray が空です。ランダム選択ができません。");
             return -1;
         }
 
+        int randomIndex = Random.Range(0, objectArray.Length);
         return randomIndex;
-        //Debug.Log($"ランダムで{randomObject.name}を抽選");
     }
 
 
