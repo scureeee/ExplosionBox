@@ -206,10 +206,10 @@ public class TurnController : MonoBehaviourPunCallbacks
 
     IEnumerator DelayedSpawn()
     {
-        yield return new WaitForSeconds(2f); // 2秒待ってから実行
+        yield return new WaitForSeconds(2f);
         if (PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.Instantiate("TreasureChestPrefab", new Vector3(0, 0, 0), Quaternion.identity);
+            PhotonNetwork.Instantiate("Player", new Vector3(0, 0, 0), Quaternion.identity);
         }
     }
 
