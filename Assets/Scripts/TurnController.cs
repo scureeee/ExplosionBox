@@ -209,8 +209,6 @@ public class TurnController : MonoBehaviourPunCallbacks
             objectArray = GameObject.FindGameObjectsWithTag("Cube");
         }
 
-        StartTurn();
-
         Debug.Log(currentState);
     }
 
@@ -394,7 +392,10 @@ public class TurnController : MonoBehaviourPunCallbacks
             currentState = isFirst ? new Dictionary<int, PhaseState>(firstPlayerState)
                                    : new Dictionary<int, PhaseState>(firstEnemyState);
         }
+        
         Debug.Log("currentState is now " + (currentState == null ? "NULL" : "NOT NULL"));
+
+        StartTurn();
     }
 
     private void StartTurn()
