@@ -385,14 +385,16 @@ public class TurnController : MonoBehaviourPunCallbacks
     {
         Debug.Log("SetFirstPlayerOrder called, isFirst: " + isFirst);
 
-        isPlayerFirst = isFirst; // 先行プレイヤーを判定
+        isPlayerFirst = isFirst; // 先行プレイヤーを設定
 
-        if (currentState == null) // 既にセットされていたら上書きしない
-        {
-            currentState = isFirst ? new Dictionary<int, PhaseState>(firstPlayerState)
-                                   : new Dictionary<int, PhaseState>(firstEnemyState);
-        }
-        
+        // 先攻/後攻に応じて currentState を設定
+        currentState = isFirst ? new Dictionary<int, PhaseState>(firstPlayerState)
+                               : new Dictionary<int, PhaseState>(firstEnemyState);
+
+        // インデックスをリセット
+        currentIndex = 0;
+
+        Debug.Log($"先攻: {(isFirst ? "プレイヤー" : "敵")}");
         Debug.Log("currentState is now " + (currentState == null ? "NULL" : "NOT NULL"));
 
         StartTurn();
