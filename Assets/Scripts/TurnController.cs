@@ -402,21 +402,25 @@ public class TurnController : MonoBehaviourPunCallbacks
         if (isPlayerFirst)
         {
             MyPhase();
+            Debug.Log("先行");
         }
         else
         {
             OtherPhase();
+            Debug.Log("後攻");
         }
     }
 
     public void MyPhase()
     {
         isMyFaPhase = true;
+        Debug.Log("先行");
     }
 
     public void OtherPhase()
     {
         isMyFaPhase = false;
+        Debug.Log("後攻");
     }
 
     // 現在のstateを取得する
