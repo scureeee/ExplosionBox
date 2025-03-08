@@ -72,54 +72,56 @@ public class ClickController : MonoBehaviour
 
                 Debug.Log("hit");
 
-                //turnCountが整数か判別
-                if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
+                if(turnController.isMyPhase)
                 {
-                    if (hit.collider.CompareTag("Cube"))
+                    //turnCountが整数か判別
+                    if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
                     {
-                        hit.collider.gameObject.tag = "Explosion";
+                        if (hit.collider.CompareTag("Cube"))
+                        {
+                            hit.collider.gameObject.tag = "Explosion";
 
-                        Debug.Log($"オブジェクト{hit.collider.gameObject.name}のタグを'Explosion'に変更しました。");
+                            Debug.Log($"オブジェクト{hit.collider.gameObject.name}のタグを'Explosion'に変更しました。");
 
-                        // NavMeshの非同期構築を開始
-                        StartCoroutine(BuildNavMeshAsync());
+                            // NavMeshの非同期構築を開始
+                            StartCoroutine(BuildNavMeshAsync());
 
-                        // クリックしたオブジェクト以外のコライダーを無効化
-                        DeactivateOtherColliders(clickedObject);
+                            // クリックしたオブジェクト以外のコライダーを無効化
+                            DeactivateOtherColliders(clickedObject);
 
-                        targetPosition = hit.point;
+                            targetPosition = hit.point;
 
-                        optionController.choiceTime = 60f;
+                            optionController.choiceTime = 60f;
 
-                        // フラグを有効化
-                        isMoving = true;
+                            // フラグを有効化
+                            isMoving = true;
 
-                        turnController.countText.enabled = false;
+                            turnController.countText.enabled = false;
 
-                        StartCoroutine(turnController.NextState());
+                            StartCoroutine(turnController.NextState());
+                        }
                     }
-                }
-                //後で変える
-                else if(currentState == PhaseState.PlayerChoiceToOpenBox || currentState == PhaseState.EnemyChoiceToOpenBox)
-                {
-                    //タグを比較
-                    //explosionが付いていない
-                    if (hit.collider.CompareTag("Cube") || hit.collider.CompareTag("Explosion"))
+                    else if (currentState == PhaseState.PlayerChoiceToOpenBox || currentState == PhaseState.EnemyChoiceToOpenBox)
                     {
-                        // NavMeshの非同期構築を開始
-                        StartCoroutine(BuildNavMeshAsync());
+                        //タグを比較
+                        //explosionが付いていない
+                        if (hit.collider.CompareTag("Cube") || hit.collider.CompareTag("Explosion"))
+                        {
+                            // NavMeshの非同期構築を開始
+                            StartCoroutine(BuildNavMeshAsync());
 
-                        // クリックしたオブジェクト以外のコライダーを無効化
-                        DeactivateOtherColliders(clickedObject);
+                            // クリックしたオブジェクト以外のコライダーを無効化
+                            DeactivateOtherColliders(clickedObject);
 
-                        targetPosition = hit.point;
+                            targetPosition = hit.point;
 
-                        // フラグを有効化
-                        isMoving = true;
+                            // フラグを有効化
+                            isMoving = true;
 
-                        turnController.countText.enabled = false;
+                            turnController.countText.enabled = false;
 
-                        StartCoroutine(turnController.NextState());
+                            StartCoroutine(turnController.NextState());
+                        }
                     }
                 }
             }

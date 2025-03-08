@@ -76,7 +76,7 @@ public class TurnController : MonoBehaviourPunCallbacks
 
     private bool isPlayerFirst;
 
-    public bool isMyFaPhase = false;
+    public bool isMyPhase = false;
 
     public enum PhaseState
     {
@@ -210,6 +210,8 @@ public class TurnController : MonoBehaviourPunCallbacks
         }
 
         StartTurn();
+
+        Debug.Log(currentState);
     }
 
     IEnumerator DelayedSpawn()
@@ -224,8 +226,6 @@ public class TurnController : MonoBehaviourPunCallbacks
     private void Update()
     {
         PhaseState currentState = GetCurrentState();
-
-        Debug.Log(currentState);
 
         //Debug.Log(turnCount);
         //Debug.Log(enemyPoint);
@@ -413,13 +413,13 @@ public class TurnController : MonoBehaviourPunCallbacks
 
     public void MyPhase()
     {
-        isMyFaPhase = true;
+        isMyPhase = true;
         Debug.Log("先行");
     }
 
     public void OtherPhase()
     {
-        isMyFaPhase = false;
+        isMyPhase = false;
         Debug.Log("後攻");
     }
 
