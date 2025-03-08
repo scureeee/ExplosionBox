@@ -72,7 +72,7 @@ public class ClickController : MonoBehaviour
 
                 Debug.Log("hit");
 
-                if(turnController.isMyPhase)
+                if(turnController.isMyPhase == true)
                 {
                     //turnCount‚ª®”‚©”»•Ê
                     if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
