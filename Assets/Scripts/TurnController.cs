@@ -74,6 +74,10 @@ public class TurnController : MonoBehaviourPunCallbacks
 
     public bool canselTriger = false;
 
+    private bool isPlayerFirst;
+
+    public bool isMyFaPhase = false;
+
     public enum PhaseState
     {
         EnemyChoiceToSetBomb,
@@ -204,6 +208,8 @@ public class TurnController : MonoBehaviourPunCallbacks
             Debug.LogWarning("Start: objectArray が空なので初期化します。");
             objectArray = GameObject.FindGameObjectsWithTag("Cube");
         }
+
+        StartTurn();
     }
 
     IEnumerator DelayedSpawn()
@@ -363,13 +369,11 @@ public class TurnController : MonoBehaviourPunCallbacks
         if (firstTurn == 0)
         {
             Debug.Log("プレイヤーが先行です");
-            //SetFirstPlayerOrder(true);
             photonView.RPC("SetFirstPlayerOrder", RpcTarget.All, true);
         }
         else
         {
             Debug.Log("敵が先行です");
-            //SetFirstPlayerOrder(false);
             photonView.RPC("SetFirstPlayerOrder", RpcTarget.All, false);
         }
     }
@@ -382,12 +386,37 @@ public class TurnController : MonoBehaviourPunCallbacks
     public void SetFirstPlayerOrder(bool isFirst)
     {
         Debug.Log("SetFirstPlayerOrder called, isFirst: " + isFirst);
+
+        isPlayerFirst = isFirst; // 先行プレイヤーを判定
+
         if (currentState == null) // 既にセットされていたら上書きしない
         {
             currentState = isFirst ? new Dictionary<int, PhaseState>(firstPlayerState)
                                    : new Dictionary<int, PhaseState>(firstEnemyState);
         }
         Debug.Log("currentState is now " + (currentState == null ? "NULL" : "NOT NULL"));
+    }
+
+    private void StartTurn()
+    {
+        if (isPlayerFirst)
+        {
+            MyPhase();
+        }
+        else
+        {
+            OtherPhase();
+        }
+    }
+
+    public void MyPhase()
+    {
+        isMyFaPhase = true;
+    }
+
+    public void OtherPhase()
+    {
+        isMyFaPhase = false;
     }
 
     // 現在のstateを取得する

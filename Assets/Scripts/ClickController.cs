@@ -73,7 +73,7 @@ public class ClickController : MonoBehaviour
                 Debug.Log("hit");
 
                 //turnCount‚ª®”‚©”»•Ê
-                if (currentState == PhaseState.PlayerChoiceToSetBomb)
+                if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
                 {
                     if (hit.collider.CompareTag("Cube"))
                     {
@@ -100,7 +100,7 @@ public class ClickController : MonoBehaviour
                     }
                 }
                 //Œã‚Å•Ï‚¦‚é
-                else if(currentState == PhaseState.PlayerChoiceToOpenBox)
+                else if(currentState == PhaseState.PlayerChoiceToOpenBox || currentState == PhaseState.EnemyChoiceToOpenBox)
                 {
                     //ƒ^ƒO‚ğ”äŠr
                     //explosion‚ª•t‚¢‚Ä‚¢‚È‚¢
