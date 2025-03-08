@@ -225,7 +225,7 @@ public class TurnController : MonoBehaviourPunCallbacks
     {
         PhaseState currentState = GetCurrentState();
 
-        Debug.Log(currentIndex);
+        Debug.Log(currentState);
 
         //Debug.Log(turnCount);
         //Debug.Log(enemyPoint);
