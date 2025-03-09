@@ -404,13 +404,29 @@ public class TurnController : MonoBehaviourPunCallbacks
     {
         if (isPlayerFirst)
         {
-            MyPhase();
-            Debug.Log("先行");
+            if (PhotonNetwork.IsMasterClient)
+            {
+                MyPhase();
+                Debug.Log("先行");
+            }
+            else if (!PhotonNetwork.IsMasterClient)
+            {
+                OtherPhase();
+                Debug.Log("後攻");
+            }
         }
         else
         {
-            OtherPhase();
-            Debug.Log("後攻");
+            if (PhotonNetwork.IsMasterClient)
+            {
+                OtherPhase();
+                Debug.Log("後攻");
+            }
+            else if (!PhotonNetwork.IsMasterClient)
+            {
+                MyPhase();
+                Debug.Log("先行");
+            }
         }
     }
 
