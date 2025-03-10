@@ -208,8 +208,6 @@ public class TurnController : MonoBehaviourPunCallbacks
             Debug.LogWarning("Start: objectArray が空なので初期化します。");
             objectArray = GameObject.FindGameObjectsWithTag("Cube");
         }
-
-        Debug.Log(currentState);
     }
 
     IEnumerator DelayedSpawn()
@@ -434,12 +432,14 @@ public class TurnController : MonoBehaviourPunCallbacks
     {
         isMyPhase = true;
         Debug.Log("先行");
+        Debug.Log(currentState);
     }
 
     public void OtherPhase()
     {
         isMyPhase = false;
         Debug.Log("後攻");
+        Debug.Log(currentState);
     }
 
     // 現在のstateを取得する
