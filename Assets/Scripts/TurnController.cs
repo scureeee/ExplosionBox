@@ -432,14 +432,16 @@ public class TurnController : MonoBehaviourPunCallbacks
     {
         isMyPhase = true;
         Debug.Log("先行");
-        Debug.Log(currentState);
+        // 現在の状態をログ出力
+        Debug.Log($"今の状態: {currentState[currentIndex]}");
     }
 
     public void OtherPhase()
     {
         isMyPhase = false;
         Debug.Log("後攻");
-        Debug.Log(currentState);
+        // 現在の状態をログ出力
+        Debug.Log($"今の状態: {currentState[currentIndex]}");
     }
 
     // 現在のstateを取得する
