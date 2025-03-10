@@ -153,7 +153,7 @@ public class CollisionController : MonoBehaviour
 
         if (other.gameObject.tag == "Player")
         {
-            if(currentState == PhaseState.PlayerMoveToChoiceBox)
+            if(currentState == PhaseState.PlayerMoveToChoiceBox || currentState == PhaseState.EnemyMoveToChoiceBox)
             {
                 clickController.isMoving = false; // フラグをリセット
 
@@ -169,7 +169,7 @@ public class CollisionController : MonoBehaviour
 
                 BottonEmerge();
             }
-            else if(currentState == PhaseState.PlayerMoveToSetBox)
+            else if(currentState == PhaseState.PlayerMoveToSetBox || currentState == PhaseState.EnemyMoveToSetBox)
             {
                 clickController.isMoving = false; // フラグをリセット
 

@@ -573,14 +573,6 @@ public class TurnController : MonoBehaviourPunCallbacks
         return randomIndex;
     }
 
-
-   public void PlayerTurn()
-    {
-        Debug.Log("hiukuhjguigui");
-
-        playerObject.SetActive(true);
-    }
-
     public void Retirement()
     {
         SceneManager.LoadScene("OptionScene");
