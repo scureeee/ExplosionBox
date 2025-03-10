@@ -69,15 +69,17 @@ public class CamController : MonoBehaviour
     {
         // Œ»İ‚Ìstate‚ğæ“¾
         TurnController.PhaseState currentState = turnController.GetCurrentState();
-
-        if (currentState == PhaseState.PlayerSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
+        if(turnController.isMyPhase == false)
         {
-            FadeOut();
-        }
+            if (currentState == PhaseState.PlayerSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
+            {
+                FadeOut();
+            }
 
-        if(fadeInTrigger == true || currentState == PhaseState.EnemySetBomb)
-        {
-            FadeIn();
+            if (fadeInTrigger == true || currentState == PhaseState.EnemySetBomb)
+            {
+                FadeIn();
+            }
         }
     }
 
