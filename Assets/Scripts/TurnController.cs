@@ -152,6 +152,9 @@ public class TurnController : MonoBehaviourPunCallbacks
 
         imageController = FindObjectOfType<ImageController>();
 
+        currentState = new Dictionary<int, PhaseState>(firstPlayerState);
+        Debug.Log("仮のcurrentStateを初期化しました。");
+
         StartCoroutine(DelayedSpawn());
 
         // currentStateの状態を確認
@@ -407,7 +410,7 @@ public class TurnController : MonoBehaviourPunCallbacks
                 MyPhase();
                 Debug.Log("先行");
             }
-            else
+            else if (!PhotonNetwork.IsMasterClient)
             {
                 OtherPhase();
                 Debug.Log("後攻");
