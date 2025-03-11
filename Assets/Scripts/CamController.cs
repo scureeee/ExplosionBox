@@ -76,7 +76,7 @@ public class CamController : MonoBehaviour
                 FadeOut();
             }
 
-            if (fadeInTrigger == true || currentState == PhaseState.EnemySetBomb)
+            if (fadeInTrigger == true || currentState == PhaseState.EnemySetBomb || currentState == PhaseState.PlayerSetBomb)
             {
                 FadeIn();
             }
@@ -135,7 +135,7 @@ public class CamController : MonoBehaviour
             {
                 Debug.Log(",dak,lda,l");
             }
-            else if(currentState == PhaseState.EnemySetBomb)
+            else if(currentState == PhaseState.EnemySetBomb || currentState == PhaseState.PlayerSetBomb)
             {
                 StartCoroutine(turnController.NextState());
             }

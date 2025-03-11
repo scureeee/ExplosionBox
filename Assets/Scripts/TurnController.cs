@@ -76,7 +76,7 @@ public class TurnController : MonoBehaviourPunCallbacks
 
     private bool isPlayerFirst;
 
-    public bool isMyPhase = false;
+    public bool isMyPhase = true;
 
     public enum PhaseState
     {
