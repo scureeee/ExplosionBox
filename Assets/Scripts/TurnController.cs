@@ -489,7 +489,14 @@ public class TurnController : MonoBehaviourPunCallbacks
             yield return null;
         }
     }
-    
+
+    [PunRPC]
+    public void SyncCurrentIndex(int index)
+    {
+        currentIndex = index;
+        Debug.Log($"currentIndex を同期: {currentIndex}");
+    }
+
     public void Next()
     {
         // 次のインデックスに進む
@@ -523,6 +530,12 @@ public class TurnController : MonoBehaviourPunCallbacks
         Debug.Log($"今の状態: {currentState[currentIndex]}");
 
         optionController.clickNext = false;
+
+        // マスタークライアントがindexを同期
+        if (PhotonNetwork.IsMasterClient)
+        {
+            photonView.RPC("SyncCurrentIndex", RpcTarget.Others, currentIndex);
+        }
     }
 
     public void BuckState()
