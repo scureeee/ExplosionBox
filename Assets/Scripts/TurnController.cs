@@ -399,6 +399,7 @@ public class TurnController : MonoBehaviourPunCallbacks
         Debug.Log($"先攻: {(isFirst ? "プレイヤー" : "敵")}");
         Debug.Log("currentState is now " + (currentState == null ? "NULL" : "NOT NULL"));
 
+        Debug.Log($"[TurnController] SetFirstPlayerOrder 実行: isFirst: {isFirst}, currentState: {currentState[0]}, isMyPhase: {isMyPhase}");
         StartTurn();
     }
 

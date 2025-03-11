@@ -52,6 +52,7 @@ public class ClickController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log($"[ClickController] currentState: {turnController.currentState}, isMyPhase: {turnController.isMyPhase}, isMaster: {Photon.Pun.PhotonNetwork.IsMasterClient}");
 
         // Œ»İ‚Ìstate‚ğæ“¾
         TurnController.PhaseState currentState = turnController.GetCurrentState();
