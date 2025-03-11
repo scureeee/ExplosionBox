@@ -151,7 +151,9 @@ public class CamController : MonoBehaviour
 
         fadeAlpha.color = new Color(0,0,0,alpha);
 
-        if(alpha >= 1)
+        Debug.Log("enemyˆÃ‚­");
+
+        if (alpha >= 1)
         {
             if(currentState == PhaseState.PlayerSetBomb)
             {
@@ -159,12 +161,6 @@ public class CamController : MonoBehaviour
 
                 fadeInTrigger = true;
 
-            }
-            else if (currentState == PhaseState.EnemyChoiceToSetBomb)
-            {
-                Debug.Log("enemyˆÃ‚­");
-
-                StartCoroutine(turnController.NextState());
             }
         }
     }
