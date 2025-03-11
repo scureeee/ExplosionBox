@@ -76,7 +76,7 @@ public class TurnController : MonoBehaviourPunCallbacks
 
     private bool isPlayerFirst;
 
-    public bool isMyPhase;
+    public bool isMyPhase = true;
 
     public enum PhaseState
     {
@@ -142,8 +142,6 @@ public class TurnController : MonoBehaviourPunCallbacks
 
         enemyLife = OptionController.maxLife;
 
-        isMyPhase = true;
-
         optionController = FindObjectOfType<OptionController>();
         if (optionController == null)
         {
@@ -153,11 +151,6 @@ public class TurnController : MonoBehaviourPunCallbacks
         clickController = FindObjectOfType<ClickController>();
 
         imageController = FindObjectOfType<ImageController>();
-
-        // 仮の初期化
-        currentState = new Dictionary<int, PhaseState>(firstPlayerState);
-
-        Debug.Log("仮のcurrentStateを初期化しました。");
 
         StartCoroutine(DelayedSpawn());
 
@@ -414,7 +407,7 @@ public class TurnController : MonoBehaviourPunCallbacks
                 MyPhase();
                 Debug.Log("先行");
             }
-            else if (!PhotonNetwork.IsMasterClient)
+            else
             {
                 OtherPhase();
                 Debug.Log("後攻");
@@ -427,7 +420,7 @@ public class TurnController : MonoBehaviourPunCallbacks
                 OtherPhase();
                 Debug.Log("後攻");
             }
-            else if (!PhotonNetwork.IsMasterClient)
+            else
             {
                 MyPhase();
                 Debug.Log("先行");
