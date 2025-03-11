@@ -454,7 +454,7 @@ public class TurnController : MonoBehaviourPunCallbacks
         if (currentState == null)
         {
             Debug.LogError("GetCurrentState: currentState is NULL!! 仮の初期化を行います。");
-            currentState = new Dictionary<int, PhaseState>(firstPlayerState);
+            currentState = new Dictionary<int, PhaseState>(firstEnemyState);
             return PhaseState.EnemyChoiceToSetBomb; // デフォルトのフェーズを返す
         }
 
