@@ -76,7 +76,7 @@ public class TurnController : MonoBehaviourPunCallbacks
 
     private bool isPlayerFirst;
 
-    public bool isMyPhase = true;
+    public bool isMyPhase;
 
     public enum PhaseState
     {
@@ -141,6 +141,8 @@ public class TurnController : MonoBehaviourPunCallbacks
         playerLife = OptionController.maxLife;
 
         enemyLife = OptionController.maxLife;
+
+        isMyPhase = true;
 
         optionController = FindObjectOfType<OptionController>();
         if (optionController == null)
