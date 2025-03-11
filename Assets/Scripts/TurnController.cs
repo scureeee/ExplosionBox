@@ -451,18 +451,6 @@ public class TurnController : MonoBehaviourPunCallbacks
     // 現在のstateを取得する
     public PhaseState GetCurrentState()
     {
-        if (currentState == null)
-        {
-            Debug.LogError("GetCurrentState: currentState is NULL!! 仮の初期化を行います。");
-            currentState = new Dictionary<int, PhaseState>(firstEnemyState);
-            return PhaseState.EnemyChoiceToSetBomb; // デフォルトのフェーズを返す
-        }
-
-        if (!currentState.ContainsKey(currentIndex))
-        {
-            Debug.LogError($"GetCurrentState: Index {currentIndex} が currentState に存在しません。");
-            return PhaseState.EnemyChoiceToSetBomb; // デフォルトのフェーズを返す
-        }
         return currentState[currentIndex];
     }
     
