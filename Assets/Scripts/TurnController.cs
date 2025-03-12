@@ -452,7 +452,9 @@ public class TurnController : MonoBehaviourPunCallbacks
         Debug.Log($"今の状態: {currentState[currentIndex]}");
     }
 
+
     // 現在のstateを取得する
+    [PunRPC]
     public PhaseState GetCurrentState()
     {
         return currentState[currentIndex];
