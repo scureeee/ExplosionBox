@@ -28,6 +28,8 @@ public class ClickController : MonoBehaviour
     // Ä¶¬‚·‚é NavMesh ‚Ì”ÍˆÍ”¼Œa
     public float navMeshUpdateRadius = 5f;
 
+    public bool isClickMove = true;
+
     //Start is called before the first frame update
     void Start()
     {
@@ -73,9 +75,13 @@ public class ClickController : MonoBehaviour
 
                 Debug.Log("hit");
 
-                if(turnController.isMyPhase == true)
+                isClickMove = true;
+
+                if(turnController.isMyPhase == true && isClickMove == true)
                 {
                     Debug.Log("isMyPhase == true");
+
+                    isClickMove = false;
 
                     //turnCount‚ª®”‚©”»•Ê
                     if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
