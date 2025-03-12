@@ -28,8 +28,6 @@ public class ClickController : MonoBehaviour
     // 再生成する NavMesh の範囲半径
     public float navMeshUpdateRadius = 5f;
 
-    public bool isClickMove = true;
-
     //Start is called before the first frame update
     void Start()
     {
@@ -75,13 +73,9 @@ public class ClickController : MonoBehaviour
 
                 Debug.Log("hit");
 
-                isClickMove = true;
-
-                if(turnController.isMyPhase == true && isClickMove == true)
+                if(turnController.isMyPhase == true)
                 {
                     Debug.Log("isMyPhase == true");
-
-                    isClickMove = false;
 
                     //turnCountが整数か判別
                     if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
@@ -101,6 +95,9 @@ public class ClickController : MonoBehaviour
                             targetPosition = hit.point;
 
                             optionController.choiceTime = 60f;
+
+                            // クリック時に移動フラグを立てる前
+                            Debug.Log($"targetPosition 設定: {targetPosition}, isMoving を true にします");
 
                             // フラグを有効化
                             isMoving = true;
@@ -216,6 +213,16 @@ public class ClickController : MonoBehaviour
 
     private void MovePlayer()
     {
+        float distance = Vector3.Distance(player.transform.position, targetPosition);
+
+        if (distance < 0.01f)
+        {
+            isMoving = false;
+            animator.SetBool("Bool Walk", false);
+            Debug.Log("移動完了");
+            return;
+        }
+
         Debug.Log("Move");
 
         // プレイヤーをターゲット位置に向けて移動
