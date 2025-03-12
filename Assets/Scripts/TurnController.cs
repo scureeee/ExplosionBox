@@ -128,6 +128,17 @@ public class TurnController : MonoBehaviourPunCallbacks
         {11,PhaseState.PlayerOpenBox},
     };
 
+    private void Awake()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // ターンの決定
+            Debug.Log("オブジェクト生成が完了しました。DecideFirstTurnを実行します。");
+            DecideFirstTurn();
+        }
+
+    }
+
     void Start()
     {
         Debug.Log("Startメソッドが実行された");
@@ -152,8 +163,8 @@ public class TurnController : MonoBehaviourPunCallbacks
 
         imageController = FindObjectOfType<ImageController>();
 
-        currentState = new Dictionary<int, PhaseState>(firstPlayerState);
-        Debug.Log("仮のcurrentStateを初期化しました。");
+       // currentState = new Dictionary<int, PhaseState>(firstPlayerState);
+        //Debug.Log("仮のcurrentStateを初期化しました。");
 
         StartCoroutine(DelayedSpawn());
 
@@ -187,12 +198,6 @@ public class TurnController : MonoBehaviourPunCallbacks
 
         // オブジェクト生成
         GenerateObjectsInCircle(numberOfObjects);
-        if(PhotonNetwork.IsMasterClient)
-        {
-            // ターンの決定
-            Debug.Log("オブジェクト生成が完了しました。DecideFirstTurnを実行します。");
-            DecideFirstTurn();
-        }
 
         optionController.choiceTime = 60f;
 
