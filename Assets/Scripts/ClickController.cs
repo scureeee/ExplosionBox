@@ -75,6 +75,8 @@ public class ClickController : MonoBehaviour
 
                 if(turnController.isMyPhase == true)
                 {
+                    Debug.Log("isMyPhase == true");
+
                     //turnCountが整数か判別
                     if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
                     {
@@ -208,6 +210,8 @@ public class ClickController : MonoBehaviour
 
     private void MovePlayer()
     {
+        Debug.Log("Move");
+
         // プレイヤーをターゲット位置に向けて移動
         //MoveTowards関数によってスムーズに移動する
         player.transform.position = Vector3.MoveTowards(
