@@ -460,7 +460,7 @@ public class TurnController : MonoBehaviourPunCallbacks
     
     public IEnumerator NextState()
     {
-        Debug.Log("state");
+        Debug.Log("nextstate");
 
         PhaseState currentState = GetCurrentState();
         
