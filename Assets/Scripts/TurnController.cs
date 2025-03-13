@@ -452,14 +452,19 @@ public class TurnController : MonoBehaviourPunCallbacks
         Debug.Log($"今の状態: {currentState[currentIndex]}");
     }
 
-
     // 現在のstateを取得する
-    [PunRPC]
     public PhaseState GetCurrentState()
     {
         return currentState[currentIndex];
     }
-    
+
+    [PunRPC]
+    public void SyncCurrentState(int index)
+    {
+        currentIndex = index;
+        Debug.Log("同期された currentIndex: " + currentIndex);
+    }
+
     public IEnumerator NextState()
     {
         Debug.Log("nextstate");
@@ -495,6 +500,8 @@ public class TurnController : MonoBehaviourPunCallbacks
     {
         // 次のインデックスに進む
         currentIndex++;
+
+        photonView.RPC("SyncCurrentState", RpcTarget.Others, currentIndex);
 
         // インデックスが順序の範囲外ならリセット
         if (currentIndex >= currentState.Count)
