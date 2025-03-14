@@ -86,9 +86,22 @@ public class ClickController : MonoBehaviourPunCallbacks
                     {
                         if (hit.collider.CompareTag("Cube"))
                         {
-                            hit.collider.gameObject.tag = "Explosion";
+                            GameObject cube = hit.collider.gameObject;
 
-                            Debug.Log($"オブジェクト{hit.collider.gameObject.name}のタグを'Explosion'に変更しました。");
+                            // Cube の PhotonView を取得
+                            PhotonView cubeView = cube.GetComponent<PhotonView>();
+
+                            if (cubeView != null)
+                            {
+                                // RPCで全員のタグを変更
+                                photonView.RPC("ChangeTagToExplosion", RpcTarget.AllBuffered, cubeView.ViewID);
+                            }
+                            else
+                            {
+                                Debug.LogWarning("クリックされたCubeにPhotonViewがありません！");
+                            }
+
+                            Debug.Log($"オブジェクト{cube.name}のタグを'Explosion'に変更しました。");
 
                             // NavMeshの非同期構築を開始
                             StartCoroutine(BuildNavMeshAsync());
@@ -141,6 +154,22 @@ public class ClickController : MonoBehaviourPunCallbacks
         if (isMoving)
         {
             MovePlayer();
+        }
+    }
+
+    [PunRPC]
+    public void ChangeTagToExplosion(int viewID)
+    {
+        GameObject obj = PhotonView.Find(viewID)?.gameObject;
+
+        if (obj != null)
+        {
+            obj.tag = "Explosion";
+            Debug.Log($"[RPC] タグ変更: {obj.name} → Explosion");
+        }
+        else
+        {
+            Debug.LogWarning($"[RPC] ViewID {viewID} のオブジェクトが見つかりませんでした。");
         }
     }
 
