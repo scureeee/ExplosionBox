@@ -2,8 +2,9 @@ using System.Collections;
 using UnityEngine;
 using static TurnController;
 using optionSpace;
+using Photon.Pun;
 
-public class ClickController : MonoBehaviour
+public class ClickController : MonoBehaviourPunCallbacks
 {
     [SerializeField] float smooth = 10f;
 
@@ -76,6 +77,9 @@ public class ClickController : MonoBehaviour
                 if(turnController.isMyPhase == true)
                 {
                     Debug.Log("isMyPhase == true");
+
+                    // ©•ª‚ª‘€ì‚µ‚½‚¢‚Æ‚«
+                    photonView.RequestOwnership();
 
                     //turnCount‚ª®”‚©”»•Ê
                     if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
