@@ -42,6 +42,7 @@ MonoBehaviour:
   - SetFirstPlayerOrder
   - SyncCurrentIndex
   - GetCurrentState
+  - SyncCurrentState
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

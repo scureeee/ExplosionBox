@@ -199,6 +199,8 @@ public class CollisionController : MonoBehaviour
             yield return null;
         }
 
+        Debug.Log("移動する");
+
         turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
     }
 
