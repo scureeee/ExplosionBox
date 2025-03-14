@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Photon.Pun;
 using static TurnController;
 
-public class CollisionController : MonoBehaviour
+public class CollisionController : MonoBehaviourPunCallbacks
 {
 
     private TurnController turnController;
