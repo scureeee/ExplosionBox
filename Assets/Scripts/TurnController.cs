@@ -343,7 +343,7 @@ public class TurnController : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    void SetupObject(int index)
+    public void SetupObject(int index)
     {
         Debug.Log("set");
 
