@@ -338,27 +338,21 @@ public class TurnController : MonoBehaviourPunCallbacks
             GameObject obj = PhotonNetwork.Instantiate("TreasureChestPrefab", position, Quaternion.identity);
             objectArray[i] = obj;
 
-            StartCoroutine(SetupObjectsAfterSpawn());
+            photonView.RPC("SetupObjectByViewID", RpcTarget.All, obj.GetComponent<PhotonView>().ViewID, i);
         }
         Debug.Log($"Total objects generated: {objectArray.Length}");
     }
 
-    IEnumerator SetupObjectsAfterSpawn()
-    {
-        yield return new WaitUntil(() => objectArray.All(obj => obj != null));
-
-        for (int i = 0; i < objectArray.Length; i++)
-        {
-            photonView.RPC("SetupObject", RpcTarget.All, i);
-        }
-    }
-
     [PunRPC]
-    public void SetupObject(int index)
+    public void SetupObjectByViewID(int viewID, int index)
     {
-        Debug.Log("set");
+        GameObject obj = PhotonView.Find(viewID).gameObject;
+        if (obj == null)
+        {
+            Debug.LogWarning($"[SetupObjectByViewID] Could not find object with ViewID {viewID}");
+            return;
+        }
 
-        GameObject obj = objectArray[index];
         obj.name = $"Object_{index}";
 
         GameObject textobj = new GameObject("NumberText");
@@ -370,6 +364,8 @@ public class TurnController : MonoBehaviourPunCallbacks
         tmp.fontSize = 10;
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = Color.red;
+
+        Debug.Log($"[SetupObjectByViewID] Setup done for index {index}, ViewID {viewID}");
     }
 
     void DecideFirstTurn()
