@@ -185,7 +185,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
         }
     }
 
-    private IEnumerator MovePlayerToWarpPoint()
+    public IEnumerator MovePlayerToWarpPoint()
     {
         float duration = 1.0f; // 移動時間（秒）
         float elapsedTime = 0f;
