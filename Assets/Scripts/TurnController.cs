@@ -345,6 +345,8 @@ public class TurnController : MonoBehaviourPunCallbacks
     [PunRPC]
     void SetupObject(int index)
     {
+        Debug.Log("set");
+
         GameObject obj = objectArray[index];
         obj.name = $"Object_{index}";
 
