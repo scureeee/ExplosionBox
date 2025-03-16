@@ -11,6 +11,7 @@ using optionSpace;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 using UnityEngine.UIElements;
+using System.Linq;
 
 public class TurnController : MonoBehaviourPunCallbacks
 {
@@ -337,9 +338,19 @@ public class TurnController : MonoBehaviourPunCallbacks
             GameObject obj = PhotonNetwork.Instantiate("TreasureChestPrefab", position, Quaternion.identity);
             objectArray[i] = obj;
 
-            photonView.RPC("SetupObject", RpcTarget.AllBuffered, i);
+            StartCoroutine(SetupObjectsAfterSpawn());
         }
         Debug.Log($"Total objects generated: {objectArray.Length}");
+    }
+
+    IEnumerator SetupObjectsAfterSpawn()
+    {
+        yield return new WaitUntil(() => objectArray.All(obj => obj != null));
+
+        for (int i = 0; i < objectArray.Length; i++)
+        {
+            photonView.RPC("SetupObject", RpcTarget.AllBuffered, i);
+        }
     }
 
     [PunRPC]
