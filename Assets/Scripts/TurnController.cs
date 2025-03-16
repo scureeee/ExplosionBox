@@ -349,7 +349,7 @@ public class TurnController : MonoBehaviourPunCallbacks
 
         for (int i = 0; i < objectArray.Length; i++)
         {
-            photonView.RPC("SetupObject", RpcTarget.AllBuffered, i);
+            photonView.RPC("SetupObject", RpcTarget.All, i);
         }
     }
 

@@ -894,10 +894,10 @@ GameObject:
   m_Component:
   - component: {fileID: 3471643304242014600}
   - component: {fileID: 3471643304249230964}
-  - component: {fileID: 635090848246112007}
   - component: {fileID: 424312692020983575}
   - component: {fileID: 803319136659360179}
   - component: {fileID: 2396700050753402481}
+  - component: {fileID: 635090848246112007}
   - component: {fileID: 4656519548358706588}
   m_Layer: 6
   m_Name: TreasureChestPrefab
@@ -949,30 +949,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &635090848246112007
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3471643304241853864}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2eddc7424c3d6c845bf9854b560b7fdb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  openBotton: {fileID: 3749524858036392910}
-  buckBotton: {fileID: 745802849093212444}
-  particle: {fileID: 821746290695135865}
-  bomb: {fileID: 1054647491916398433}
-  openSound: {fileID: 8300000, guid: 971645d18ebacd6409e29f9579474b3f, type: 3}
-  explsionSound: {fileID: 8300000, guid: cf0e7927dd169274db7f62c33e691917, type: 3}
-  canselSound: {fileID: 8300000, guid: cc2469190375b6a4fbd913c71c2f4acb, type: 3}
-  warpPoint: {fileID: 2628061434538824980}
-  animator: {fileID: 3471643304249230964}
-  particleSystem: {fileID: 693930932380841069}
-  cameraBuck: 1
-  isPaused: 0
 --- !u!135 &424312692020983575
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1113,6 +1089,30 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &635090848246112007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3471643304241853864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2eddc7424c3d6c845bf9854b560b7fdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  openBotton: {fileID: 3749524858036392910}
+  buckBotton: {fileID: 745802849093212444}
+  particle: {fileID: 821746290695135865}
+  bomb: {fileID: 1054647491916398433}
+  openSound: {fileID: 8300000, guid: 971645d18ebacd6409e29f9579474b3f, type: 3}
+  explsionSound: {fileID: 8300000, guid: cf0e7927dd169274db7f62c33e691917, type: 3}
+  canselSound: {fileID: 8300000, guid: cc2469190375b6a4fbd913c71c2f4acb, type: 3}
+  warpPoint: {fileID: 2628061434538824980}
+  animator: {fileID: 3471643304249230964}
+  particleSystem: {fileID: 693930932380841069}
+  cameraBuck: 1
+  isPaused: 0
 --- !u!114 &4656519548358706588
 MonoBehaviour:
   m_ObjectHideFlags: 0
