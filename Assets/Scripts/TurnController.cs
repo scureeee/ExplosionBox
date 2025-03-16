@@ -337,32 +337,26 @@ public class TurnController : MonoBehaviourPunCallbacks
             GameObject obj = PhotonNetwork.Instantiate("TreasureChestPrefab", position, Quaternion.identity);
             objectArray[i] = obj;
 
-            // 各オブジェクトに一意の番号を割り当て
-            objectNumberMapping[obj] = i;
-
-            // オブジェクトの名前に番号を設定
-            obj.name = $"Object_{i}";
-
-            //TextMeshProの追加
-            GameObject textobj = new GameObject("NumberText");
-            //親をオブジェクトに設定
-            textobj.transform.SetParent(obj.transform);
-            //表示位置調整
-            textobj.transform.localPosition = new Vector3(0, 2f, 0);
-
-            TextMeshPro tmp = textobj.AddComponent<TextMeshPro>();
-            //番号を+1して表示
-            tmp.text = (i + 1).ToString();
-            tmp.fontSize = 10;
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.color = Color.red;
-
-            Debug.Log($"オブジェクト生成: {obj.name}, 位置: {position}");
-
-            // タグの確認
-            Debug.Log($"Object_{i} のタグ: {obj.tag}");
+            photonView.RPC("SetupObject", RpcTarget.AllBuffered, i);
         }
         Debug.Log($"Total objects generated: {objectArray.Length}");
+    }
+
+    [PunRPC]
+    void SetupObject(int index)
+    {
+        GameObject obj = objectArray[index];
+        obj.name = $"Object_{index}";
+
+        GameObject textobj = new GameObject("NumberText");
+        textobj.transform.SetParent(obj.transform);
+        textobj.transform.localPosition = new Vector3(0, 2f, 0);
+
+        TextMeshPro tmp = textobj.AddComponent<TextMeshPro>();
+        tmp.text = (index + 1).ToString();
+        tmp.fontSize = 10;
+        tmp.alignment = TextAlignmentOptions.Center;
+        tmp.color = Color.red;
     }
 
     void DecideFirstTurn()
