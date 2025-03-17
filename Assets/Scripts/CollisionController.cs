@@ -182,14 +182,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                     clickController.animator.SetBool("Bool Walk", false);
 
-                    if (photonView.IsMine)
-                    {
-                        StartCoroutine(MovePlayerToWarpPoint());
-                    }
-                    else
-                    {
-                        Debug.Log("このプレイヤーの移動権限はない");
-                    }
+                    StartCoroutine(MovePlayerToWarpPoint());
 
                     photonView.RPC("clickController.ActivateOtherColliders", RpcTarget.All);
 
