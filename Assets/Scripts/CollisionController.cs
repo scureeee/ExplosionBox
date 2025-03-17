@@ -152,53 +152,49 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         //selectedObject = this.gameObject; // 衝突したオブジェクトを保存
 
-        if (other.gameObject.tag == "Player")
+         if(turnController.isMyPhase)
         {
-            if(currentState == PhaseState.PlayerMoveToChoiceBox || currentState == PhaseState.EnemyMoveToChoiceBox)
+            if (other.gameObject.tag == "Player")
             {
-                Debug.Log("open時に当たった");
-
-                clickController.isMoving = false; // フラグをリセット
-
-                clickController.animator.SetBool("Bool Walk", false);
-
-                if (photonView.IsMine)
+                if (currentState == PhaseState.PlayerMoveToChoiceBox || currentState == PhaseState.EnemyMoveToChoiceBox)
                 {
+                    Debug.Log("open時に当たった");
+
+                    clickController.isMoving = false; // フラグをリセット
+
+                    clickController.animator.SetBool("Bool Walk", false);
+
                     StartCoroutine(MovePlayerToWarpPoint());
+
+                    // カメラを当たったオブジェクトに近づける処理を開始
+                    camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
+                    camController.isCameraMoving = true; // カメラ移動を開始
+
+                    StartCoroutine(turnController.NextState());
+
+                    BottonEmerge();
                 }
-                else
+                else if (currentState == PhaseState.PlayerMoveToSetBox || currentState == PhaseState.EnemyMoveToSetBox)
                 {
-                    Debug.Log("このプレイヤーの移動権限はない");
+                    Debug.Log("set時に当たった");
+
+                    clickController.isMoving = false; // フラグをリセット
+
+                    clickController.animator.SetBool("Bool Walk", false);
+
+                    if (photonView.IsMine)
+                    {
+                        StartCoroutine(MovePlayerToWarpPoint());
+                    }
+                    else
+                    {
+                        Debug.Log("このプレイヤーの移動権限はない");
+                    }
+
+                    photonView.RPC("clickController.ActivateOtherColliders", RpcTarget.All);
+
+                    StartCoroutine(turnController.NextState());
                 }
-
-                // カメラを当たったオブジェクトに近づける処理を開始
-                camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
-                camController.isCameraMoving = true; // カメラ移動を開始
-
-                StartCoroutine(turnController.NextState());
-
-                BottonEmerge();
-            }
-            else if(currentState == PhaseState.PlayerMoveToSetBox || currentState == PhaseState.EnemyMoveToSetBox)
-            {
-                Debug.Log("set時に当たった");
-
-                clickController.isMoving = false; // フラグをリセット
-
-                clickController.animator.SetBool("Bool Walk", false);
-
-                if (photonView.IsMine)
-                {
-                    StartCoroutine(MovePlayerToWarpPoint());
-                }
-                else
-                {
-                    Debug.Log("このプレイヤーの移動権限はない");
-                }
-
-                photonView.RPC("clickController.ActivateOtherColliders", RpcTarget.All);
-
-                StartCoroutine(turnController.NextState());
             }
         }
     }

@@ -76,7 +76,7 @@ public class ClickController : MonoBehaviourPunCallbacks
 
                 Debug.Log("hit");
 
-                if(turnController.isMyPhase == true)
+                if(turnController.isMyPhase)
                 {
                     Debug.Log("isMyPhase == true");
 
