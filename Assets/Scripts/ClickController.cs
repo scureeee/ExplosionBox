@@ -235,6 +235,8 @@ public class ClickController : MonoBehaviourPunCallbacks
         {
             Collider collider = obj.GetComponent<Collider>();
 
+
+            Debug.Log("è¡Ç∑");
             collider.enabled = false;
         }
     }
