@@ -158,13 +158,13 @@ public class CollisionController : MonoBehaviourPunCallbacks
             {
                 if (currentState == PhaseState.PlayerMoveToChoiceBox || currentState == PhaseState.EnemyMoveToChoiceBox)
                 {
+                    photonView.RPC("ColliderOff", RpcTarget.All);
+
                     Debug.Log("open時に当たった");
 
                     clickController.isMoving = false; // フラグをリセット
 
                     clickController.animator.SetBool("Bool Walk", false);
-
-                    photonView.RPC("ColliderOff", RpcTarget.All);
 
                     StartCoroutine(MovePlayerToWarpPoint());
 
@@ -178,13 +178,13 @@ public class CollisionController : MonoBehaviourPunCallbacks
                 }
                 else if (currentState == PhaseState.PlayerMoveToSetBox || currentState == PhaseState.EnemyMoveToSetBox)
                 {
+                    photonView.RPC("ColliderOff", RpcTarget.All);
+
                     Debug.Log("set時に当たった");
 
                     clickController.isMoving = false; // フラグをリセット
 
                     clickController.animator.SetBool("Bool Walk", false);
-
-                    photonView.RPC("ColliderOff", RpcTarget.All);
 
                     StartCoroutine(MovePlayerToWarpPoint());
 
