@@ -164,7 +164,11 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                     clickController.animator.SetBool("Bool Walk", false);
 
-                    other.enabled = false;
+                    // ★ コライダーを全て無効化
+                    foreach (var col in other.gameObject.GetComponents<Collider>())
+                    {
+                        col.enabled = false;
+                    }
 
                     StartCoroutine(MovePlayerToWarpPoint());
 
@@ -184,7 +188,11 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                     clickController.animator.SetBool("Bool Walk", false);
 
-                    other.enabled = false;
+                    // ★ コライダーを全て無効化
+                    foreach (var col in other.gameObject.GetComponents<Collider>())
+                    {
+                        col.enabled = false;
+                    }
 
                     StartCoroutine(MovePlayerToWarpPoint());
 
