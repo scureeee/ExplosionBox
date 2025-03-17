@@ -164,7 +164,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                     clickController.animator.SetBool("Bool Walk", false);
 
-                    clickController.ColliderOff();
+                    ColliderOff();
 
                     StartCoroutine(MovePlayerToWarpPoint());
 
@@ -184,7 +184,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                     clickController.animator.SetBool("Bool Walk", false);
 
-                    clickController.ColliderOff();
+                    ColliderOff();
 
                     StartCoroutine(MovePlayerToWarpPoint());
 
@@ -194,6 +194,12 @@ public class CollisionController : MonoBehaviourPunCallbacks
                 }
             }
         }
+    }
+
+    public void ColliderOff()
+    {
+        Debug.Log("消す");
+        enabled = false;
     }
 
     private IEnumerator MovePlayerToWarpPoint()

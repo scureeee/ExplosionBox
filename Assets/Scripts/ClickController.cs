@@ -229,16 +229,10 @@ public class ClickController : MonoBehaviourPunCallbacks
         Debug.Log("クリックしたオブジェクト以外のコライダーを無効化しました。");
     }
 
-    public void ColliderOff()
+    public void ColliderOff(GameObject clickObject)
     {
-        foreach (GameObject obj in FindObjectsOfType<GameObject>())
-        {
-            Collider collider = obj.GetComponent<Collider>();
-
-
-            Debug.Log("消す");
-            collider.enabled = false;
-        }
+        Debug.Log("消す");
+        enabled = false;
     }
 
     [PunRPC]
