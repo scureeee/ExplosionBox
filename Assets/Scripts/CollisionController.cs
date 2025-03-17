@@ -178,7 +178,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                 StartCoroutine(MovePlayerToWarpPoint());
 
-                clickController.ActivateOtherColliders();
+                photonView.RPC("ActivateOtherColliders", RpcTarget.All);
 
                 StartCoroutine(turnController.NextState());
             }
@@ -229,7 +229,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         isExplosion = false;
 
-        clickController.ActivateOtherColliders();
+        photonView.RPC("ActivateOtherColliders", RpcTarget.All);
 
         camController.MotionAids();
 

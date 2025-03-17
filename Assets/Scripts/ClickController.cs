@@ -220,6 +220,7 @@ public class ClickController : MonoBehaviourPunCallbacks
         Debug.Log("クリックしたオブジェクト以外のコライダーを無効化しました。");
     }
 
+    [PunRPC]
     public void ActivateOtherColliders()
     {
         // "対象オブジェクト" を判定する条件に基づき取得する
