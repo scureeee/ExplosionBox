@@ -259,6 +259,8 @@ public class TurnController : MonoBehaviourPunCallbacks
                 {
                     if (randomObject.CompareTag("Cube"))
                     {
+                        PhotonView clickedView = randomObject.GetComponent<PhotonView>();
+
                         randomObject.gameObject.tag = "Explosion";
 
                         Debug.Log($"オブジェクト{randomObject.gameObject.name}のタグを'Explosion'に変更しました。");
@@ -273,13 +275,14 @@ public class TurnController : MonoBehaviourPunCallbacks
                         StartCoroutine(NextState());
 
                         // クリックしたオブジェクト以外のコライダーを無効化
-                        clickController.DeactivateOtherColliders(randomObject);
+                        photonView.RPC("DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
                     }
                 }
                 else if(currentState == PhaseState.PlayerChoiceToOpenBox)
                 {
-                    Debug.Log("きたぞー");
+                    PhotonView clickedView = randomObject.GetComponent<PhotonView>();
 
+                    Debug.Log("きたぞー");
 
                     clickController.targetPosition = randomObject.transform.position;
 
@@ -293,7 +296,7 @@ public class TurnController : MonoBehaviourPunCallbacks
                     StartCoroutine(NextState());
 
                     // クリックしたオブジェクト以外のコライダーを無効化
-                    clickController.DeactivateOtherColliders(randomObject);
+                    photonView.RPC("DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
                 }
             }
         }
