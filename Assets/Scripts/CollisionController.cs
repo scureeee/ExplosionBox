@@ -198,8 +198,11 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     public void ColliderOff()
     {
-        Debug.Log("消す");
-        enabled = false;
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+        foreach (var col in colliders)
+        {
+            col.enabled = false;
+        }
     }
 
     private IEnumerator MovePlayerToWarpPoint()
