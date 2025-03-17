@@ -106,8 +106,12 @@ public class ClickController : MonoBehaviourPunCallbacks
                             // NavMeshの非同期構築を開始
                             StartCoroutine(BuildNavMeshAsync());
 
+                            Debug.Log("前");
+
                             // クリックしたオブジェクト以外のコライダーを無効化
                             photonView.RPC("DeactivateOtherColliders", RpcTarget.All, clickedObject);
+
+                            Debug.Log("後");
 
                             targetPosition = hit.point;
 
