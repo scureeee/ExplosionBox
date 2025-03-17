@@ -72,6 +72,8 @@ public class ClickController : MonoBehaviourPunCallbacks
             {
                 GameObject clickedObject = hit.collider.gameObject; // クリックしたオブジェクト
 
+                PhotonView clickedView = clickedObject.GetComponent<PhotonView>();
+
                 Debug.Log("hit");
 
                 if(turnController.isMyPhase == true)
@@ -109,7 +111,7 @@ public class ClickController : MonoBehaviourPunCallbacks
                             Debug.Log("前");
 
                             // クリックしたオブジェクト以外のコライダーを無効化
-                            photonView.RPC("DeactivateOtherColliders", RpcTarget.All, clickedObject);
+                            photonView.RPC("DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
 
                             Debug.Log("後");
 
@@ -138,7 +140,7 @@ public class ClickController : MonoBehaviourPunCallbacks
                             StartCoroutine(BuildNavMeshAsync());
 
                             // クリックしたオブジェクト以外のコライダーを無効化
-                            photonView.RPC("DeactivateOtherColliders", RpcTarget.All,clickedObject);
+                            photonView.RPC("DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
 
                             targetPosition = hit.point;
 
@@ -190,8 +192,10 @@ public class ClickController : MonoBehaviourPunCallbacks
 
     // クリックしたオブジェクト以外のコライダーを無効化するメソッド
     [PunRPC]
-    public void DeactivateOtherColliders(GameObject clickedObject)
+    public void DeactivateOtherColliders(int clickedViewID)
     {
+        GameObject clickedObject = PhotonView.Find(clickedViewID)?.gameObject;
+
         if (turnController == null)
         {
             Debug.LogError("DeactivateOtherColliders: turnController が null です。");
