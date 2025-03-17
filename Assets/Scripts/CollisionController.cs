@@ -164,7 +164,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                     clickController.animator.SetBool("Bool Walk", false);
 
-                    ColliderOff();
+                    photonView.RPC("ColliderOff", RpcTarget.All);
 
                     StartCoroutine(MovePlayerToWarpPoint());
 
@@ -184,7 +184,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                     clickController.animator.SetBool("Bool Walk", false);
 
-                    ColliderOff();
+                    photonView.RPC("ColliderOff", RpcTarget.All);
 
                     StartCoroutine(MovePlayerToWarpPoint());
 
@@ -196,6 +196,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
         }
     }
 
+    [PunRPC]
     public void ColliderOff()
     {
         Collider[] colliders = GetComponentsInChildren<Collider>();
