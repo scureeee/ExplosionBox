@@ -162,7 +162,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                 clickController.animator.SetBool("Bool Walk", false);
 
-                StartCoroutine(MovePlayerToWarpPoint());
+                MovePlayerToWarpPoint();
 
                 // カメラを当たったオブジェクトに近づける処理を開始
                 camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
@@ -180,7 +180,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                 clickController.animator.SetBool("Bool Walk", false);
 
-                StartCoroutine(MovePlayerToWarpPoint());
+                MovePlayerToWarpPoint();
 
                 photonView.RPC("clickController.ActivateOtherColliders", RpcTarget.All);
 
@@ -189,7 +189,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
         }
     }
 
-    private IEnumerator MovePlayerToWarpPoint()
+    private void MovePlayerToWarpPoint()
     {
         float duration = 1.0f; // 移動時間（秒）
         float elapsedTime = 0f;
@@ -201,7 +201,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
         {
             turnController.playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
             elapsedTime += Time.deltaTime;
-            yield return null;
+            break;
         }
 
         Debug.Log("移動する");

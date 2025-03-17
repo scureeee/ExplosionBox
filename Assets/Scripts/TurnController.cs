@@ -275,7 +275,7 @@ public class TurnController : MonoBehaviourPunCallbacks
                         StartCoroutine(NextState());
 
                         // クリックしたオブジェクト以外のコライダーを無効化
-                        photonView.RPC("DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
+                        photonView.RPC("clickController.DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
                     }
                 }
                 else if(currentState == PhaseState.PlayerChoiceToOpenBox)
@@ -296,7 +296,7 @@ public class TurnController : MonoBehaviourPunCallbacks
                     StartCoroutine(NextState());
 
                     // クリックしたオブジェクト以外のコライダーを無効化
-                    photonView.RPC("DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
+                    photonView.RPC("clickController.DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
                 }
             }
         }
