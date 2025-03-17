@@ -107,7 +107,7 @@ public class ClickController : MonoBehaviourPunCallbacks
                             StartCoroutine(BuildNavMeshAsync());
 
                             // クリックしたオブジェクト以外のコライダーを無効化
-                            DeactivateOtherColliders(clickedObject);
+                            photonView.RPC("DeactivateOtherColliders", RpcTarget.All, clickedObject);
 
                             targetPosition = hit.point;
 
@@ -134,7 +134,7 @@ public class ClickController : MonoBehaviourPunCallbacks
                             StartCoroutine(BuildNavMeshAsync());
 
                             // クリックしたオブジェクト以外のコライダーを無効化
-                            DeactivateOtherColliders(clickedObject);
+                            photonView.RPC("DeactivateOtherColliders", RpcTarget.All,clickedObject);
 
                             targetPosition = hit.point;
 
@@ -185,6 +185,7 @@ public class ClickController : MonoBehaviourPunCallbacks
     }
 
     // クリックしたオブジェクト以外のコライダーを無効化するメソッド
+    [PunRPC]
     public void DeactivateOtherColliders(GameObject clickedObject)
     {
         if (turnController == null)
