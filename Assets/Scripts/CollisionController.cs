@@ -164,6 +164,8 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                     clickController.animator.SetBool("Bool Walk", false);
 
+                    other.enabled = false;
+
                     StartCoroutine(MovePlayerToWarpPoint());
 
                     // カメラを当たったオブジェクトに近づける処理を開始
@@ -181,6 +183,8 @@ public class CollisionController : MonoBehaviourPunCallbacks
                     clickController.isMoving = false; // フラグをリセット
 
                     clickController.animator.SetBool("Bool Walk", false);
+
+                    other.enabled = false;
 
                     StartCoroutine(MovePlayerToWarpPoint());
 
