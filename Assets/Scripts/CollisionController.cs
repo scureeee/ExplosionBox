@@ -156,6 +156,8 @@ public class CollisionController : MonoBehaviourPunCallbacks
         {
             if(currentState == PhaseState.PlayerMoveToChoiceBox || currentState == PhaseState.EnemyMoveToChoiceBox)
             {
+                Debug.Log("open時に当たった");
+
                 clickController.isMoving = false; // フラグをリセット
 
                 clickController.animator.SetBool("Bool Walk", false);
@@ -172,6 +174,8 @@ public class CollisionController : MonoBehaviourPunCallbacks
             }
             else if(currentState == PhaseState.PlayerMoveToSetBox || currentState == PhaseState.EnemyMoveToSetBox)
             {
+                Debug.Log("set時に当たった");
+
                 clickController.isMoving = false; // フラグをリセット
 
                 clickController.animator.SetBool("Bool Walk", false);
