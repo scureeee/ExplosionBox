@@ -158,8 +158,6 @@ public class CollisionController : MonoBehaviourPunCallbacks
             {
                 if (currentState == PhaseState.PlayerMoveToChoiceBox || currentState == PhaseState.EnemyMoveToChoiceBox)
                 {
-                    photonView.RPC("ColliderOff", RpcTarget.All);
-
                     Debug.Log("open時に当たった");
 
                     clickController.isMoving = false; // フラグをリセット
@@ -178,8 +176,6 @@ public class CollisionController : MonoBehaviourPunCallbacks
                 }
                 else if (currentState == PhaseState.PlayerMoveToSetBox || currentState == PhaseState.EnemyMoveToSetBox)
                 {
-                    photonView.RPC("ColliderOff", RpcTarget.All);
-
                     Debug.Log("set時に当たった");
 
                     clickController.isMoving = false; // フラグをリセット
@@ -196,18 +192,16 @@ public class CollisionController : MonoBehaviourPunCallbacks
         }
     }
 
-    [PunRPC]
-    public void ColliderOff()
-    {
-        Collider[] colliders = GetComponentsInChildren<Collider>();
-        foreach (var col in colliders)
-        {
-            col.enabled = false;
-        }
-    }
-
     private IEnumerator MovePlayerToWarpPoint()
     {
+        PhotonTransformView photonTransformView = turnController.playerObject.GetComponent<PhotonTransformView>();
+
+        if (photonTransformView != null)
+        {
+            Debug.Log("同期停止");
+            photonTransformView.enabled = false; // 同期を一時停止
+        }
+
         float duration = 1.0f; // 移動時間（秒）
         float elapsedTime = 0f;
 
@@ -216,6 +210,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         while (elapsedTime < duration)
         {
+            Debug.Log("移動中");
             turnController.playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
             elapsedTime += Time.deltaTime;
             yield return null;
@@ -224,6 +219,12 @@ public class CollisionController : MonoBehaviourPunCallbacks
         Debug.Log("移動する");
 
         turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
+
+        if (photonTransformView != null)
+        {
+            Debug.Log("同期再開");
+            photonTransformView.enabled = true; // 同期を再開
+        }
     }
 
 

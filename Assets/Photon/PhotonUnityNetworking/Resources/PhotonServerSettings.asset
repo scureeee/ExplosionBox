@@ -46,6 +46,9 @@ MonoBehaviour:
   - ChangeTagToExplosion
   - SetupObject
   - SetupObjectByViewID
+  - ActivateOtherColliders
+  - DeactivateOtherColliders
+  - ColliderOff
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
