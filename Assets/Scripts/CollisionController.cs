@@ -194,6 +194,8 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private IEnumerator MovePlayerToWarpPoint()
     {
+        Debug.Log($"warpPoint位置: {warpPoint.transform.position}");
+
         PhotonTransformView photonTransformView = turnController.playerObject.GetComponent<PhotonTransformView>();
 
         if (photonTransformView != null)
