@@ -210,6 +210,9 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         while (elapsedTime < duration)
         {
+            Debug.Log($"開始位置: {startPosition}, 目標位置: {targetPosition}");
+            Debug.Log($"現在の位置: {turnController.playerObject.transform.position}");
+
             //Debug.Log("移動中");
             turnController.playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
             elapsedTime += Time.deltaTime;
