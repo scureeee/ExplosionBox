@@ -221,7 +221,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         Debug.Log("移動する");
 
-        //turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
+        turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
         if (photonTransformView != null)
         {
             Debug.Log("同期再開");
