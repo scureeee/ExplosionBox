@@ -898,7 +898,7 @@ GameObject:
   - component: {fileID: 803319136659360179}
   - component: {fileID: 2396700050753402481}
   - component: {fileID: 635090848246112007}
-  - component: {fileID: 4656519548358706588}
+  - component: {fileID: -369520410670818927}
   m_Layer: 6
   m_Name: TreasureChestPrefab
   m_TagString: Cube
@@ -1084,8 +1084,7 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 1
   observableSearch: 2
-  ObservedComponents:
-  - {fileID: 4656519548358706588}
+  ObservedComponents: []
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -1113,7 +1112,7 @@ MonoBehaviour:
   particleSystem: {fileID: 693930932380841069}
   cameraBuck: 1
   isPaused: 0
---- !u!114 &4656519548358706588
+--- !u!114 &-369520410670818927
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1122,30 +1121,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 3471643304241853864}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8efc6b1d64977384eb3405357896c656, type: 3}
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PositionModel:
-    SynchronizeEnabled: 1
-    TeleportEnabled: 1
-    TeleportIfDistanceGreaterThan: 3
-    InterpolateOption: 4
-    InterpolateMoveTowardsSpeed: 1
-    InterpolateLerpSpeed: 1
-    ExtrapolateOption: 0
-    ExtrapolateSpeed: 1
-    ExtrapolateIncludingRoundTripTime: 1
-    ExtrapolateNumberOfStoredPositions: 1
-  m_RotationModel:
-    SynchronizeEnabled: 1
-    InterpolateOption: 1
-    InterpolateRotateTowardsSpeed: 180
-    InterpolateLerpSpeed: 5
-  m_ScaleModel:
-    SynchronizeEnabled: 1
-    InterpolateOption: 0
-    InterpolateMoveTowardsSpeed: 1
-    InterpolateLerpSpeed: 0
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
 --- !u!1 &3749524858036392910
 GameObject:
   m_ObjectHideFlags: 0
