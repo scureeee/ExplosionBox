@@ -65,6 +65,9 @@ public class CollisionController : MonoBehaviourPunCallbacks
         particleSystem = particle.GetComponent<ParticleSystem>();
 
         imageController = FindObjectOfType<ImageController>();
+
+        // warpPointの位置をこの箱の位置に合わせる
+        warpPoint.position = transform.position;
     }
 
     // Update is called once per frame
