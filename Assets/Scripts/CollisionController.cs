@@ -33,7 +33,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private OptionController optionController;
 
-    [SerializeField] private Transform warpPoint;
+    public Transform warpPoint;
 
     //アニメーターコンポーネント
 
@@ -65,11 +65,6 @@ public class CollisionController : MonoBehaviourPunCallbacks
         particleSystem = particle.GetComponent<ParticleSystem>();
 
         imageController = FindObjectOfType<ImageController>();
-
-        if (warpPoint == null)
-        {
-            Debug.LogError("warpPointがアサインされていません！");
-        }
     }
 
     // Update is called once per frame
@@ -228,7 +223,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         Debug.Log("移動する");
 
-        //turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
+        turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
         if (photonTransformView != null)
         {
             Debug.Log("同期再開");
