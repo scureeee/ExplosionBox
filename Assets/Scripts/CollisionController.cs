@@ -54,6 +54,13 @@ public class CollisionController : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
+        // すでに生成されているシーン上の自分の位置をwarpPointにコピーする
+        if (warpPoint != null)
+        {
+            warpPoint.position = transform.position;
+            Debug.Log($"warpPoint位置を初期化（生成座標に同期）: {warpPoint.position}");
+        }
+
         animator = GetComponent<Animator>();
 
         optionController = FindObjectOfType<OptionController>();
@@ -65,9 +72,6 @@ public class CollisionController : MonoBehaviourPunCallbacks
         particleSystem = particle.GetComponent<ParticleSystem>();
 
         imageController = FindObjectOfType<ImageController>();
-
-        // warpPointの位置をこの箱の位置に合わせる
-        warpPoint.position = transform.position;
     }
 
     // Update is called once per frame
