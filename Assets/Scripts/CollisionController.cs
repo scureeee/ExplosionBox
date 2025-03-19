@@ -54,21 +54,6 @@ public class CollisionController : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
-        if (warpPoint == null)
-        {
-            warpPoint = transform.Find("warpPoint");
-            if (warpPoint == null)
-            {
-                Debug.LogWarning("warpPoint が見つかりません！");
-            }
-        }
-
-        if (warpPoint != null)
-        {
-            warpPoint.position = transform.position;
-            Debug.Log($"warpPoint 初期化完了: {warpPoint.position}");
-        }
-
         animator = GetComponent<Animator>();
 
         optionController = FindObjectOfType<OptionController>();
@@ -171,6 +156,20 @@ public class CollisionController : MonoBehaviourPunCallbacks
         {
             if (other.gameObject.tag == "Player")
             {
+                if (warpPoint == null)
+                {
+                    warpPoint = transform.Find("warpPoint");
+                    if (warpPoint == null)
+                    {
+                        Debug.LogWarning("warpPoint が見つかりません！");
+                    }
+                }
+
+                if (warpPoint != null)
+                {
+                    warpPoint.position = transform.position;
+                    Debug.Log($"warpPoint 初期化完了: {warpPoint.position}");
+                }
                 if (currentState == PhaseState.PlayerMoveToChoiceBox || currentState == PhaseState.EnemyMoveToChoiceBox)
                 {
                     Debug.Log("open時に当たった");
