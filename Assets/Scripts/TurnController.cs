@@ -339,6 +339,7 @@ public class TurnController : MonoBehaviourPunCallbacks
 
             // オブジェクト生成
             GameObject obj = PhotonNetwork.Instantiate("TreasureChestPrefab", position, Quaternion.identity);
+            obj.transform.position = position;
             objectArray[i] = obj;
 
             photonView.RPC("SetupObjectByViewID", RpcTarget.All, obj.GetComponent<PhotonView>().ViewID, i);

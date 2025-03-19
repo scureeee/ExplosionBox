@@ -142,6 +142,14 @@ public class CollisionController : MonoBehaviourPunCallbacks
         }
     }
 
+    public void SetNewWarpPoint(Vector3 newPosition)
+    {
+        if (warpPoint != null)
+        {
+            warpPoint.position = newPosition; // warpPointの位置を更新
+        }
+    }
+
     void OnTriggerEnter(Collider other)
     {
         // 現在のstateを取得
