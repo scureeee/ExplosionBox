@@ -373,7 +373,7 @@ public class TurnController : MonoBehaviourPunCallbacks
 
     void DecideFirstTurn()
     {
-        firstTurn = Random.Range(0, 2);
+        firstTurn = Random.Range(1, 2);
 
         if (firstTurn == 0)
         {
