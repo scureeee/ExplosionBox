@@ -33,7 +33,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private OptionController optionController;
 
-    private Transform warpPoint;
+    [SerializeField] private Transform warpPoint;
 
     //アニメーターコンポーネント
 
