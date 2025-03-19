@@ -33,7 +33,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private OptionController optionController;
 
-    public Transform warpPoint;
+    private Transform warpPoint;
 
     //アニメーターコンポーネント
 
@@ -65,6 +65,11 @@ public class CollisionController : MonoBehaviourPunCallbacks
         particleSystem = particle.GetComponent<ParticleSystem>();
 
         imageController = FindObjectOfType<ImageController>();
+
+        if (warpPoint == null)
+        {
+            Debug.LogError("warpPointがアサインされていません！");
+        }
     }
 
     // Update is called once per frame
@@ -156,20 +161,6 @@ public class CollisionController : MonoBehaviourPunCallbacks
         {
             if (other.gameObject.tag == "Player")
             {
-                if (warpPoint == null)
-                {
-                    warpPoint = transform.Find("warpPoint");
-                    if (warpPoint == null)
-                    {
-                        Debug.LogWarning("warpPoint が見つかりません！");
-                    }
-                }
-
-                if (warpPoint != null)
-                {
-                    warpPoint.position = transform.position;
-                    Debug.Log($"warpPoint 初期化完了: {warpPoint.position}");
-                }
                 if (currentState == PhaseState.PlayerMoveToChoiceBox || currentState == PhaseState.EnemyMoveToChoiceBox)
                 {
                     Debug.Log("open時に当たった");
