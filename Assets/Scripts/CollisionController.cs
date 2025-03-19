@@ -33,7 +33,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private OptionController optionController;
 
-    public Transform warpPoint;
+    public GameObject warp;
 
     //アニメーターコンポーネント
 
@@ -142,14 +142,6 @@ public class CollisionController : MonoBehaviourPunCallbacks
         }
     }
 
-    public void SetNewWarpPoint(Vector3 newPosition)
-    {
-        if (warpPoint != null)
-        {
-            warpPoint.position = newPosition; // warpPointの位置を更新
-        }
-    }
-
     void OnTriggerEnter(Collider other)
     {
         // 現在のstateを取得
@@ -164,6 +156,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
         {
             if (other.gameObject.tag == "Player")
             {
+                warp = turnController.warpPoint;
                 if (currentState == PhaseState.PlayerMoveToChoiceBox || currentState == PhaseState.EnemyMoveToChoiceBox)
                 {
                     Debug.Log("open時に当たった");
@@ -202,7 +195,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private IEnumerator MovePlayerToWarpPoint()
     {
-        Debug.Log($"warpPoint位置: {warpPoint.transform.position}");
+        Debug.Log($"warpPoint位置: {warp.transform.position}");
 
         PhotonTransformView photonTransformView = turnController.playerObject.GetComponent<PhotonTransformView>();
 
@@ -216,7 +209,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
         float elapsedTime = 0f;
 
         Vector3 startPosition = turnController.playerObject.transform.position;
-        Vector3 targetPosition = warpPoint.transform.position;
+        Vector3 targetPosition = warp.transform.position;
 
         while (elapsedTime < duration)
         {
