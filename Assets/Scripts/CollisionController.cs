@@ -150,7 +150,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
         //selectedObject = this.gameObject; // 衝突したオブジェクトを保存
 
         //playerが消えた時再度読み込まなくてはならないのでここに置く
-        clickController = FindObjectOfType<ClickController>();
+        //clickController = FindObjectOfType<ClickController>();
 
         if (turnController.isMyPhase)
         {
@@ -165,10 +165,15 @@ public class CollisionController : MonoBehaviourPunCallbacks
                     clickController.animator.SetBool("Bool Walk", false);
 
                     // 触れたボックスのwarpPointをターゲットに設定
-                    Transform targetWarpPoint = other.gameObject.GetComponent<CollisionController>().warpPoint;
+                    CollisionController collisionController = other.gameObject.GetComponent<CollisionController>();
+                    Transform targetWarpPoint = collisionController != null ? collisionController.warpPoint : null;
 
-                    // プレイヤーをwarpPointに移動
-                    StartCoroutine(MovePlayerToWarpPoint(targetWarpPoint));
+                    // warpPointがnullでない場合に移動処理を行う
+                    if (targetWarpPoint != null)
+                    {
+                        // プレイヤーをwarpPointに移動
+                        StartCoroutine(MovePlayerToWarpPoint(targetWarpPoint));
+                    }
 
                     // カメラを当たったオブジェクトに近づける処理を開始
                     camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
@@ -187,10 +192,15 @@ public class CollisionController : MonoBehaviourPunCallbacks
                     clickController.animator.SetBool("Bool Walk", false);
 
                     // 触れたボックスのwarpPointをターゲットに設定
-                    Transform targetWarpPoint = other.gameObject.GetComponent<CollisionController>().warpPoint;
+                    CollisionController collisionController = other.gameObject.GetComponent<CollisionController>();
+                    Transform targetWarpPoint = collisionController != null ? collisionController.warpPoint : null;
 
-                    // プレイヤーをwarpPointに移動
-                    StartCoroutine(MovePlayerToWarpPoint(targetWarpPoint));
+                    // warpPointがnullでない場合に移動処理を行う
+                    if (targetWarpPoint != null)
+                    {
+                        // プレイヤーをwarpPointに移動
+                        StartCoroutine(MovePlayerToWarpPoint(targetWarpPoint));
+                    }
 
                     photonView.RPC("clickController.ActivateOtherColliders", RpcTarget.All);
 
@@ -202,7 +212,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private IEnumerator MovePlayerToWarpPoint(Transform targetWarpPoint)
     {
-        Debug.Log($"warpPoint位置: {targetWarpPoint.transform.position}");
+        Debug.Log($"warpPoint位置: {targetWarpPoint.position}");
 
         PhotonTransformView photonTransformView = turnController.playerObject.GetComponent<PhotonTransformView>();
 
@@ -212,26 +222,19 @@ public class CollisionController : MonoBehaviourPunCallbacks
             photonTransformView.enabled = false; // 同期を一時停止
         }
 
-        float duration = 1.0f; // 移動時間（秒）
-        float elapsedTime = 0f;
+        Rigidbody rb = turnController.playerObject.GetComponent<Rigidbody>();
+        Vector3 targetPosition = targetWarpPoint.position;
+        Vector3 direction = (targetPosition - turnController.playerObject.transform.position).normalized;
+        float moveSpeed = 5f;
 
-        Vector3 startPosition = turnController.playerObject.transform.position;
-        Vector3 targetPosition = targetWarpPoint.transform.position;
-
-        while (elapsedTime < duration)
+        while (Vector3.Distance(turnController.playerObject.transform.position, targetPosition) > 0.01f)
         {
-            Debug.Log($"開始位置: {startPosition}, 目標位置: {targetPosition}");
-            Debug.Log($"現在の位置: {turnController.playerObject.transform.position}");
-
-            //Debug.Log("移動中");
-            turnController.playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
-            elapsedTime += Time.deltaTime;
+            rb.MovePosition(turnController.playerObject.transform.position + direction * moveSpeed * Time.deltaTime);
             yield return null;
         }
 
-        Debug.Log("移動する");
+        Debug.Log("移動完了");
 
-        turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
         if (photonTransformView != null)
         {
             Debug.Log("同期再開");
