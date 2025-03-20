@@ -189,6 +189,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private IEnumerator MovePlayerToWarpPoint()
     {
+        Debug.Log("移動開始");
         Vector3 targetPosition = Vector3.zero; // 中央座標 (0, 0, 0)
         float moveSpeed = 5f;
 
