@@ -181,14 +181,23 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                     clickController.animator.SetBool("Bool Walk", false);
 
-                    StartCoroutine(MovePlayerToWarpPoint());
-
-                    photonView.RPC("clickController.ActivateOtherColliders", RpcTarget.All);
-
-                    StartCoroutine(turnController.NextState());
+                    StartCoroutine(MoveThenNextState());
                 }
             }
         }
+    }
+
+    private IEnumerator MoveThenNextState()
+    {
+        Debug.Log("通る");
+
+        yield return StartCoroutine(MovePlayerToWarpPoint());
+
+        // 他プレイヤーにもコライダー有効化通知
+        photonView.RPC("clickController.ActivateOtherColliders", RpcTarget.All);
+
+        // 次の状態へ
+        StartCoroutine(turnController.NextState());
     }
 
     private IEnumerator MovePlayerToWarpPoint()
