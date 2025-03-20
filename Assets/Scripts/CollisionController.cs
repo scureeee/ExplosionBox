@@ -177,15 +177,15 @@ public class CollisionController : MonoBehaviourPunCallbacks
                 {
                     Debug.Log("set時に当たった");
 
-                    clickController.isMoving = false; // フラグをリセット
-
-                    clickController.animator.SetBool("Bool Walk", false);
-
                     Debug.Log("MoveThenNextState() 呼び出し直前！");
 
                     StartCoroutine(MoveThenNextState());
 
                     Debug.Log("MoveThenNextState() 呼び出し済み！");
+
+                    clickController.isMoving = false; // フラグをリセット
+
+                    clickController.animator.SetBool("Bool Walk", false);
                 }
             }
         }
