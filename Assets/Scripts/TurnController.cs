@@ -346,7 +346,7 @@ public class TurnController : MonoBehaviourPunCallbacks
 
             // warpPoint を生成（ネットワーク同期）
             GameObject warpPoint = PhotonNetwork.Instantiate("WarpPoint", warpPos, Quaternion.identity);
-            warpPoint.transform.SetParent(obj.transform); // 宝箱の子にする（ローカルでOK）
+            warpPoint.transform.SetParent(obj.transform);
 
 
             photonView.RPC("SetupObjectByViewID", RpcTarget.All, obj.GetComponent<PhotonView>().ViewID, i);
