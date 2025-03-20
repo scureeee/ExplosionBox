@@ -1076,7 +1076,7 @@ MonoBehaviour:
   openSound: {fileID: 8300000, guid: 971645d18ebacd6409e29f9579474b3f, type: 3}
   explsionSound: {fileID: 8300000, guid: cf0e7927dd169274db7f62c33e691917, type: 3}
   canselSound: {fileID: 8300000, guid: cc2469190375b6a4fbd913c71c2f4acb, type: 3}
-  warp: {fileID: 0}
+  warpPoint: {fileID: 6027411033696434328, guid: 271a9ed13a89ed442a854b8355087783, type: 3}
   animator: {fileID: 3471643304249230964}
   particleSystem: {fileID: 693930932380841069}
   cameraBuck: 1
