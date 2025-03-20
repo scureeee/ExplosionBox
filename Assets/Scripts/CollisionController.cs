@@ -204,25 +204,19 @@ public class CollisionController : MonoBehaviourPunCallbacks
             photonTransformView.enabled = false; // 同期を一時停止
         }
 
-        float moveSpeed = 5f; // 移動速度
-        Vector3 startPosition = turnController.playerObject.transform.position;
+        Rigidbody rb = turnController.playerObject.GetComponent<Rigidbody>();
         Vector3 targetPosition = warpPoint.transform.position;
+        Vector3 direction = (targetPosition - turnController.playerObject.transform.position).normalized;
+        float moveSpeed = 5f;
 
         while (Vector3.Distance(turnController.playerObject.transform.position, targetPosition) > 0.01f)
         {
-            // 一定速度でターゲットに向かって移動
-            turnController.playerObject.transform.position = Vector3.MoveTowards(
-                turnController.playerObject.transform.position,
-                targetPosition,
-                moveSpeed * Time.deltaTime
-            );
-
+            rb.MovePosition(turnController.playerObject.transform.position + direction * moveSpeed * Time.deltaTime);
             yield return null;
         }
 
         Debug.Log("移動完了");
 
-        turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
         if (photonTransformView != null)
         {
             Debug.Log("同期再開");
