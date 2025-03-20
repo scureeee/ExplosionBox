@@ -213,36 +213,45 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private IEnumerator MovePlayerToWarpPoint()
     {
-        Debug.Log("移動開始");
-        Vector3 targetPosition = Vector3.zero; // 中央座標 (0, 0, 0)
+        Debug.Log("Warp 開始");
+
+        Vector3 targetPosition = Vector3.zero;
         float moveSpeed = 5f;
 
-        PhotonTransformView photonTransformView = turnController.playerObject.GetComponent<PhotonTransformView>();
+        GameObject player = turnController.playerObject;
+
+        PhotonTransformView photonTransformView = player.GetComponent<PhotonTransformView>();
         if (photonTransformView != null)
         {
             Debug.Log("同期停止");
             photonTransformView.enabled = false;
         }
 
-        Rigidbody rb = turnController.playerObject.GetComponent<Rigidbody>();
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+        Debug.Log("Rigidbody: " + rb);
 
-        while (Vector3.Distance(turnController.playerObject.transform.position, targetPosition) > 0.01f)
+        if (rb == null)
         {
-            Vector3 direction = (targetPosition - turnController.playerObject.transform.position).normalized;
-            rb.MovePosition(turnController.playerObject.transform.position + direction * moveSpeed * Time.deltaTime);
+            Debug.LogError("Rigidbody が見つからない！");
+            yield break;
+        }
+
+        while (Vector3.Distance(player.transform.position, targetPosition) > 0.01f)
+        {
+            Debug.Log("移動中: " + player.transform.position + " → " + targetPosition);
+            Vector3 direction = (targetPosition - player.transform.position).normalized;
+            rb.MovePosition(player.transform.position + direction * moveSpeed * Time.deltaTime);
             yield return null;
         }
 
-        // 最終位置をピタッと中央に
-        turnController.playerObject.transform.position = targetPosition;
+        Debug.Log("中央到達！");
+        player.transform.position = targetPosition;
 
         if (photonTransformView != null)
         {
             Debug.Log("同期再開");
             photonTransformView.enabled = true;
         }
-
-        Debug.Log("プレイヤーを中央(0,0,0)に移動完了");
     }
 
 
