@@ -198,6 +198,12 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         PhotonTransformView photonTransformView = turnController.playerObject.GetComponent<PhotonTransformView>();
 
+        if (photonTransformView != null)
+        {
+            Debug.Log("同期停止");
+            photonTransformView.enabled = false; // 同期を一時停止
+        }
+
         float duration = 1.0f; // 移動時間（秒）
         float elapsedTime = 0f;
 
@@ -218,6 +224,11 @@ public class CollisionController : MonoBehaviourPunCallbacks
         Debug.Log("移動する");
 
         turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
+        if (photonTransformView != null)
+        {
+            Debug.Log("同期再開");
+            photonTransformView.enabled = true; // 同期を再開
+        }
     }
 
 
