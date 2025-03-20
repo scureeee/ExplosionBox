@@ -181,7 +181,11 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                     clickController.animator.SetBool("Bool Walk", false);
 
+                    Debug.Log("MoveThenNextState() 呼び出し直前！");
+
                     StartCoroutine(MoveThenNextState());
+
+                    Debug.Log("MoveThenNextState() 呼び出し済み！");
                 }
             }
         }
@@ -193,8 +197,15 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         yield return StartCoroutine(MovePlayerToWarpPoint());
 
-        // 他プレイヤーにもコライダー有効化通知
-        photonView.RPC("clickController.ActivateOtherColliders", RpcTarget.All);
+        // photonView.RPC を使う前に null チェック
+        if (photonView != null)
+        {
+            photonView.RPC("clickController.ActivateOtherColliders", RpcTarget.All);
+        }
+        else
+        {
+            Debug.LogError("PhotonView が見つかりません！");
+        }
 
         // 次の状態へ
         StartCoroutine(turnController.NextState());
