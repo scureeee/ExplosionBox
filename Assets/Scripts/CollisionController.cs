@@ -50,15 +50,6 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     public bool isPaused = false;  // コルーチンの一時停止フラグ
 
-    void OnEnable()
-    {
-        if (clickController == null)
-        {
-            clickController = FindObjectOfType<ClickController>();
-            Debug.Log("clickController を再取得しました");
-        }
-    }
-
     // Start is called before the first frame update
     void Start()
     {
@@ -71,6 +62,8 @@ public class CollisionController : MonoBehaviourPunCallbacks
         camController = FindObjectOfType<CamController>();
 
         particleSystem = particle.GetComponent<ParticleSystem>();
+
+        clickController = FindObjectOfType<ClickController>();
 
         imageController = FindObjectOfType<ImageController>();
     }
