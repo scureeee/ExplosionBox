@@ -199,7 +199,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private IEnumerator MovePlayerToWarpPoint(Transform targetWarpPoint)
     {
-        Debug.Log($"warpPoint位置: {warpPoint.transform.position}");
+        Debug.Log($"warpPoint位置: {targetWarpPoint.transform.position}");
 
         PhotonTransformView photonTransformView = turnController.playerObject.GetComponent<PhotonTransformView>();
 
@@ -213,7 +213,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
         float elapsedTime = 0f;
 
         Vector3 startPosition = turnController.playerObject.transform.position;
-        Vector3 targetPosition = warpPoint.transform.position;
+        Vector3 targetPosition = targetWarpPoint.transform.position;
 
         while (elapsedTime < duration)
         {
