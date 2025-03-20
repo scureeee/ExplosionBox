@@ -341,14 +341,6 @@ public class TurnController : MonoBehaviourPunCallbacks
             GameObject obj = PhotonNetwork.Instantiate("TreasureChestPrefab", position, Quaternion.identity);
             objectArray[i] = obj;
 
-            // warpPoint の位置を計算
-            Vector3 warpPos = position + new Vector3(0, 0, -3f);
-
-            // warpPoint を生成（ネットワーク同期）
-            GameObject warpPoint = PhotonNetwork.Instantiate("WarpPoint", warpPos, Quaternion.identity);
-            warpPoint.transform.SetParent(obj.transform);
-
-
             photonView.RPC("SetupObjectByViewID", RpcTarget.All, obj.GetComponent<PhotonView>().ViewID, i);
         }
         Debug.Log($"Total objects generated: {objectArray.Length}");

@@ -33,8 +33,6 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private OptionController optionController;
 
-    public Transform warpPoint;
-
     //アニメーターコンポーネント
 
     public Animator animator;
@@ -191,34 +189,35 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private IEnumerator MovePlayerToWarpPoint()
     {
-        Debug.Log($"warpPoint位置: {warpPoint.transform.position}");
+        Vector3 targetPosition = Vector3.zero; // 中央座標 (0, 0, 0)
+        float moveSpeed = 5f;
 
         PhotonTransformView photonTransformView = turnController.playerObject.GetComponent<PhotonTransformView>();
-
         if (photonTransformView != null)
         {
             Debug.Log("同期停止");
-            photonTransformView.enabled = false; // 同期を一時停止
+            photonTransformView.enabled = false;
         }
 
         Rigidbody rb = turnController.playerObject.GetComponent<Rigidbody>();
-        Vector3 targetPosition = warpPoint.transform.position;
-        Vector3 direction = (targetPosition - turnController.playerObject.transform.position).normalized;
-        float moveSpeed = 5f;
 
         while (Vector3.Distance(turnController.playerObject.transform.position, targetPosition) > 0.01f)
         {
+            Vector3 direction = (targetPosition - turnController.playerObject.transform.position).normalized;
             rb.MovePosition(turnController.playerObject.transform.position + direction * moveSpeed * Time.deltaTime);
             yield return null;
         }
 
-        Debug.Log("移動完了");
+        // 最終位置をピタッと中央に
+        turnController.playerObject.transform.position = targetPosition;
 
         if (photonTransformView != null)
         {
             Debug.Log("同期再開");
-            photonTransformView.enabled = true; // 同期を再開
+            photonTransformView.enabled = true;
         }
+
+        Debug.Log("プレイヤーを中央(0,0,0)に移動完了");
     }
 
 
