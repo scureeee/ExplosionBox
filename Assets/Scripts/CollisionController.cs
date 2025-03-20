@@ -122,7 +122,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
             }
 
 
-            if(optionController.openTime <= 30f)
+            if (optionController.openTime <= 30f)
             {
                 turnController.countText.enabled = true;
 
@@ -130,7 +130,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
             }
         }
 
-        if(isExplosion == true)
+        if (isExplosion == true)
         {
             if (particleSystem != null && !particleSystem.IsAlive())
             {
@@ -152,7 +152,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         //selectedObject = this.gameObject; // 衝突したオブジェクトを保存
 
-         if(turnController.isMyPhase)
+        if (turnController.isMyPhase)
         {
             if (other.gameObject.tag == "Player")
             {
@@ -204,26 +204,19 @@ public class CollisionController : MonoBehaviourPunCallbacks
             photonTransformView.enabled = false; // 同期を一時停止
         }
 
-        float duration = 1.0f; // 移動時間（秒）
-        float elapsedTime = 0f;
-
-        Vector3 startPosition = turnController.playerObject.transform.position;
+        Rigidbody rb = turnController.playerObject.GetComponent<Rigidbody>();
         Vector3 targetPosition = warpPoint.transform.position;
+        Vector3 direction = (targetPosition - turnController.playerObject.transform.position).normalized;
+        float moveSpeed = 5f;
 
-        while (elapsedTime < duration)
+        while (Vector3.Distance(turnController.playerObject.transform.position, targetPosition) > 0.01f)
         {
-            Debug.Log($"開始位置: {startPosition}, 目標位置: {targetPosition}");
-            Debug.Log($"現在の位置: {turnController.playerObject.transform.position}");
-
-            //Debug.Log("移動中");
-            turnController.playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
-            elapsedTime += Time.deltaTime;
+            rb.MovePosition(turnController.playerObject.transform.position + direction * moveSpeed * Time.deltaTime);
             yield return null;
         }
 
-        Debug.Log("移動する");
+        Debug.Log("移動完了");
 
-        turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
         if (photonTransformView != null)
         {
             Debug.Log("同期再開");
@@ -375,7 +368,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
             yield return null;  // 次のフレームへ
         }
-        // ループを抜ける場合も `boxOpenCoroutine = null;` を実行
+        // ループを抜ける場合も boxOpenCoroutine = null; を実行
         boxOpenCoroutine = null;
     }
 
