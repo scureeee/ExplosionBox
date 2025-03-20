@@ -347,7 +347,7 @@ public class TurnController : MonoBehaviourPunCallbacks
             Vector3 warpPos = position + new Vector3(0, 0, -3f);
 
             // warpPoint を生成（ネットワーク同期）
-            GameObject warpPoint = PhotonNetwork.Instantiate("WarpPointPrefab", warpPos, Quaternion.identity);
+            GameObject warpPoint = PhotonNetwork.Instantiate("WarpPoint", warpPos, Quaternion.identity);
             warpPoint.transform.SetParent(obj.transform); // 宝箱の子にする（ローカルでOK）
 
 
