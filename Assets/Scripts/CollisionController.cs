@@ -149,7 +149,10 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         //selectedObject = this.gameObject; // 衝突したオブジェクトを保存
 
-         if(turnController.isMyPhase)
+        //playerが消えた時再度読み込まなくてはならないのでここに置く
+        clickController = FindObjectOfType<ClickController>();
+
+        if (turnController.isMyPhase)
         {
             if (other.gameObject.tag == "Player")
             {
