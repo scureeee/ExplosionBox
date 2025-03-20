@@ -147,9 +147,6 @@ public class CollisionController : MonoBehaviourPunCallbacks
         // 現在のstateを取得
         TurnController.PhaseState currentState = turnController.GetCurrentState();
 
-        //playerが消えた時再度読み込まなくてはならないのでここに置く
-        //clickController = FindObjectOfType<ClickController>();
-
         //selectedObject = this.gameObject; // 衝突したオブジェクトを保存
 
          if(turnController.isMyPhase)
@@ -164,7 +161,11 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                     clickController.animator.SetBool("Bool Walk", false);
 
-                    StartCoroutine(MovePlayerToWarpPoint());
+                    // 触れたボックスのwarpPointをターゲットに設定
+                    Transform targetWarpPoint = other.gameObject.GetComponent<CollisionController>().warpPoint;
+
+                    // プレイヤーをwarpPointに移動
+                    StartCoroutine(MovePlayerToWarpPoint(targetWarpPoint));
 
                     // カメラを当たったオブジェクトに近づける処理を開始
                     camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
@@ -182,7 +183,11 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
                     clickController.animator.SetBool("Bool Walk", false);
 
-                    StartCoroutine(MovePlayerToWarpPoint());
+                    // 触れたボックスのwarpPointをターゲットに設定
+                    Transform targetWarpPoint = other.gameObject.GetComponent<CollisionController>().warpPoint;
+
+                    // プレイヤーをwarpPointに移動
+                    StartCoroutine(MovePlayerToWarpPoint(targetWarpPoint));
 
                     photonView.RPC("clickController.ActivateOtherColliders", RpcTarget.All);
 
@@ -192,9 +197,9 @@ public class CollisionController : MonoBehaviourPunCallbacks
         }
     }
 
-    private IEnumerator MovePlayerToWarpPoint()
+    private IEnumerator MovePlayerToWarpPoint(Transform targetWarpPoint)
     {
-        Debug.Log($"warpPoint位置: {warpPoint.transform.position}");
+        Debug.Log($"warpPoint位置: {targetWarpPoint.position}");
 
         PhotonTransformView photonTransformView = turnController.playerObject.GetComponent<PhotonTransformView>();
 
@@ -205,7 +210,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
         }
 
         Rigidbody rb = turnController.playerObject.GetComponent<Rigidbody>();
-        Vector3 targetPosition = warpPoint.transform.position;
+        Vector3 targetPosition = targetWarpPoint.position;
         Vector3 direction = (targetPosition - turnController.playerObject.transform.position).normalized;
         float moveSpeed = 5f;
 
