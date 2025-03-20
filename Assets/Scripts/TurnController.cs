@@ -43,8 +43,6 @@ public class TurnController : MonoBehaviourPunCallbacks
 
     public GameObject turnPanel;
 
-    public GameObject warpPoint;
-
     private Vector3 startPosition;
 
     private Vector3 targetPosition;
