@@ -49,6 +49,16 @@ public class CollisionController : MonoBehaviourPunCallbacks
     private Coroutine boxOpenCoroutine;
 
     public bool isPaused = false;  // コルーチンの一時停止フラグ
+
+    void OnEnable()
+    {
+        if (clickController == null)
+        {
+            clickController = FindObjectOfType<ClickController>();
+            Debug.Log("clickController を再取得しました");
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -68,6 +78,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
+        Debug.Log("playerObject 現在位置: " + turnController.playerObject.transform.position);
 
         if (optionController.clickNext == true)
         {
@@ -146,9 +157,6 @@ public class CollisionController : MonoBehaviourPunCallbacks
         TurnController.PhaseState currentState = turnController.GetCurrentState();
 
         //selectedObject = this.gameObject; // 衝突したオブジェクトを保存
-
-        //playerが消えた時再度読み込まなくてはならないのでここに置く
-        clickController = FindObjectOfType<ClickController>();
 
         if (turnController.isMyPhase)
         {
