@@ -26,9 +26,6 @@ public class ClickController : MonoBehaviourPunCallbacks
 
     private OptionController optionController;
 
-    // Ä¶¬‚·‚é NavMesh ‚Ì”ÍˆÍ”¼Œa
-    public float navMeshUpdateRadius = 5f;
-
     //Start is called before the first frame update
     void Start()
     {
