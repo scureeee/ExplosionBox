@@ -867,7 +867,6 @@ MonoBehaviour:
   targetPosition: {x: 0, y: 0, z: 0}
   isMoving: 0
   animator: {fileID: 2571161699073337402}
-  navMeshUpdateRadius: 5
 --- !u!65 &4063739127541246202
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -914,7 +913,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 4
+  m_Constraints: 36
   m_CollisionDetection: 0
 --- !u!114 &-6718073215497431013
 MonoBehaviour:
