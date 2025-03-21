@@ -46,8 +46,6 @@ public class ClickController : MonoBehaviourPunCallbacks
         {
             turnController.InitializeObjectArray();
         }
-
-        StartCoroutine(BuildNavMeshAsync());
     }
 
     // Update is called once per frame
@@ -105,9 +103,6 @@ public class ClickController : MonoBehaviourPunCallbacks
 
                             Debug.Log($"オブジェクト{cube.name}のタグを'Explosion'に変更しました。");
 
-                            // NavMeshの非同期構築を開始
-                            StartCoroutine(BuildNavMeshAsync());
-
                             Debug.Log("前");
 
                             // クリックしたオブジェクト以外のコライダーを無効化
@@ -136,9 +131,6 @@ public class ClickController : MonoBehaviourPunCallbacks
                         //explosionが付いていない
                         if (hit.collider.CompareTag("Cube") || hit.collider.CompareTag("Explosion"))
                         {
-                            // NavMeshの非同期構築を開始
-                            StartCoroutine(BuildNavMeshAsync());
-
                             // クリックしたオブジェクト以外のコライダーを無効化
                             photonView.RPC("DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
 
@@ -246,12 +238,6 @@ public class ClickController : MonoBehaviourPunCallbacks
         }
 
         Debug.Log("シーン内のすべての対象オブジェクトをアクティブにしました。");
-    }
-
-    public IEnumerator BuildNavMeshAsync()
-    {
-        yield return new WaitForSeconds(0.1f); // NavMesh構築前に少し待機
-        Debug.Log("NavMeshの構築が完了しました。");
     }
 
     private void MovePlayer()
