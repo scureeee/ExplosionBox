@@ -9,15 +9,14 @@ using JetBrains.Annotations;
 using Unity.VisualScripting;
 using optionSpace;
 using UnityEngine.SceneManagement;
-using Photon.Pun;
-using UnityEngine.UIElements;
-using System.Linq;
 
-public class TurnController : MonoBehaviourPunCallbacks
+public class TurnController : MonoBehaviour
 {
     private int firstTurn;
 
     private ClickController clickController;
+
+    private EnemyMoveController enemyMoveController;
 
     private ImageController imageController;
 
@@ -38,6 +37,8 @@ public class TurnController : MonoBehaviourPunCallbacks
     public Dictionary<GameObject, int> objectNumberMapping;
 
     public GameObject playerObject;
+
+    public GameObject enemyObject;
 
     public GameObject randomObject;
 
@@ -75,10 +76,6 @@ public class TurnController : MonoBehaviourPunCallbacks
 
     public bool canselTriger = false;
 
-    private bool isPlayerFirst;
-
-    public bool isMyPhase = true;
-
     public enum PhaseState
     {
         EnemyChoiceToSetBomb,
@@ -95,6 +92,7 @@ public class TurnController : MonoBehaviourPunCallbacks
         EnemyOpenBox
     }
 
+    //あとでアクセッサ入れる
     public Dictionary<int, PhaseState> currentState;
 
     private Dictionary<int, PhaseState> firstEnemyState = new Dictionary<int, PhaseState>
@@ -129,21 +127,8 @@ public class TurnController : MonoBehaviourPunCallbacks
         {11,PhaseState.PlayerOpenBox},
     };
 
-    private void Awake()
-    {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            // ターンの決定
-            Debug.Log("オブジェクト生成が完了しました。DecideFirstTurnを実行します。");
-            DecideFirstTurn();
-        }
-
-    }
-
     void Start()
     {
-        Debug.Log("Startメソッドが実行された");
-
         turnCount = 1;
 
         playerPoint = 0;
@@ -155,25 +140,14 @@ public class TurnController : MonoBehaviourPunCallbacks
         enemyLife = OptionController.maxLife;
 
         optionController = FindObjectOfType<OptionController>();
-        if (optionController == null)
-        {
-            Debug.LogError("OptionController が見つかりません！シーンに OptionController を配置してください。");
-        }
 
         clickController = FindObjectOfType<ClickController>();
 
+        enemyMoveController = FindObjectOfType<EnemyMoveController>();
+
         imageController = FindObjectOfType<ImageController>();
 
-       // currentState = new Dictionary<int, PhaseState>(firstPlayerState);
-        //Debug.Log("仮のcurrentStateを初期化しました。");
-
-        StartCoroutine(DelayedSpawn());
-
-        // currentStateの状態を確認
-        Debug.Log("currentState is " + (currentState == null ? "NULL" : "NOT NULL"));
-
-        Debug.Log("TurnController Start called");
-        Debug.Log("currentState is " + (currentState == null ? "NULL" : "NOT NULL"));
+        SetFirstPlayerOrder(true);
 
         // サンプル：現在の順序をデバッグ出力
         foreach (var pair in currentState)
@@ -182,7 +156,7 @@ public class TurnController : MonoBehaviourPunCallbacks
         }
 
         // DataManagerから設定されたオブジェクト数を取得
-        int numberOfObjects = optionController.objectCountToSet;
+        int numberOfObjects = DataManager.Instance.objectCount;
         Debug.Log($"DataManager.instance.objectCount: {numberOfObjects}");
 
         if (numberOfObjects <= 0)
@@ -195,10 +169,12 @@ public class TurnController : MonoBehaviourPunCallbacks
         objectArray = new GameObject[numberOfObjects];
         objectNumberMapping = new Dictionary<GameObject, int>();
 
-        Debug.Log($"オブジェクト生成完了: objectArray.Length = {objectArray.Length}");
-
         // オブジェクト生成
         GenerateObjectsInCircle(numberOfObjects);
+
+        // ターンの決定
+        Debug.Log("オブジェクト生成が完了しました。DecideFirstTurnを実行します。");
+        DecideFirstTurn();
 
         optionController.choiceTime = 60f;
 
@@ -206,35 +182,18 @@ public class TurnController : MonoBehaviourPunCallbacks
         // 200px下に移動
         targetPosition = new Vector3(startPosition.x, startPosition.y - 1, startPosition.z);
         StartCoroutine(AnimatePanel());
-
-        if (objectArray == null || objectArray.Length == 0)
-        {
-            Debug.LogWarning("Start: objectArray が空なので初期化します。");
-            objectArray = GameObject.FindGameObjectsWithTag("Cube");
-        }
-    }
-
-    IEnumerator DelayedSpawn()
-    {
-        yield return new WaitForSeconds(2f);
-        if (PhotonNetwork.IsMasterClient)
-        {
-            PhotonNetwork.Instantiate("Player", new Vector3(0, 0, 0), Quaternion.identity);
-        }
     }
 
     private void Update()
     {
         PhaseState currentState = GetCurrentState();
 
-        // 現在の状態をログ出力
-        Debug.Log($"今の状態: {currentIndex}");
-        // 現在の状態をログ出力
-        Debug.Log($"今の状態: {currentState}");
+        //Debug.Log(currentIndex);
+
         //Debug.Log(turnCount);
         //Debug.Log(enemyPoint);
         //Debug.Log(objectArray.Length);
-        //Debug.Log("choice"+ optionController.choiceTime);
+        Debug.Log("choice"+ optionController.choiceTime);
         //時間制限で箱をランダムで選択
         if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.PlayerChoiceToOpenBox)
         {
@@ -259,8 +218,6 @@ public class TurnController : MonoBehaviourPunCallbacks
                 {
                     if (randomObject.CompareTag("Cube"))
                     {
-                        PhotonView clickedView = randomObject.GetComponent<PhotonView>();
-
                         randomObject.gameObject.tag = "Explosion";
 
                         Debug.Log($"オブジェクト{randomObject.gameObject.name}のタグを'Explosion'に変更しました。");
@@ -275,14 +232,13 @@ public class TurnController : MonoBehaviourPunCallbacks
                         StartCoroutine(NextState());
 
                         // クリックしたオブジェクト以外のコライダーを無効化
-                        photonView.RPC("clickController.DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
+                        clickController.DeactivateOtherColliders(randomObject);
                     }
                 }
                 else if(currentState == PhaseState.PlayerChoiceToOpenBox)
                 {
-                    PhotonView clickedView = randomObject.GetComponent<PhotonView>();
-
                     Debug.Log("きたぞー");
+
 
                     clickController.targetPosition = randomObject.transform.position;
 
@@ -296,7 +252,7 @@ public class TurnController : MonoBehaviourPunCallbacks
                     StartCoroutine(NextState());
 
                     // クリックしたオブジェクト以外のコライダーを無効化
-                    photonView.RPC("clickController.DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
+                    clickController.DeactivateOtherColliders(randomObject);
                 }
             }
         }
@@ -321,16 +277,8 @@ public class TurnController : MonoBehaviourPunCallbacks
         }
     }
 
-    public void InitializeObjectArray()
-    {
-        objectArray = GameObject.FindGameObjectsWithTag("Cube");
-        Debug.Log($"objectArray を初期化しました。要素数: {objectArray.Length}");
-    }
-
     void GenerateObjectsInCircle(int numberOfObjects)
     {
-        if (!PhotonNetwork.IsMasterClient) return; // マスタークライアントのみオブジェクト生成
-
         for (int i = 0; i < numberOfObjects; i++)
         {
             // 配置角度を計算
@@ -338,52 +286,50 @@ public class TurnController : MonoBehaviourPunCallbacks
             Vector3 position = new Vector3(Mathf.Cos(-angle) * radius, 0, Mathf.Sin(-angle) * radius);
 
             // オブジェクト生成
-            GameObject obj = PhotonNetwork.Instantiate("TreasureChestPrefab", position, Quaternion.identity);
+            GameObject obj = Instantiate(objectPrefab, position, Quaternion.identity, transform);
             objectArray[i] = obj;
 
-            photonView.RPC("SetupObjectByViewID", RpcTarget.All, obj.GetComponent<PhotonView>().ViewID, i);
+            // 各オブジェクトに一意の番号を割り当て
+            objectNumberMapping[obj] = i;
+
+            // オブジェクトの名前に番号を設定
+            obj.name = $"Object_{i}";
+
+            //TextMeshProの追加
+            GameObject textobj = new GameObject("NumberText");
+            //親をオブジェクトに設定
+            textobj.transform.SetParent(obj.transform);
+            //表示位置調整
+            textobj.transform.localPosition = new Vector3(0, 2f, 0);
+
+            TextMeshPro tmp = textobj.AddComponent<TextMeshPro>();
+            //番号を+1して表示
+            tmp.text = (i + 1).ToString();
+            tmp.fontSize = 10;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.color = Color.red;
+
+
+            //Debug.Log($"Object created: {obj.name}, Assigned Number: {i}");
         }
         Debug.Log($"Total objects generated: {objectArray.Length}");
     }
 
-    [PunRPC]
-    public void SetupObjectByViewID(int viewID, int index)
-    {
-        GameObject obj = PhotonView.Find(viewID).gameObject;
-        if (obj == null)
-        {
-            Debug.LogWarning($"[SetupObjectByViewID] Could not find object with ViewID {viewID}");
-            return;
-        }
-
-        obj.name = $"Object_{index}";
-
-        GameObject textobj = new GameObject("NumberText");
-        textobj.transform.SetParent(obj.transform);
-        textobj.transform.localPosition = new Vector3(0, 2f, 0);
-
-        TextMeshPro tmp = textobj.AddComponent<TextMeshPro>();
-        tmp.text = (index + 1).ToString();
-        tmp.fontSize = 10;
-        tmp.alignment = TextAlignmentOptions.Center;
-        tmp.color = Color.red;
-
-        Debug.Log($"[SetupObjectByViewID] Setup done for index {index}, ViewID {viewID}");
-    }
-
     void DecideFirstTurn()
     {
-        firstTurn = Random.Range(1, 2);
+        firstTurn = Random.Range(0, 2);
 
         if (firstTurn == 0)
         {
             Debug.Log("プレイヤーが先行です");
-            photonView.RPC("SetFirstPlayerOrder", RpcTarget.All, true);
+            SetFirstPlayerOrder(true);
+            PlayerTurn();
         }
         else
         {
             Debug.Log("敵が先行です");
-            photonView.RPC("SetFirstPlayerOrder", RpcTarget.All, false);
+            SetFirstPlayerOrder(false);
+            EnemyBombSet();
         }
     }
 
@@ -391,71 +337,9 @@ public class TurnController : MonoBehaviourPunCallbacks
     /// 先攻/後攻の順序を切り替える
     /// </summary>
     /// <param name="isFirst">trueならplayerが先攻、falseならplayerが後攻</param>
-    [PunRPC]
     public void SetFirstPlayerOrder(bool isFirst)
     {
-        Debug.Log("SetFirstPlayerOrder called, isFirst: " + isFirst);
-
-        isPlayerFirst = isFirst; // 先行プレイヤーを設定
-
-        // 先攻/後攻に応じて currentState を設定
-        currentState = isFirst ? new Dictionary<int, PhaseState>(firstPlayerState)
-                               : new Dictionary<int, PhaseState>(firstEnemyState);
-
-        // インデックスをリセット
-        currentIndex = 0;
-
-        Debug.Log($"先攻: {(isFirst ? "プレイヤー" : "敵")}");
-        Debug.Log("currentState is now " + (currentState == null ? "NULL" : "NOT NULL"));
-
-        Debug.Log($"[TurnController] SetFirstPlayerOrder 実行: isFirst: {isFirst}, currentState: {currentState[0]}, isMyPhase: {isMyPhase}");
-        StartTurn();
-    }
-
-    private void StartTurn()
-    {
-        if (isPlayerFirst)
-        {
-            if (PhotonNetwork.IsMasterClient)
-            {
-                MyPhase();
-                Debug.Log("先行");
-            }
-            else if (!PhotonNetwork.IsMasterClient)
-            {
-                OtherPhase();
-                Debug.Log("後攻!");
-            }
-        }
-        else
-        {
-            if (PhotonNetwork.IsMasterClient)
-            {
-                OtherPhase();
-                Debug.Log("後攻?");
-            }
-            else
-            {
-                MyPhase();
-                Debug.Log("先行");
-            }
-        }
-    }
-
-    public void MyPhase()
-    {
-        isMyPhase = true;
-        Debug.Log("先行");
-        // 現在の状態をログ出力
-        Debug.Log($"今の状態: {currentState[currentIndex]}");
-    }
-
-    public void OtherPhase()
-    {
-        isMyPhase = false;
-        Debug.Log("後攻");
-        // 現在の状態をログ出力
-        Debug.Log($"今の状態: {currentState[currentIndex]}");
+        currentState = isFirst ? firstPlayerState : firstEnemyState;
     }
 
     // 現在のstateを取得する
@@ -463,17 +347,10 @@ public class TurnController : MonoBehaviourPunCallbacks
     {
         return currentState[currentIndex];
     }
-
-    [PunRPC]
-    public void SyncCurrentState(int index)
-    {
-        currentIndex = index;
-        Debug.Log("同期された currentIndex: " + currentIndex);
-    }
-
+    
     public IEnumerator NextState()
     {
-        Debug.Log("nextstate");
+        Debug.Log("state");
 
         PhaseState currentState = GetCurrentState();
         
@@ -494,20 +371,11 @@ public class TurnController : MonoBehaviourPunCallbacks
             yield return null;
         }
     }
-
-    [PunRPC]
-    public void SyncCurrentIndex(int index)
-    {
-        currentIndex = index;
-        Debug.Log($"currentIndex を同期: {currentIndex}");
-    }
-
+    
     public void Next()
     {
         // 次のインデックスに進む
         currentIndex++;
-
-        photonView.RPC("SyncCurrentState", RpcTarget.Others, currentIndex);
 
         // インデックスが順序の範囲外ならリセット
         if (currentIndex >= currentState.Count)
@@ -537,12 +405,6 @@ public class TurnController : MonoBehaviourPunCallbacks
         Debug.Log($"今の状態: {currentState[currentIndex]}");
 
         optionController.clickNext = false;
-
-        // マスタークライアントがindexを同期
-        if (PhotonNetwork.IsMasterClient)
-        {
-            photonView.RPC("SyncCurrentIndex", RpcTarget.Others, currentIndex);
-        }
     }
 
     public void BuckState()
@@ -577,24 +439,70 @@ public class TurnController : MonoBehaviourPunCallbacks
         turnPanel.transform.position = endPos;
     }
 
-    public int NumberRandom()
+    public void NumberRandom()
     {
-        if (objectArray == null || objectArray.Length == 0)
-        {
-            Debug.LogWarning("objectArray が空なので再取得を試みます...");
-            objectArray = GameObject.FindGameObjectsWithTag("Cube");
-
-            Debug.Log($"再取得後の objectArray.Length = {objectArray.Length}");
-        }
-
-        if (objectArray == null || objectArray.Length == 0)
-        {
-            Debug.LogError("NumberRandom: objectArray が空です。ランダム選択ができません。");
-            return -1;
-        }
-
+        // ランダムにオブジェクトを選択
         int randomIndex = Random.Range(0, objectArray.Length);
-        return randomIndex;
+        randomObject = objectArray[randomIndex];
+
+        Debug.Log($"ランダムで{randomObject.name}を抽選");
+    }
+
+    public void EnemyBombSet()
+    {
+        Debug.Log("BombSite");
+
+        // プレイヤーオブジェクトを非アクティブ化
+        if (playerObject != null)
+        {
+            enemyObject.SetActive(true);
+
+            playerObject.SetActive(false);
+            Debug.Log("Player object deactivated.");
+        }
+
+        if (objectArray == null || objectArray.Length == 0)
+        {
+            Debug.LogWarning("objectArray が空です！");
+            return;
+        }
+
+        if (turnCount < OptionController.maxTurn)
+        {
+            NumberRandom();
+
+            enemyMoveController.enemyTarget = randomObject.transform.position;
+
+            enemyMoveController.enemyMoving = true;
+
+            // ランダムに選ばれたオブジェクトの情報を表示
+            //Debug.Log($"ランダムに選ばれたオブジェクト: {randomObject.name}, 割り当て番号: {assignedNumber}");
+        }
+    }
+
+    public void EnemyBoxChoice()
+    {
+        playerObject.SetActive(false);
+
+        enemyObject.SetActive(true);
+
+        //Enemyがboxを選択する
+        NumberRandom();
+
+        StartCoroutine(NextState());
+
+        enemyMoveController.enemyTarget = randomObject.transform.position;
+
+        enemyMoveController.enemyMoving = true;
+    }
+
+   public void PlayerTurn()
+    {
+        Debug.Log("hiukuhjguigui");
+
+        playerObject.SetActive(true);
+
+        enemyObject.SetActive(false);
     }
 
     public void Retirement()

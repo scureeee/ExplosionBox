@@ -2,9 +2,8 @@ using System.Collections;
 using UnityEngine;
 using static TurnController;
 using optionSpace;
-using Photon.Pun;
 
-public class ClickController : MonoBehaviourPunCallbacks
+public class ClickController : MonoBehaviour
 {
     [SerializeField] float smooth = 10f;
 
@@ -26,6 +25,9 @@ public class ClickController : MonoBehaviourPunCallbacks
 
     private OptionController optionController;
 
+    // 再生成する NavMesh の範囲半径
+    public float navMeshUpdateRadius = 5f;
+
     //Start is called before the first frame update
     void Start()
     {
@@ -37,18 +39,12 @@ public class ClickController : MonoBehaviourPunCallbacks
 
         turnController = FindObjectOfType<TurnController>();
 
-        StartCoroutine(WaitForTurnController());
-
-        if (turnController != null)
-        {
-            turnController.InitializeObjectArray();
-        }
+        StartCoroutine(BuildNavMeshAsync());
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log($"[ClickController] currentState: {turnController.currentState}, isMyPhase: {turnController.isMyPhase}, isMaster: {Photon.Pun.PhotonNetwork.IsMasterClient}");
 
         // 現在のstateを取得
         TurnController.PhaseState currentState = turnController.GetCurrentState();
@@ -60,86 +56,59 @@ public class ClickController : MonoBehaviourPunCallbacks
 
             RaycastHit hit;
 
-            Debug.Log("click");
-
             //Rayを投射
             if (Physics.Raycast(ray, out hit))
             {
                 GameObject clickedObject = hit.collider.gameObject; // クリックしたオブジェクト
 
-                PhotonView clickedView = clickedObject.GetComponent<PhotonView>();
-
-                Debug.Log("hit");
-
-                if(turnController.isMyPhase)
+                //turnCountが整数か判別
+                if (currentState == PhaseState.PlayerChoiceToSetBomb)
                 {
-                    Debug.Log("isMyPhase == true");
-
-                    // 自分が操作したいとき
-                    photonView.RequestOwnership();
-
-                    //turnCountが整数か判別
-                    if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
+                    if (hit.collider.CompareTag("Cube"))
                     {
-                        if (hit.collider.CompareTag("Cube"))
-                        {
-                            GameObject cube = hit.collider.gameObject;
+                        hit.collider.gameObject.tag = "Explosion";
 
-                            // Cube の PhotonView を取得
-                            PhotonView cubeView = cube.GetComponent<PhotonView>();
+                        Debug.Log($"オブジェクト{hit.collider.gameObject.name}のタグを'Explosion'に変更しました。");
 
-                            if (cubeView != null)
-                            {
-                                // RPCで全員のタグを変更
-                                photonView.RPC("ChangeTagToExplosion", RpcTarget.AllBuffered, cubeView.ViewID);
-                            }
-                            else
-                            {
-                                Debug.LogWarning("クリックされたCubeにPhotonViewがありません！");
-                            }
+                        // NavMeshの非同期構築を開始
+                        StartCoroutine(BuildNavMeshAsync());
 
-                            Debug.Log($"オブジェクト{cube.name}のタグを'Explosion'に変更しました。");
+                        // クリックしたオブジェクト以外のコライダーを無効化
+                        DeactivateOtherColliders(clickedObject);
 
-                            Debug.Log("前");
+                        targetPosition = hit.point;
 
-                            // クリックしたオブジェクト以外のコライダーを無効化
-                            photonView.RPC("DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
+                        optionController.choiceTime = 60f;
 
-                            Debug.Log("後");
+                        // フラグを有効化
+                        isMoving = true;
 
-                            targetPosition = hit.point;
+                        turnController.countText.enabled = false;
 
-                            optionController.choiceTime = 60f;
-
-                            // クリック時に移動フラグを立てる前
-                            Debug.Log($"targetPosition 設定: {targetPosition}, isMoving を true にします");
-
-                            // フラグを有効化
-                            isMoving = true;
-
-                            turnController.countText.enabled = false;
-
-                            StartCoroutine(turnController.NextState());
-                        }
+                        StartCoroutine(turnController.NextState());
                     }
-                    else if (currentState == PhaseState.PlayerChoiceToOpenBox || currentState == PhaseState.EnemyChoiceToOpenBox)
+                }
+                //後で変える
+                else if(currentState == PhaseState.PlayerChoiceToOpenBox)
+                {
+                    //タグを比較
+                    //explosionが付いていない
+                    if (hit.collider.CompareTag("Cube") || hit.collider.CompareTag("Explosion"))
                     {
-                        //タグを比較
-                        //explosionが付いていない
-                        if (hit.collider.CompareTag("Cube") || hit.collider.CompareTag("Explosion"))
-                        {
-                            // クリックしたオブジェクト以外のコライダーを無効化
-                            photonView.RPC("DeactivateOtherColliders", RpcTarget.All, clickedView.ViewID);
+                        // NavMeshの非同期構築を開始
+                        StartCoroutine(BuildNavMeshAsync());
 
-                            targetPosition = hit.point;
+                        // クリックしたオブジェクト以外のコライダーを無効化
+                        DeactivateOtherColliders(clickedObject);
 
-                            // フラグを有効化
-                            isMoving = true;
+                        targetPosition = hit.point;
 
-                            turnController.countText.enabled = false;
+                        // フラグを有効化
+                        isMoving = true;
 
-                            StartCoroutine(turnController.NextState());
-                        }
+                        turnController.countText.enabled = false;
+
+                        StartCoroutine(turnController.NextState());
                     }
                 }
             }
@@ -152,59 +121,11 @@ public class ClickController : MonoBehaviourPunCallbacks
         }
     }
 
-    [PunRPC]
-    public void ChangeTagToExplosion(int viewID)
-    {
-        GameObject obj = PhotonView.Find(viewID)?.gameObject;
-
-        if (obj != null)
-        {
-            obj.tag = "Explosion";
-            Debug.Log($"[RPC] タグ変更: {obj.name} → Explosion");
-        }
-        else
-        {
-            Debug.LogWarning($"[RPC] ViewID {viewID} のオブジェクトが見つかりませんでした。");
-        }
-    }
-
-    IEnumerator WaitForTurnController()
-    {
-        while (turnController == null || turnController.objectArray == null)
-        {
-            Debug.Log("WaitForTurnController: TurnController または objectArray が null です。待機中...");
-            yield return new WaitForSeconds(0.5f);
-            turnController = FindObjectOfType<TurnController>();
-        }
-        Debug.Log("WaitForTurnController: TurnController の準備完了！");
-    }
-
     // クリックしたオブジェクト以外のコライダーを無効化するメソッド
-    [PunRPC]
-    public void DeactivateOtherColliders(int clickedViewID)
+    public void DeactivateOtherColliders(GameObject clickedObject)
     {
-        GameObject clickedObject = PhotonView.Find(clickedViewID)?.gameObject;
-
-        if (turnController == null)
-        {
-            Debug.LogError("DeactivateOtherColliders: turnController が null です。");
-            return;
-        }
-
-        if (turnController.objectArray == null)
-        {
-            Debug.LogError("DeactivateOtherColliders: objectArray が null です。");
-            return;
-        }
-
         foreach (GameObject obj in turnController.objectArray)
         {
-            if (obj == null)
-            {
-                Debug.LogWarning("DeactivateOtherColliders: objectArray に null の要素があります。");
-                continue;
-            }
-
             if (obj != clickedObject)
             {
                 Collider collider = obj.GetComponent<Collider>();
@@ -218,7 +139,6 @@ public class ClickController : MonoBehaviourPunCallbacks
         Debug.Log("クリックしたオブジェクト以外のコライダーを無効化しました。");
     }
 
-    [PunRPC]
     public void ActivateOtherColliders()
     {
         // "対象オブジェクト" を判定する条件に基づき取得する
@@ -237,20 +157,14 @@ public class ClickController : MonoBehaviourPunCallbacks
         Debug.Log("シーン内のすべての対象オブジェクトをアクティブにしました。");
     }
 
+    public IEnumerator BuildNavMeshAsync()
+    {
+        yield return new WaitForSeconds(0.1f); // NavMesh構築前に少し待機
+        Debug.Log("NavMeshの構築が完了しました。");
+    }
+
     private void MovePlayer()
     {
-        float distance = Vector3.Distance(player.transform.position, targetPosition);
-
-        if (distance < 0.01f)
-        {
-            isMoving = false;
-            animator.SetBool("Bool Walk", false);
-            Debug.Log("移動完了");
-            return;
-        }
-
-        Debug.Log("Move");
-
         // プレイヤーをターゲット位置に向けて移動
         //MoveTowards関数によってスムーズに移動する
         player.transform.position = Vector3.MoveTowards(

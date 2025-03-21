@@ -3,10 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Photon.Pun;
 using static TurnController;
 
-public class CollisionController : MonoBehaviourPunCallbacks
+public class CollisionController : MonoBehaviour
 {
 
     private TurnController turnController;
@@ -31,7 +30,11 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private CamController camController;
 
+    private EnemyMoveController enemyMoveController;
+
     private OptionController optionController;
+
+    public Transform warpPoint;
 
     //アニメーターコンポーネント
 
@@ -42,6 +45,8 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
     private bool isExplosion = false;
 
+    private bool enemyOpen = false;
+
     public bool cameraBuck = true;
 
     private bool stopCoroutineFlag = false;
@@ -49,7 +54,6 @@ public class CollisionController : MonoBehaviourPunCallbacks
     private Coroutine boxOpenCoroutine;
 
     public bool isPaused = false;  // コルーチンの一時停止フラグ
-
     // Start is called before the first frame update
     void Start()
     {
@@ -63,15 +67,12 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         particleSystem = particle.GetComponent<ParticleSystem>();
 
-        clickController = FindObjectOfType<ClickController>();
-
         imageController = FindObjectOfType<ImageController>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("playerObject 現在位置: " + turnController.playerObject.transform.position);
 
         if (optionController.clickNext == true)
         {
@@ -124,7 +125,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
             }
 
 
-            if (optionController.openTime <= 30f)
+            if(optionController.openTime <= 30f)
             {
                 turnController.countText.enabled = true;
 
@@ -132,7 +133,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
             }
         }
 
-        if (isExplosion == true)
+        if(isExplosion == true)
         {
             if (particleSystem != null && !particleSystem.IsAlive())
             {
@@ -149,112 +150,123 @@ public class CollisionController : MonoBehaviourPunCallbacks
         // 現在のstateを取得
         TurnController.PhaseState currentState = turnController.GetCurrentState();
 
+        //start時に読み込めないのでここに置く
+        enemyMoveController = FindObjectOfType<EnemyMoveController>();
+
+        //playerが消えた時再度読み込まなくてはならないのでここに置く
+        clickController = FindObjectOfType<ClickController>();
+
         //selectedObject = this.gameObject; // 衝突したオブジェクトを保存
 
-        if (turnController.isMyPhase)
+        if (other.gameObject.tag == "Player")
         {
-            if (other.gameObject.tag == "Player")
+            if(currentState == PhaseState.PlayerMoveToChoiceBox)
             {
-                if (currentState == PhaseState.PlayerMoveToChoiceBox || currentState == PhaseState.EnemyMoveToChoiceBox)
-                {
-                    Debug.Log("open時に当たった");
+                clickController.isMoving = false; // フラグをリセット
 
-                    clickController.isMoving = false; // フラグをリセット
+                clickController.animator.SetBool("Bool Walk", false);
 
-                    clickController.animator.SetBool("Bool Walk", false);
+                StartCoroutine(MovePlayerToWarpPoint());
 
-                    StartCoroutine(MovePlayerToWarpPoint());
+                // カメラを当たったオブジェクトに近づける処理を開始
+                camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
+                camController.isCameraMoving = true; // カメラ移動を開始
 
-                    // カメラを当たったオブジェクトに近づける処理を開始
-                    camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
-                    camController.isCameraMoving = true; // カメラ移動を開始
+                StartCoroutine(turnController.NextState());
 
-                    StartCoroutine(turnController.NextState());
+                BottonEmerge();
+            }
+            else if(currentState == PhaseState.PlayerMoveToSetBox)
+            {
+                clickController.isMoving = false; // フラグをリセット
 
-                    BottonEmerge();
-                }
-                else if (currentState == PhaseState.PlayerMoveToSetBox || currentState == PhaseState.EnemyMoveToSetBox)
-                {
-                    Debug.Log("set時に当たった");
+                clickController.animator.SetBool("Bool Walk", false);
 
-                    Debug.Log("MoveThenNextState() 呼び出し直前！");
+                StartCoroutine(MovePlayerToWarpPoint());
 
-                    StartCoroutine(MoveThenNextState());
+                clickController.ActivateOtherColliders();
 
-                    Debug.Log("MoveThenNextState() 呼び出し済み！");
-
-                    clickController.isMoving = false; // フラグをリセット
-
-                    clickController.animator.SetBool("Bool Walk", false);
-                }
+                StartCoroutine(turnController.NextState());
             }
         }
-    }
-
-    private IEnumerator MoveThenNextState()
-    {
-        Debug.Log("通る");
-
-        yield return StartCoroutine(MovePlayerToWarpPoint());
-
-        // photonView.RPC を使う前に null チェック
-        if (photonView != null)
+        else if (other.gameObject.tag == "Enemy")
         {
-            photonView.RPC("clickController.ActivateOtherColliders", RpcTarget.All);
-        }
-        else
-        {
-            Debug.LogError("PhotonView が見つかりません！");
+            if(currentState == PhaseState.EnemyMoveToChoiceBox)
+            {
+                enemyMoveController.enemyMoving = false;
+
+                enemyMoveController.enemyAnimator.SetBool("Bool Walk", false);
+
+                StartCoroutine(MoveEnemyToWarpPoint());
+
+                camController.targetObject = other.transform;
+                camController.isCameraMoving = true;
+
+                if (camController.targetObject == other.transform)
+                {
+                    Debug.Log("疲れた");
+
+                    //Animation Eventを使ってboxOpenを行う
+                    animator.SetBool("open", true);
+
+                    enemyOpen = true;
+
+                    StartCoroutine(turnController.NextState());
+                }
+            }
+            else if(currentState == PhaseState.EnemyMoveToSetBox)
+            {
+                enemyMoveController.enemyMoving = false;
+
+                enemyMoveController.enemyAnimator.SetBool("Bool Walk", false);
+
+                StartCoroutine(MoveEnemyToWarpPoint());
+
+                StartCoroutine(turnController.NextState());
+
+                turnController.randomObject.tag = "Explosion";
+                Debug.Log($"Enemyがオブジェクト {turnController.randomObject.name} のタグを 'Explosion' に変更しました。");
+
+                turnController.PlayerTurn();
+            }
         }
 
-        // 次の状態へ
-        StartCoroutine(turnController.NextState());
     }
 
     private IEnumerator MovePlayerToWarpPoint()
     {
-        Debug.Log("Warp 開始");
+        float duration = 1.0f; // 移動時間（秒）
+        float elapsedTime = 0f;
 
-        Vector3 targetPosition = Vector3.zero;
-        float moveSpeed = 5f;
+        Vector3 startPosition = turnController.playerObject.transform.position;
+        Vector3 targetPosition = warpPoint.transform.position;
 
-        GameObject player = turnController.playerObject;
-
-        PhotonTransformView photonTransformView = player.GetComponent<PhotonTransformView>();
-        if (photonTransformView != null)
+        while (elapsedTime < duration)
         {
-            Debug.Log("同期停止");
-            photonTransformView.enabled = false;
-        }
-
-        Rigidbody rb = player.GetComponent<Rigidbody>();
-        Debug.Log("Rigidbody: " + rb);
-
-        if (rb == null)
-        {
-            Debug.LogError("Rigidbody が見つからない！");
-            yield break;
-        }
-
-        while (Vector3.Distance(player.transform.position, targetPosition) > 0.01f)
-        {
-            player.transform.position = Vector3.MoveTowards(
-                player.transform.position,
-                targetPosition,
-                moveSpeed * Time.deltaTime
-            );
-            Debug.Log("強制移動中: " + player.transform.position);
+            turnController.playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        Debug.Log("中央到達！");
-        player.transform.position = targetPosition;
+        turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
+    }
 
-        if (photonTransformView != null)
+    private IEnumerator MoveEnemyToWarpPoint()
+    {
+        float duration = 1.0f; // 移動時間（秒）
+        float elapsedTime = 0f;
+
+        Vector3 startPosition = turnController.enemyObject.transform.position;
+        Vector3 targetPosition = warpPoint.transform.position;
+
+        while (elapsedTime < duration)
         {
-            Debug.Log("同期再開");
-            photonTransformView.enabled = true;
+            turnController.enemyObject.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
         }
+
+        turnController.enemyObject.transform.position = targetPosition; // 最終位置を確定
     }
 
 
@@ -281,7 +293,7 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         isExplosion = false;
 
-        photonView.RPC("ActivateOtherColliders", RpcTarget.All);
+        clickController.ActivateOtherColliders();
 
         camController.MotionAids();
 
@@ -346,62 +358,119 @@ public class CollisionController : MonoBehaviourPunCallbacks
                 continue;  // ループの最初に戻る
             }
 
-            turnController.countText.enabled = false;
-
-            if (this.gameObject.tag == "Cube")
+            if (enemyOpen == false)
             {
-                Debug.Log("cubeだよ");
-                turnController.randomObject.tag = "Cube";
+                turnController.countText.enabled = false;
 
-                // 番号の処理
-                int assignedNumber = turnController.objectNumberMapping[this.gameObject];
-                playerPoint += assignedNumber + 1;
-
-                BottonInbisible();
-                imageController.Safe();
-
-                yield return new WaitForSeconds(1f);
-                List<GameObject> tempList = new List<GameObject>(turnController.objectArray);
-                if (tempList.Contains(this.gameObject))
+                if (this.gameObject.tag == "Cube")
                 {
+                    Debug.Log("cubeだよ");
+                    turnController.randomObject.tag = "Cube";
+
+                    // 番号の処理
+                    int assignedNumber = turnController.objectNumberMapping[this.gameObject];
+                    playerPoint += assignedNumber + 1;
+
+                    BottonInbisible();
+                    imageController.Safe();
+
+                    yield return new WaitForSeconds(1f);
+                    List<GameObject> tempList = new List<GameObject>(turnController.objectArray);
+                    if (tempList.Contains(this.gameObject))
+                    {
+                        tempList.Remove(this.gameObject);
+                        turnController.objectArray = tempList.ToArray();
+                        this.gameObject.SetActive(false);
+                    }
+
+                    boxOpenCoroutine = null;  // コルーチンの参照をクリア
+
+                    yield break;
+                }
+                else if (this.gameObject.tag == "Explosion")
+                {
+                    Debug.Log("Explosionだよ");
+
+                    bomb.SetActive(true);
+                    particle.SetActive(true);
+
+                    playerLife -= 1;
+                    playerPoint = 0;
+
+                    isExplosion = true;
+
+                    animator.SetBool("open", false);
+                    camController.isCameraMoving = false;
+
+                    StartCoroutine(imageController.ExplosionSwitch());
+                    GetComponent<AudioSource>().PlayOneShot(explsionSound);
+
+                    this.gameObject.tag = "Cube";
+                    yield return new WaitForSeconds(1f);
+
+                    boxOpenCoroutine = null;  // コルーチンの参照をクリア
+
+                    yield break;
+                }
+            }
+            else
+            {
+
+                enemyOpen = false;
+                camController.isCameraMoving = false;
+                if (this.gameObject.tag == "Cube")
+                {
+                    enemyPoint += turnController.objectNumberMapping[this.gameObject] + 1;
+                    imageController.Safe();
+
+                    yield return new WaitForSeconds(1f);
+                    this.gameObject.SetActive(false);
+                    List<GameObject> tempList = new List<GameObject>(turnController.objectArray);
                     tempList.Remove(this.gameObject);
                     turnController.objectArray = tempList.ToArray();
-                    this.gameObject.SetActive(false);
+
+                    GameObject[] objectsWithTag = GameObject.FindGameObjectsWithTag("Explosion");
+                    foreach (GameObject obj in objectsWithTag)
+                    {
+                        obj.tag = "Cube";
+                    }
+
+                    Debug.Log(enemyPoint);
+
+                    boxOpenCoroutine = null;  // コルーチンの参照をクリア
+
+                    yield break;
                 }
+                else if (this.gameObject.tag == "Explosion")
+                {
 
-                boxOpenCoroutine = null;  // コルーチンの参照をクリア
+                    bomb.SetActive(true);
 
-                yield break;
+                    particle.SetActive(true);
+
+                    enemyLife -= 1;
+
+                    enemyPoint = 0;
+
+                    //Animation Eventを使ってboxOpenを行う
+                    animator.SetBool("open", false);
+
+                    Debug.Log("EnemyがExplosionを触った");
+
+                    StartCoroutine(imageController.ExplosionSwitch());
+                    GetComponent<AudioSource>().PlayOneShot(explsionSound);
+
+                    this.gameObject.tag = "Cube";
+                    yield return new WaitForSeconds(1f);
+
+                    boxOpenCoroutine = null;  // コルーチンの参照をクリア
+
+                    yield break;
+                }
             }
-            else if (this.gameObject.tag == "Explosion")
-            {
-                Debug.Log("Explosionだよ");
-
-                bomb.SetActive(true);
-                particle.SetActive(true);
-
-                playerLife -= 1;
-                playerPoint = 0;
-
-                isExplosion = true;
-
-                animator.SetBool("open", false);
-                camController.isCameraMoving = false;
-
-                StartCoroutine(imageController.ExplosionSwitch());
-                GetComponent<AudioSource>().PlayOneShot(explsionSound);
-
-                this.gameObject.tag = "Cube";
-                yield return new WaitForSeconds(1f);
-
-                boxOpenCoroutine = null;  // コルーチンの参照をクリア
-
-                yield break;
-            }
-
             yield return null;  // 次のフレームへ
         }
-        // ループを抜ける場合も boxOpenCoroutine = null; を実行
+        // ループを抜ける場合も `boxOpenCoroutine = null;` を実行
         boxOpenCoroutine = null;
     }
 

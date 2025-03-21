@@ -26,9 +26,11 @@ namespace optionSpace
         public bool clickNext = false;
 
         public bool canselTime = false;
-
-        private void Awake()
+        // Start is called before the first frame update
+        void Start()
         {
+
+
             if (Instance == null)
             {
                 Instance = this;
@@ -45,6 +47,12 @@ namespace optionSpace
             maxLife = 2;
 
             objectCountToSet = 8;
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            DataManager.Instance.objectCount = objectCountToSet;
         }
     }
 }

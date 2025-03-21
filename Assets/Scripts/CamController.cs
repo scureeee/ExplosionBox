@@ -69,17 +69,15 @@ public class CamController : MonoBehaviour
     {
         // Œ»Ý‚Ìstate‚ðŽæ“¾
         TurnController.PhaseState currentState = turnController.GetCurrentState();
-        if(turnController.isMyPhase == false)
-        {
-            if (currentState == PhaseState.PlayerChoiceToSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
-            {
-                FadeOut();
-            }
 
-            if (fadeInTrigger == true || currentState == PhaseState.EnemySetBomb || currentState == PhaseState.PlayerSetBomb)
-            {
-                FadeIn();
-            }
+        if (currentState == PhaseState.PlayerSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
+        {
+            FadeOut();
+        }
+
+        if(fadeInTrigger == true || currentState == PhaseState.EnemySetBomb)
+        {
+            FadeIn();
         }
     }
 
@@ -134,8 +132,10 @@ public class CamController : MonoBehaviour
             if (currentState == PhaseState.EnemyChoiceToOpenBox)
             {
                 Debug.Log(",dak,lda,l");
+
+                turnController.EnemyBoxChoice();
             }
-            else if(currentState == PhaseState.EnemySetBomb || currentState == PhaseState.PlayerSetBomb)
+            else if(currentState == PhaseState.EnemySetBomb)
             {
                 StartCoroutine(turnController.NextState());
             }
@@ -151,9 +151,7 @@ public class CamController : MonoBehaviour
 
         fadeAlpha.color = new Color(0,0,0,alpha);
 
-        Debug.Log("enemyˆÃ‚­");
-
-        if (alpha >= 1)
+        if(alpha >= 1)
         {
             if(currentState == PhaseState.PlayerSetBomb)
             {
@@ -161,6 +159,14 @@ public class CamController : MonoBehaviour
 
                 fadeInTrigger = true;
 
+            }
+            else if (currentState == PhaseState.EnemyChoiceToSetBomb)
+            {
+                Debug.Log("enemyˆÃ‚­");
+
+                StartCoroutine(turnController.NextState());
+
+                turnController.EnemyBombSet();
             }
         }
     }
