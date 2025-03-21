@@ -238,9 +238,12 @@ public class CollisionController : MonoBehaviourPunCallbacks
 
         while (Vector3.Distance(player.transform.position, targetPosition) > 0.01f)
         {
-            Debug.Log("移動中: " + player.transform.position + " → " + targetPosition);
-            Vector3 direction = (targetPosition - player.transform.position).normalized;
-            rb.MovePosition(player.transform.position + direction * moveSpeed * Time.deltaTime);
+            player.transform.position = Vector3.MoveTowards(
+                player.transform.position,
+                targetPosition,
+                moveSpeed * Time.deltaTime
+            );
+            Debug.Log("強制移動中: " + player.transform.position);
             yield return null;
         }
 
