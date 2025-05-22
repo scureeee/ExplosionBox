@@ -3,182 +3,170 @@ using UnityEngine;
 using static TurnController;
 using optionSpace;
 
+/// <summary>
+/// ClickControllerã¯ã€ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒãƒã‚¦ã‚¹ã§ãƒœãƒƒã‚¯ã‚¹ã‚’ã‚¯ãƒªãƒƒã‚¯ã—ã¦ç§»å‹•ãƒ»çˆ†å¼¾è¨­ç½®ãƒ»é–‹å°ã‚’è¡Œã†
+/// æ“ä½œã®ä¸­å¿ƒã¨ãªã‚‹ã‚¯ãƒ©ã‚¹ã§ã™ã€‚ç¾åœ¨ã®ãƒ•ã‚§ãƒ¼ã‚ºã«å¿œã˜ã¦æŒ™å‹•ã‚’åˆ‡ã‚Šæ›¿ãˆã¾ã™ã€‚
+/// </summary>
 public class ClickController : MonoBehaviour
 {
-    [SerializeField] float smooth = 10f;
+    // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚¿ãƒ¼ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ï¼ˆç§»å‹•ä¸­ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ãŸã‚ã®ãƒãƒƒã‚·ãƒ¥å€¤ï¼‰
+    private static readonly int Property = Animator.StringToHash("Bool Walk");
+    
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å›è»¢è£œé–“é€Ÿåº¦
+    [SerializeField] private float smooth = 10f;
 
-    public GameObject player;
+    // ç§»å‹•ã•ã›ã‚‹å¯¾è±¡ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+    [SerializeField] public GameObject player;
 
-    //ƒvƒŒƒCƒ„[‚ÌˆÚ“®‘¬“x
-    public float moveSpeed = 5f;
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç§»å‹•é€Ÿåº¦
+    private const float MoveSpeed = 5f;
 
-    //ˆÚ“®æ‚Ìƒ^[ƒQƒbƒgˆÊ’u
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç›®çš„åœ°ï¼ˆã‚¯ãƒªãƒƒã‚¯ã—ãŸå ´æ‰€ï¼‰
     public Vector3 targetPosition;
 
-    //ƒvƒŒƒCƒ„[‚ªˆÚ“®’†‚©‚Ç‚¤‚©
-    public bool isMoving = false;
+    // ç¾åœ¨ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒç§»å‹•ä¸­ã‹ã©ã†ã‹
+    public bool isMoving;
 
-    //ƒAƒjƒ[ƒ^[ƒRƒ“ƒ|[ƒlƒ“ƒg
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚¿ãƒ¼
     public Animator animator;
 
-    private TurnController turnController;
-
-    private OptionController optionController;
-
-    // Ä¶¬‚·‚é NavMesh ‚Ì”ÍˆÍ”¼Œa
-    public float navMeshUpdateRadius = 5f;
+    // ãƒ•ã‚§ãƒ¼ã‚ºã‚’ç®¡ç†ã™ã‚‹TurnController
+    [SerializeField] private TurnController turnController;
 
     //Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         isMoving = false;
 
+        // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚¿ãƒ¼å–å¾—
         animator = GetComponent<Animator>();
-
-        optionController = FindObjectOfType<OptionController>();
-
-        turnController = FindObjectOfType<TurnController>();
-
-        StartCoroutine(BuildNavMeshAsync());
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
+        //ç¾åœ¨ã®stateã‚’å–å¾—
+        var currentState = turnController.GetCurrentState();
 
-        // Œ»İ‚Ìstate‚ğæ“¾
-        TurnController.PhaseState currentState = turnController.GetCurrentState();
-
+        //ã‚¯ãƒªãƒƒã‚¯æ™‚ã®å‡¦ç†
         if (Input.GetMouseButtonDown(0))
         {
-            //Ray‚ğ¶¬
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            RaycastHit hit;
-
-            //Ray‚ğ“ŠË
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out var hit))
             {
-                GameObject clickedObject = hit.collider.gameObject; // ƒNƒŠƒbƒN‚µ‚½ƒIƒuƒWƒFƒNƒg
+                var clickedObject = hit.collider.gameObject;
 
-                //turnCount‚ª®”‚©”»•Ê
-                if (currentState == PhaseState.PlayerChoiceToSetBomb)
+                switch (currentState)
                 {
-                    if (hit.collider.CompareTag("Cube"))
+                    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒçˆ†å¼¾ã‚’è¨­ç½®ã™ã‚‹ãŸã‚ã«é¸æŠã™ã‚‹ãƒ•ã‚§ãƒ¼ã‚º
+                    case PhaseState.PlayerChoiceToSetBomb:
                     {
-                        hit.collider.gameObject.tag = "Explosion";
+                        if (hit.collider.CompareTag("Cube"))
+                        {
+                            // Cubeã‚’çˆ†ç™ºå¯¾è±¡ã«å¤‰æ›´ï¼ˆçˆ†å¼¾ãŒè¨­ç½®ã•ã‚Œã‚‹ï¼‰
+                            hit.collider.gameObject.tag = "Explosion";
 
-                        Debug.Log($"ƒIƒuƒWƒFƒNƒg{hit.collider.gameObject.name}‚Ìƒ^ƒO‚ğ'Explosion'‚É•ÏX‚µ‚Ü‚µ‚½B");
+                            // ä»–ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®Colliderã‚’ç„¡åŠ¹åŒ–ï¼ˆå†é¸æŠé˜²æ­¢ï¼‰
+                            DeactivateOtherColliders(clickedObject);
 
-                        // NavMesh‚Ì”ñ“¯Šú\’z‚ğŠJn
-                        StartCoroutine(BuildNavMeshAsync());
+                            // ç§»å‹•å…ˆä½ç½®ã®ä¿å­˜
+                            targetPosition = hit.point;
 
-                        // ƒNƒŠƒbƒN‚µ‚½ƒIƒuƒWƒFƒNƒgˆÈŠO‚ÌƒRƒ‰ƒCƒ_[‚ğ–³Œø‰»
-                        DeactivateOtherColliders(clickedObject);
+                            // ã‚¿ã‚¤ãƒãƒ¼ãƒªã‚»ãƒƒãƒˆ
+                            OptionController.Instance.choiceTime = 60f;
 
-                        targetPosition = hit.point;
+                            isMoving = true;
 
-                        optionController.choiceTime = 60f;
+                            // ã‚«ã‚¦ãƒ³ãƒˆãƒ†ã‚­ã‚¹ãƒˆéè¡¨ç¤º
+                            turnController.countText.enabled = false;
 
-                        // ƒtƒ‰ƒO‚ğ—LŒø‰»
-                        isMoving = true;
+                            // æ¬¡ã®çŠ¶æ…‹ã¸é€²ã‚€
+                            StartCoroutine(turnController.NextState());
+                        }
 
-                        turnController.countText.enabled = false;
-
-                        StartCoroutine(turnController.NextState());
+                        break;
                     }
-                }
-                //Œã‚Å•Ï‚¦‚é
-                else if(currentState == PhaseState.PlayerChoiceToOpenBox)
-                {
-                    //ƒ^ƒO‚ğ”äŠr
-                    //explosion‚ª•t‚¢‚Ä‚¢‚È‚¢
-                    if (hit.collider.CompareTag("Cube") || hit.collider.CompareTag("Explosion"))
+                    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒãƒœãƒƒã‚¯ã‚¹ã‚’é–‹ã‘ã‚‹ãƒ•ã‚§ãƒ¼ã‚º
+                    case PhaseState.PlayerChoiceToOpenBox:
                     {
-                        // NavMesh‚Ì”ñ“¯Šú\’z‚ğŠJn
-                        StartCoroutine(BuildNavMeshAsync());
+                        if (hit.collider.CompareTag("Cube") || hit.collider.CompareTag("Explosion"))
+                        {
+                            DeactivateOtherColliders(clickedObject);
 
-                        // ƒNƒŠƒbƒN‚µ‚½ƒIƒuƒWƒFƒNƒgˆÈŠO‚ÌƒRƒ‰ƒCƒ_[‚ğ–³Œø‰»
-                        DeactivateOtherColliders(clickedObject);
+                            targetPosition = hit.point;
 
-                        targetPosition = hit.point;
+                            isMoving = true;
 
-                        // ƒtƒ‰ƒO‚ğ—LŒø‰»
-                        isMoving = true;
+                            turnController.countText.enabled = false;
 
-                        turnController.countText.enabled = false;
+                            StartCoroutine(turnController.NextState());
+                        }
 
-                        StartCoroutine(turnController.NextState());
+                        break;
                     }
                 }
             }
         }
 
-        // ƒvƒŒƒCƒ„[‚ğˆÚ“®‚³‚¹‚éˆ—
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç§»å‹•å‡¦ç†ã‚’å®Ÿè¡Œ
         if (isMoving)
         {
             MovePlayer();
         }
     }
 
-    // ƒNƒŠƒbƒN‚µ‚½ƒIƒuƒWƒFƒNƒgˆÈŠO‚ÌƒRƒ‰ƒCƒ_[‚ğ–³Œø‰»‚·‚éƒƒ\ƒbƒh
+    /// <summary>
+    /// ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆä»¥å¤–ã®Colliderã‚’ç„¡åŠ¹åŒ–ã—ã¦å†é¸æŠã‚’é˜²æ­¢ã™ã‚‹
+    /// </summary>
+    /// <param name="clickedObject">ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ</param>
     public void DeactivateOtherColliders(GameObject clickedObject)
     {
-        foreach (GameObject obj in turnController.objectArray)
+        foreach (var obj in turnController.objectArray)
         {
-            if (obj != clickedObject)
+            if (obj == clickedObject) continue;
+            var collider = obj.GetComponent<Collider>();
+            if (collider)
             {
-                Collider collider = obj.GetComponent<Collider>();
-                if (collider != null)
-                {
-                    collider.enabled = false; // ƒRƒ‰ƒCƒ_[‚ğ–³Œø‰»
-                }
+                collider.enabled = false;
             }
         }
-
-        Debug.Log("ƒNƒŠƒbƒN‚µ‚½ƒIƒuƒWƒFƒNƒgˆÈŠO‚ÌƒRƒ‰ƒCƒ_[‚ğ–³Œø‰»‚µ‚Ü‚µ‚½B");
     }
 
+    /// <summary>
+    /// å…¨ã¦ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®Colliderã‚’å†æœ‰åŠ¹åŒ–ï¼ˆã‚²ãƒ¼ãƒ é€²è¡Œæ™‚ã«ä½¿ç”¨ï¼‰
+    /// </summary>
     public void ActivateOtherColliders()
     {
-        // "‘ÎÛƒIƒuƒWƒFƒNƒg" ‚ğ”»’è‚·‚éğŒ‚ÉŠî‚Ã‚«æ“¾‚·‚é
-        // •K—v‚É‰‚¶‚Äƒ^ƒO‚â–¼‘O‚Åi‚è‚Ş
-        foreach (GameObject obj in FindObjectsOfType<GameObject>())
+        foreach (var obj in FindObjectsOfType<GameObject>())
         {
-            Collider collider = obj.GetComponent<Collider>();
-            if (collider != null)
+            var collider = obj.GetComponent<Collider>();
+            if (collider)
             {
-                collider.enabled = true; // ƒRƒ‰ƒCƒ_[‚ğ—LŒø‰»
+                collider.enabled = true;
             }
 
-            obj.SetActive(true); // ƒIƒuƒWƒFƒNƒg©‘Ì‚ğƒAƒNƒeƒBƒu‰»
+            obj.SetActive(true);
         }
-
-        Debug.Log("ƒV[ƒ““à‚Ì‚·‚×‚Ä‚Ì‘ÎÛƒIƒuƒWƒFƒNƒg‚ğƒAƒNƒeƒBƒu‚É‚µ‚Ü‚µ‚½B");
     }
 
-    public IEnumerator BuildNavMeshAsync()
-    {
-        yield return new WaitForSeconds(0.1f); // NavMesh\’z‘O‚É­‚µ‘Ò‹@
-        Debug.Log("NavMesh‚Ì\’z‚ªŠ®—¹‚µ‚Ü‚µ‚½B");
-    }
-
+    /// <summary>
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ç›®çš„åœ°ã¸ç§»å‹•ã•ã›ã€å›è»¢ãƒ»ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’èª¿æ•´
+    /// </summary>
     private void MovePlayer()
     {
-        // ƒvƒŒƒCƒ„[‚ğƒ^[ƒQƒbƒgˆÊ’u‚ÉŒü‚¯‚ÄˆÚ“®
-        //MoveTowardsŠÖ”‚É‚æ‚Á‚ÄƒXƒ€[ƒY‚ÉˆÚ“®‚·‚é
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã«å‘ã‹ã£ã¦ç§»å‹•
         player.transform.position = Vector3.MoveTowards(
             player.transform.position,
             targetPosition,
-            moveSpeed * Time.deltaTime
+            MoveSpeed * Time.deltaTime
         );
 
-        //‘Ì‚ÌŒü‚«‚ğŠŠ‚ç‚©‚É•ÏX‚·‚é
-        Quaternion rotation = Quaternion.LookRotation(targetPosition);
-        //Å‰‚ÉŒü‚¢‚Ä‚¢‚é•ûŒü‚©‚çTime.deltaTime * smooth‚ÅtargetPosition‚ÉŒü‚«‚ğ•Ï‚¦‚é
+        // å‘ãã‚’ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã«è£œé–“ã—ã¦å›è»¢
+        var rotation = Quaternion.LookRotation(targetPosition);
         transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * smooth);
 
-        animator.SetBool("Bool Walk", true);
-        // ƒ^[ƒQƒbƒgˆÊ’u‚É“’B‚µ‚½‚çˆÚ“®‚ğI—¹
+        // æ­©è¡Œã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ON
+        animator.SetBool(Property, true);
     }
 }

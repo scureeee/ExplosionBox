@@ -1,124 +1,119 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using optionSpace;
 
+/// <summary>
+/// ゲームの勝敗判定と、結果シーンへの遷移を管理するクラス。
+/// プレイヤーのライフやポイント、ターン数などを元に判定を行う。
+/// </summary>
 public class ResultJudge : MonoBehaviour
 {
+    // 勝敗状態を保持する ResultState スクリプトの参照
+    [SerializeField] private ResultState resultState;
+    
+    // ターン制御用スクリプトへの参照
+    [SerializeField] private TurnController turnController;
 
-    private TurnController turnController;
+    // 最終ターンを知らせる演出オブジェクト
+    [SerializeField] private GameObject lastTurn;
 
-    public GameObject lastTurn;
-
+    // 最終ターン通知を1回だけ実行するためのフラグ
     private bool lastTrigger = true;
 
-    // Start is called before the first frame update
-
-    void Start()
-    {
-        turnController = FindObjectOfType<TurnController>();
-    }
-
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
+        // プレイヤーのライフが0になった場合 → 負け
         if (TurnController.playerLife == 0)
         {
-            ResultText.resultNumber = 1;
-            Debug.Log("Life�Ȃ��s�k�ł�");
+            resultState.SetState(ResultState.ResultStateType.LifeLose);
             SceneManager.LoadScene("ResultScene");
         }
 
+        // 敵のライフが0になった場合 → 勝ち
         if (TurnController.enemyLife == 0)
         {
-            ResultText.resultNumber = 2;
-            Debug.Log("Life�Ȃ������ł�");
+            resultState.SetState(ResultState.ResultStateType.LifeWin);
             SceneManager.LoadScene("ResultScene");
         }
 
+        // 敵のポイントが最大に達した場合 → 負け
         if(TurnController.enemyPoint >= OptionController.maxPoint)
         {
-            ResultText.resultNumber = 3;
-            Debug.Log("Point You LOSE");
+            resultState.SetState(ResultState.ResultStateType.PointLose);
             SceneManager.LoadScene("ResultScene");
         }
 
+        // プレイヤーのポイントが最大に達した場合 → 勝ち
         if(TurnController.playerPoint >= OptionController.maxPoint)
         {
-            ResultText.resultNumber = 4;
-            Debug.Log("Point You WIN");
+            resultState.SetState(ResultState.ResultStateType.PointWin);
             SceneManager.LoadScene("ResultScene");
         }
 
+        // 残りオブジェクトが1つしかない（最終盤面）の場合 → ポイントで勝敗決定
         if(turnController.objectArray.Length == 1)
         {
             if (TurnController.playerPoint < TurnController.enemyPoint)
             {
-                ResultText.resultNumber = 5;
-                Debug.Log("Turn You LOSE");
+                resultState.SetState(ResultState.ResultStateType.TurnLose);
                 SceneManager.LoadScene("ResultScene");
             }
 
             else if (TurnController.playerPoint > TurnController.enemyPoint)
             {
-                ResultText.resultNumber = 6;
-                Debug.Log("Turn You WIN");
+                resultState.SetState(ResultState.ResultStateType.TurnWin);
                 SceneManager.LoadScene("ResultScene");
             }
 
             else if (TurnController.playerPoint == TurnController.enemyPoint)
             {
-                ResultText.resultNumber = 7;
-                Debug.Log("Draw");
+                resultState.SetState(ResultState.ResultStateType.Draw);
                 SceneManager.LoadScene("ResultScene");
             }
         }
 
+        // 最大ターン数に達した場合 → ポイントで勝敗決定
         if (turnController.turnCount == OptionController.maxTurn)
         {
 
             if (TurnController.playerPoint < TurnController.enemyPoint)
             {
-                ResultText.resultNumber = 5;
-                Debug.Log("Turn You LOSE");
+                resultState.SetState(ResultState.ResultStateType.TurnLose);
                 SceneManager.LoadScene("ResultScene");
             }
 
             else if (TurnController.playerPoint > TurnController.enemyPoint)
             {
-                ResultText.resultNumber = 6;
-                Debug.Log("Turn You WIN");
+                resultState.SetState(ResultState.ResultStateType.TurnWin);
                 SceneManager.LoadScene("ResultScene");
             }
 
             else if (TurnController.playerPoint == TurnController.enemyPoint)
             {
-                ResultText.resultNumber = 7;
-                Debug.Log("Draw");
+                resultState.SetState(ResultState.ResultStateType.Draw);
                 SceneManager.LoadScene("ResultScene");
 
             }
         }
 
-        if(lastTrigger == true)
-        {
-            if(turnController.turnCount == OptionController.maxTurn - 1)
-            {
-                lastTrigger = false;
+        // 最終ターン1つ前のタイミングで「ラストターン演出」を1回だけ表示する
+        if (lastTrigger != true) return;// 一度表示したら以後スキップ
+        if (turnController.turnCount != OptionController.maxTurn - 1) return;// 条件が一致しないときはスキップ
+        lastTrigger = false;// 2度目以降に表示されないようにフラグをOFF
 
-                StartCoroutine(Last());
-            }
-        }
+        StartCoroutine(Last());// ラストターン演出のコルーチンを開始
 
     }
 
-    IEnumerator Last()
+    /// <summary>
+    /// 「ラストターン」のUIや演出を一時的に表示するコルーチン。
+    /// </summary>
+    private IEnumerator Last()
     {
-        lastTurn.SetActive(true);
-
-        yield return new WaitForSeconds(2f);
-
-        lastTurn.SetActive(false);
+        lastTurn.SetActive(true); // ラストターンオブジェクトを表示
+        yield return new WaitForSeconds(2f);// 2秒間待つ
+        lastTurn.SetActive(false);// オブジェクトを非表示に戻す
     }
 } 

@@ -2,95 +2,119 @@ using optionSpace;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 using static TurnController;
 
+/// <summary>
+/// CollisionControllerクラスは、プレイヤーとオブジェクト（箱など）の衝突処理を管理する。
+/// 箱のアニメーション、エフェクト、音、カメラ操作、ゲームの状態（フェーズ）管理などを担当する。
+/// </summary>
 public class CollisionController : MonoBehaviour
 {
+    //アニメーターのパラメーターのハッシュを定義
+    private static readonly int Open = Animator.StringToHash("open");
+    private static readonly int Property = Animator.StringToHash("Bool Walk");
 
+    // TurnControllerへの参照(フェーズ進行などを制御)
     private TurnController turnController;
 
+    // ImageControllerへの参照（UI表示制御などに使用）
     private ImageController imageController;
 
-    public GameObject openBotton;
+    // 箱を開けるボタンのゲームオブジェクト（UI上の操作対象）
+    [SerializeField] private GameObject openBottom;
 
-    public GameObject buckBotton;
+    // 箱を戻す（キャンセル）ボタンのゲームオブジェクト
+    [SerializeField] private GameObject buckBottom;
 
-    public GameObject particle;
+    // 箱が開いたときのパーティクルオブジェクト
+    [SerializeField] private GameObject particle;
 
-    public GameObject bomb;
+    // 爆弾オブジェクト（開けた箱が爆弾だった場合に使用）
+    [SerializeField] private GameObject bomb;
 
-    public AudioClip openSound;
+    // 箱を開けたときのサウンド
+    [SerializeField] private AudioClip openSound;
 
-    public AudioClip explsionSound;
+    // 爆発時のサウンド
+    [SerializeField] private AudioClip explosionSound;
 
-    public AudioClip canselSound;
+    // キャンセル（戻る）時のサウンド
+    [SerializeField] private AudioClip canselSound;
 
+    // ClickControllerへの参照（クリック操作や箱選択を制御）
     private ClickController clickController;
 
+    // カメラ操作を制御するスクリプトへの参照
     private CamController camController;
 
+    // 敵キャラクターの移動を制御するスクリプト
     private EnemyMoveController enemyMoveController;
 
-    private OptionController optionController;
+    // プレイヤーのワープ先位置（Transform参照）
+    [SerializeField] private Transform warpPoint;
 
-    public Transform warpPoint;
+    // 箱の開閉アニメーション用アニメーター
+    [SerializeField] private Animator animator;
 
-    //アニメーターコンポーネント
+    // パーティクルシステム（演出用）
+    [SerializeField] private new ParticleSystem particleSystem;
 
-    public Animator animator;
+    // 爆発したかどうかのフラグ（複数回爆発処理が実行されないよう制御）
+    private bool isExplosion;
 
-    // パーティクルシステムの参照
-    public new ParticleSystem particleSystem;
+    // 敵が箱を開ける状態かを判定するフラグ
+    private bool enemyOpen;
 
-    private bool isExplosion = false;
-
-    private bool enemyOpen = false;
-
+    // カメラを元の位置に戻すかどうかのフラグ（trueなら戻す）
     public bool cameraBuck = true;
 
-    private bool stopCoroutineFlag = false;
+    // コルーチン一時停止制御用のフラグ（未使用）
+    private const bool StopCoroutineFlag = false;
 
+    // 箱を開ける処理のコルーチン参照（停止・再開に使用）
     private Coroutine boxOpenCoroutine;
 
-    public bool isPaused = false;  // コルーチンの一時停止フラグ
+    // コルーチンの一時停止フラグ
+    private bool isPaused;
+    
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
+        // 自身に付属するAnimatorコンポーネントを取得
         animator = GetComponent<Animator>();
 
-        optionController = FindObjectOfType<OptionController>();
-
+        // TurnControllerをシーン内から検索して参照を取得（フェーズ進行管理用）
         turnController = FindObjectOfType<TurnController>();
 
+        // カメラの制御を行うCamControllerを取得
         camController = FindObjectOfType<CamController>();
 
+        // particleにアタッチされているParticleSystemコンポーネントを取得
         particleSystem = particle.GetComponent<ParticleSystem>();
 
+        // UIの制御などに使用するImageControllerを取得
         imageController = FindObjectOfType<ImageController>();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-
-        if (optionController.clickNext == true)
+        // プレイヤーが「次へ」クリックを待っている時
+        if (OptionController.Instance.clickNext)
         {
-            if (Input.GetMouseButtonDown(0))  // クリックを検出
+            if (Input.GetMouseButtonDown(0))// クリックを検出
             {
-                Debug.Log("押され");
                 if (isPaused)
                 {
-                    optionController.clickNext = false;
-                    isPaused = false;  // 停止を解除
-                    Debug.Log("コルーチン再開！");
-                    camController.MotionAids();
+                    OptionController.Instance.clickNext = false;
+                    isPaused = false;// アニメーション中断を解除
+                    camController.MotionAids();// カメラ補助復帰
                 }
             }
         }
 
         // カメラをターゲットに向けて移動
-        if (camController.isCameraMoving && camController.targetObject != null)
+        if (camController.isCameraMoving && camController.targetObject)
         {
             camController.mainCamera.transform.position = Vector3.Lerp(
                 camController.mainCamera.transform.position,
@@ -99,147 +123,127 @@ public class CollisionController : MonoBehaviour
             );
         }
 
-
-        //Debug.Log($"open"+optionController.openTime);
-
-        //openBottonが有ったら
-        if (openBotton.activeSelf)
+        //openBottomが表示中の場合
+        if (openBottom.activeSelf)
         {
             //時間経過でアニメーションが自動で実行
-            optionController.openTime -= Time.deltaTime;
+            OptionController.Instance.openTime -= Time.deltaTime;
 
-            if (optionController.openTime <= 0f)
+            if (OptionController.Instance.openTime <= 0f)
             {
-                //Animation Eventを使ってboxOpenを行う
-
-                //改善中
-                animator.SetBool("open", true);
-
-                openBotton.SetActive(false);
-
-                buckBotton.SetActive(false);
-
-                optionController.openTime = 60f;
-
+                animator.SetBool(Open, true);// ボックスを開く
+                openBottom.SetActive(false);
+                buckBottom.SetActive(false);
+                OptionController.Instance.openTime = 60f;
                 turnController.countText.enabled = false;
             }
 
-
-            if(optionController.openTime <= 30f)
+            // 時間が少なくなったらカウント表示
+            if(OptionController.Instance.openTime <= 30f)
             {
                 turnController.countText.enabled = true;
 
-                turnController.countText.text = "" + optionController.openTime;
+                turnController.countText.text = "" + OptionController.Instance.openTime;
             }
         }
 
-        if(isExplosion == true)
-        {
-            if (particleSystem != null && !particleSystem.IsAlive())
-            {
-                bomb.SetActive(false);
-
-                Debug.Log("届いてる");
-                BottonInbisible();
-            }
-        }
+        // 爆発演出が終了していればボックスを非表示にする
+        if (isExplosion != true) return;
+        if (!particleSystem || particleSystem.IsAlive()) return;
+        bomb.SetActive(false);
+        
+        BottomInvisible();
     }
 
-    void OnTriggerEnter(Collider other)
+    /// <summary>
+    /// 衝突時の処理。フェーズ状態と衝突相手によって動作を分岐。
+    /// </summary>
+    private void OnTriggerEnter(Collider other)
     {
         // 現在のstateを取得
-        TurnController.PhaseState currentState = turnController.GetCurrentState();
+        var currentState = turnController.GetCurrentState();
 
-        //start時に読み込めないのでここに置く
+        // ゲームオブジェクトが再生成された場合のため、毎回Find
         enemyMoveController = FindObjectOfType<EnemyMoveController>();
 
         //playerが消えた時再度読み込まなくてはならないのでここに置く
         clickController = FindObjectOfType<ClickController>();
 
-        //selectedObject = this.gameObject; // 衝突したオブジェクトを保存
-
-        if (other.gameObject.tag == "Player")
+        switch (other.gameObject.tag)
         {
-            if(currentState == PhaseState.PlayerMoveToChoiceBox)
-            {
+            // プレイヤーが選択箱に移動してきたとき
+            case "Player" when currentState == PhaseState.PlayerMoveToChoiceBox:
                 clickController.isMoving = false; // フラグをリセット
-
-                clickController.animator.SetBool("Bool Walk", false);
-
-                StartCoroutine(MovePlayerToWarpPoint());
-
-                // カメラを当たったオブジェクトに近づける処理を開始
-                camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
-                camController.isCameraMoving = true; // カメラ移動を開始
-
-                StartCoroutine(turnController.NextState());
-
-                BottonEmerge();
-            }
-            else if(currentState == PhaseState.PlayerMoveToSetBox)
+                clickController.animator.SetBool(Property, false);
+                StartCoroutine(MovePlayerToWarpPoint());// プレイヤーを箱の中心に移動
+                camController.targetObject = other.transform;// ターゲットを当たったオブジェクトに設定
+                camController.isCameraMoving = true;// カメラ移動を開始
+                StartCoroutine(turnController.NextState());// 次フェーズへ移行
+                BottomEmerge();
+                break;
+            // プレイヤーがセット箱に移動したとき
+            case "Player":
             {
-                clickController.isMoving = false; // フラグをリセット
+                if(currentState == PhaseState.PlayerMoveToSetBox)
+                {
+                    clickController.isMoving = false; // フラグをリセット
+                    clickController.animator.SetBool(Property, false);
+                    StartCoroutine(MovePlayerToWarpPoint());// セット地点に移動
+                    clickController.ActivateOtherColliders();// 他のコライダーを有効化
+                    StartCoroutine(turnController.NextState());// 次フェーズへ
+                }
 
-                clickController.animator.SetBool("Bool Walk", false);
-
-                StartCoroutine(MovePlayerToWarpPoint());
-
-                clickController.ActivateOtherColliders();
-
-                StartCoroutine(turnController.NextState());
+                break;
             }
-        }
-        else if (other.gameObject.tag == "Enemy")
-        {
-            if(currentState == PhaseState.EnemyMoveToChoiceBox)
+            // 敵が選択箱に移動してきたとき
+            case "Enemy" when currentState == PhaseState.EnemyMoveToChoiceBox:
             {
                 enemyMoveController.enemyMoving = false;
-
-                enemyMoveController.enemyAnimator.SetBool("Bool Walk", false);
-
+                enemyMoveController.enemyAnimator.SetBool(Property, false);
                 StartCoroutine(MoveEnemyToWarpPoint());
-
                 camController.targetObject = other.transform;
                 camController.isCameraMoving = true;
-
+                
+                // boxOpenはアニメーションイベントで実行される
                 if (camController.targetObject == other.transform)
                 {
-                    Debug.Log("疲れた");
-
                     //Animation Eventを使ってboxOpenを行う
-                    animator.SetBool("open", true);
-
+                    animator.SetBool(Open, true);
                     enemyOpen = true;
-
                     StartCoroutine(turnController.NextState());
                 }
+
+                break;
             }
-            else if(currentState == PhaseState.EnemyMoveToSetBox)
+            // 敵がセット箱に移動したとき
+            case "Enemy":
             {
-                enemyMoveController.enemyMoving = false;
+                if(currentState == PhaseState.EnemyMoveToSetBox)
+                {
+                    enemyMoveController.enemyMoving = false;
+                    enemyMoveController.enemyAnimator.SetBool(Property, false);
+                    StartCoroutine(MoveEnemyToWarpPoint());
+                    StartCoroutine(turnController.NextState());
+                    turnController.randomObject.tag = "Explosion";// 敵が爆弾を設置
+                    turnController.PlayerTurn();// プレイヤーのターンに移行
+                }
 
-                enemyMoveController.enemyAnimator.SetBool("Bool Walk", false);
-
-                StartCoroutine(MoveEnemyToWarpPoint());
-
-                StartCoroutine(turnController.NextState());
-
-                turnController.randomObject.tag = "Explosion";
-                Debug.Log($"Enemyがオブジェクト {turnController.randomObject.name} のタグを 'Explosion' に変更しました。");
-
-                turnController.PlayerTurn();
+                break;
             }
         }
 
     }
 
+    /// <summary>
+    /// プレイヤーをワープポイント（箱中央）へ滑らかに移動
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator MovePlayerToWarpPoint()
     {
-        float duration = 1.0f; // 移動時間（秒）
-        float elapsedTime = 0f;
-
-        Vector3 startPosition = turnController.playerObject.transform.position;
-        Vector3 targetPosition = warpPoint.transform.position;
+        const float duration = 1.0f; // 移動時間（秒）
+        var elapsedTime = 0f;
+        var startPosition = turnController.playerObject.transform.position;
+        var targetPosition = warpPoint.transform.position;
 
         while (elapsedTime < duration)
         {
@@ -251,13 +255,15 @@ public class CollisionController : MonoBehaviour
         turnController.playerObject.transform.position = targetPosition; // 最終位置を確定
     }
 
+    /// <summary>
+    /// 敵をワープポイントへ滑らかに移動
+    /// </summary>
     private IEnumerator MoveEnemyToWarpPoint()
     {
-        float duration = 1.0f; // 移動時間（秒）
-        float elapsedTime = 0f;
-
-        Vector3 startPosition = turnController.enemyObject.transform.position;
-        Vector3 targetPosition = warpPoint.transform.position;
+        const float duration = 1.0f; // 移動時間（秒）
+        var elapsedTime = 0f;
+        var startPosition = turnController.enemyObject.transform.position;
+        var targetPosition = warpPoint.transform.position;
 
         while (elapsedTime < duration)
         {
@@ -269,72 +275,63 @@ public class CollisionController : MonoBehaviour
         turnController.enemyObject.transform.position = targetPosition; // 最終位置を確定
     }
 
-
+    /// <summary>
+    /// 箱を開くアニメーションを再生（Animation Eventから呼び出される）
+    /// </summary>
     public void OpenAnimation()
     {
         //Animation Eventを使ってboxOpenを行う
-        animator.SetBool("open", true);
-
-        openBotton.SetActive(false);
-
-        buckBotton.SetActive(false);
-
-        optionController.choiceTime = 60f;
-
-        optionController.openTime = 60f;
+        animator.SetBool(Open, true);
+        openBottom.SetActive(false);
+        buckBottom.SetActive(false);
+        OptionController.Instance.choiceTime = 60f;
+        OptionController.Instance.openTime = 60f;
     }
-
-    public void BottonInbisible()
+    /// <summary>
+    /// ボタンやエフェクトを非表示にし、状態をリセット
+    /// </summary>
+    public void BottomInvisible()
     {
-
         particle.SetActive(false);
-
-        optionController.openTime = 60f;
-
+        OptionController.Instance.openTime = 60f;
         isExplosion = false;
-
         clickController.ActivateOtherColliders();
-
         camController.MotionAids();
-
         camController.isCameraMoving = false;
 
-        if (openBotton.activeSelf && buckBotton.activeSelf)
-        {
-            openBotton.SetActive(false);
-
-            buckBotton.SetActive(false);
-        }
+        if (!openBottom.activeSelf || !buckBottom.activeSelf) return;
+        openBottom.SetActive(false);
+        buckBottom.SetActive(false);
     }
 
+    /// <summary>
+    /// 「戻る」ボタンが押されたときの処理
+    /// </summary>
     public void Buck()
     {
         GetComponent<AudioSource>().PlayOneShot(canselSound);
-
-        turnController.canselTriger = false;
-
-        optionController.canselTime = true;
-
+        turnController.canselTrigger = false;
+        OptionController.Instance.canselTime = true;
         turnController.BuckState();
-
         cameraBuck = false;
     }
 
-    public void BottonEmerge()
+    /// <summary>
+    /// ボタンを出現させる
+    /// </summary>
+    private void BottomEmerge()
     {
-
-        openBotton.SetActive(true);
-
-        buckBotton.SetActive(true);
+        openBottom.SetActive(true);
+        buckBottom.SetActive(true);
     }
 
+    /// <summary>
+    /// プレイヤーが箱を開ける処理を開始
+    /// </summary>
     public void DeliveryBoxOpen()
     {
-        Debug.Log("コルーチン開始！");
-
         if (boxOpenCoroutine != null)  // 既存のコルーチンがある場合は停止
         {
-            Debug.Log("既存のコルーチンを停止して再開します。");
             StopCoroutine(boxOpenCoroutine);
             boxOpenCoroutine = null;
         }
@@ -343,39 +340,38 @@ public class CollisionController : MonoBehaviour
         boxOpenCoroutine = StartCoroutine(BoxOpen());
     }
 
-
-    IEnumerator BoxOpen()
+    /// <summary>
+    /// 箱を開けるコルーチン。中身に応じて処理（スコア加算 or 爆発）を分岐
+    /// </summary>
+    private IEnumerator BoxOpen()
     {
-        Debug.Log("BoxOpen開始");
-
-        while (!stopCoroutineFlag)
+        while (!StopCoroutineFlag)
         {
             if (isPaused)
             {
-                Debug.Log("コルーチン一時停止中...");
-                optionController.clickNext = true;
+                OptionController.Instance.clickNext = true;
                 yield return null;  // 一時停止（次のフレームへ）
                 continue;  // ループの最初に戻る
             }
 
-            if (enemyOpen == false)
+            // プレイヤーのターン処理
+            if (!enemyOpen)
             {
                 turnController.countText.enabled = false;
 
-                if (this.gameObject.tag == "Cube")
+                if (this.gameObject.CompareTag("Cube"))
                 {
-                    Debug.Log("cubeだよ");
                     turnController.randomObject.tag = "Cube";
 
                     // 番号の処理
-                    int assignedNumber = turnController.objectNumberMapping[this.gameObject];
+                    var assignedNumber = turnController.ObjectNumberMapping[this.gameObject];
                     playerPoint += assignedNumber + 1;
 
-                    BottonInbisible();
+                    BottomInvisible();
                     imageController.Safe();
-
                     yield return new WaitForSeconds(1f);
-                    List<GameObject> tempList = new List<GameObject>(turnController.objectArray);
+                    
+                    var tempList = new List<GameObject>(turnController.objectArray);
                     if (tempList.Contains(this.gameObject))
                     {
                         tempList.Remove(this.gameObject);
@@ -387,93 +383,79 @@ public class CollisionController : MonoBehaviour
 
                     yield break;
                 }
-                else if (this.gameObject.tag == "Explosion")
+                else if (this.gameObject.CompareTag("Explosion"))
                 {
-                    Debug.Log("Explosionだよ");
-
                     bomb.SetActive(true);
                     particle.SetActive(true);
-
                     playerLife -= 1;
                     playerPoint = 0;
-
                     isExplosion = true;
 
-                    animator.SetBool("open", false);
+                    animator.SetBool(Open, false);
                     camController.isCameraMoving = false;
 
                     StartCoroutine(imageController.ExplosionSwitch());
-                    GetComponent<AudioSource>().PlayOneShot(explsionSound);
-
+                    GetComponent<AudioSource>().PlayOneShot(explosionSound);
                     this.gameObject.tag = "Cube";
+                    
                     yield return new WaitForSeconds(1f);
-
                     boxOpenCoroutine = null;  // コルーチンの参照をクリア
-
                     yield break;
                 }
             }
+            // 敵のターン処理
             else
             {
 
                 enemyOpen = false;
                 camController.isCameraMoving = false;
-                if (this.gameObject.tag == "Cube")
+                
+                if (this.gameObject.CompareTag("Cube"))
                 {
-                    enemyPoint += turnController.objectNumberMapping[this.gameObject] + 1;
+                    enemyPoint += turnController.ObjectNumberMapping[this.gameObject] + 1;
                     imageController.Safe();
-
                     yield return new WaitForSeconds(1f);
                     this.gameObject.SetActive(false);
-                    List<GameObject> tempList = new List<GameObject>(turnController.objectArray);
+                    
+                    var tempList = new List<GameObject>(turnController.objectArray);
                     tempList.Remove(this.gameObject);
                     turnController.objectArray = tempList.ToArray();
 
-                    GameObject[] objectsWithTag = GameObject.FindGameObjectsWithTag("Explosion");
-                    foreach (GameObject obj in objectsWithTag)
+                    var objectsWithTag = GameObject.FindGameObjectsWithTag("Explosion");
+                    foreach (var obj in objectsWithTag)
                     {
                         obj.tag = "Cube";
                     }
 
-                    Debug.Log(enemyPoint);
-
                     boxOpenCoroutine = null;  // コルーチンの参照をクリア
-
                     yield break;
                 }
-                else if (this.gameObject.tag == "Explosion")
+                else if (this.gameObject.CompareTag("Explosion"))
                 {
 
                     bomb.SetActive(true);
-
                     particle.SetActive(true);
-
                     enemyLife -= 1;
-
                     enemyPoint = 0;
-
+                    
                     //Animation Eventを使ってboxOpenを行う
-                    animator.SetBool("open", false);
-
-                    Debug.Log("EnemyがExplosionを触った");
-
+                    animator.SetBool(Open, false);
                     StartCoroutine(imageController.ExplosionSwitch());
-                    GetComponent<AudioSource>().PlayOneShot(explsionSound);
-
+                    GetComponent<AudioSource>().PlayOneShot(explosionSound);
                     this.gameObject.tag = "Cube";
+                    
                     yield return new WaitForSeconds(1f);
-
                     boxOpenCoroutine = null;  // コルーチンの参照をクリア
-
                     yield break;
                 }
             }
             yield return null;  // 次のフレームへ
         }
-        // ループを抜ける場合も `boxOpenCoroutine = null;` を実行
-        boxOpenCoroutine = null;
     }
 
+    /// <summary>
+    /// 箱を開ける際のサウンドを再生（Animation Eventで呼び出される）
+    /// </summary>
     private void OpenSe()
     {
         GetComponent<AudioSource>().PlayOneShot(openSound);

@@ -1,173 +1,174 @@
 using optionSpace;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using static TurnController;
 
+/// <summary>
+/// CamControllerはゲーム中のカメラ制御とフェード演出を担当するスクリプトです。
+/// プレイヤーや敵の行動フェーズに応じてカメラの移動やフェードイン・アウトを行い、
+/// 状態遷移と演出をつなぐ役割を持ちます。
+/// </summary>
 public class CamController : MonoBehaviour
 {
-    private TurnController turnController;
+    // 参照する他スクリプトのインスタンス
+    [SerializeField] private TurnController turnController;
+    [SerializeField] private CollisionController collisionController;
 
-    // �J�����֘A
-
-    private CollisionController collisionController;
-
-    private OptionController optionController;
-
-    // ���C���J�������A�T�C������
+    // メインカメラの参照
     public Camera mainCamera;
 
-    // �J�����������Ă��邩�̃t���O
-    public bool isCameraMoving = false;
+    // カメラが移動中かどうかのフラグ
+    public bool isCameraMoving;
 
-    // �J�����̏����ʒu
-    public Vector3 cameraStartPosition;
+    // カメラの初期位置
+    [SerializeField] private Vector3 cameraStartPosition;
 
-    // �J�������߂Â��^�[�Q�b�g
+    // カメラが注視する対象
     public Transform targetObject;
 
-    // �J�����̈ړ����x
+    // カメラの移動速度
     public float cameraMoveSpeed = 2f;
 
-    //�t�F�[�h�C���E�t�F�[�h�A�E�g
+    // フェード用のUIパネル
+    [SerializeField] public GameObject panelFade;
 
-    //�t�F�[�h�C���E�A�E�g�p�̃p�l��
-    public GameObject panelFade;
-
-    //�p�l����image�̎擾�ϐ�
-    Image fadeAlpha;
-
-    //�p�l����alpha�l�̎擾�ϐ�
+    // フェード用画像のアルファ操作
+    private Image fadeAlpha;
     private float alpha;
-
     private bool fadeInTrigger;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        collisionController = FindObjectOfType<CollisionController>();
-
-        turnController = FindObjectOfType<TurnController>();
-
-        optionController = FindObjectOfType<OptionController>();
-
-        // �����J�����ʒu���L�^
+        // カメラ初期位置を記録
         cameraStartPosition = mainCamera.transform.position;
 
-        //�p�l���̃C���[�W�擾
+        // フェードパネルのImage取得
         fadeAlpha = panelFade.GetComponent<Image>();
 
-        //�p�l����alpha�l
+        // アルファ初期値取得
         alpha = fadeAlpha.color.a;
 
+        // フェードインフラグ初期化
         fadeInTrigger = false;
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        // ���݂�state���擾
-        TurnController.PhaseState currentState = turnController.GetCurrentState();
+        var currentState = turnController.GetCurrentState();
 
-        if (currentState == PhaseState.PlayerSetBomb || currentState == PhaseState.EnemyChoiceToSetBomb)
+        // ボム設置フェーズ時にフェードアウト
+        if (currentState is PhaseState.PlayerSetBomb or PhaseState.EnemyChoiceToSetBomb)
         {
             FadeOut();
         }
 
-        if(fadeInTrigger == true || currentState == PhaseState.EnemySetBomb)
+        // フェードインが必要な場合または敵がボムを設置するフェーズに入ったらフェードイン
+        if(fadeInTrigger || currentState == PhaseState.EnemySetBomb)
         {
             FadeIn();
         }
     }
 
+    /// <summary>
+    /// カメラを元の位置に戻す演出を開始（ボックスオープン後など）
+    /// </summary>
     public void MotionAids()
     {
-        // ���݂�state���擾
-        TurnController.PhaseState currentState = turnController.GetCurrentState();
+        //現在のstateを取得
+        var currentState = turnController.GetCurrentState();
 
-        Debug.Log("����");
+        // カメラを戻すコルーチンを開始
         StartCoroutine(CameraBack());
 
-        if(currentState == PhaseState.EnemyOpenBox || currentState == PhaseState.PlayerOpenBox)
+        // ボックスオープンフェーズなら次の状態に遷移（戻るタイミングが来たとき）
+        if (currentState is not (PhaseState.EnemyOpenBox or PhaseState.PlayerOpenBox)) return;
+        
+        if(collisionController.cameraBuck)
         {
-            if(collisionController.cameraBuck == true)
-            {
-                StartCoroutine(turnController.NextState());
-            }
+            StartCoroutine(turnController.NextState());
         }
     }
 
-    public IEnumerator CameraBack()
+    /// <summary>
+    /// カメラを元の位置に戻す処理
+    /// </summary>
+    private IEnumerator CameraBack()
     {
-        if(optionController.canselTime == false)
+        // 時間キャンセル状態に応じて待機時間を変更
+        switch (OptionController.Instance.canselTime)
         {
-            yield return new WaitForSeconds(5f);
+            case false:
+                yield return new WaitForSeconds(5f);
+                break;
+            case true:
+                OptionController.Instance.canselTime = false;
+                yield return new WaitForSeconds(2f);
+                break;
         }
-        else if(optionController.canselTime == true)
-        {
-            optionController.canselTime = false;
-            yield return new WaitForSeconds(2f);
-        }
+        // カメラ位置を初期位置に戻す
         mainCamera.transform.position = cameraStartPosition;
 
+        // カメラ戻し完了フラグ
         collisionController.cameraBuck = true;
     }
 
-    public void FadeIn()
+    /// <summary>
+    /// 画面を明るくしていく処理（フェードイン）
+    /// </summary>
+    private void FadeIn()
     {
-        // ���݂�state���擾
-        TurnController.PhaseState currentState = turnController.GetCurrentState();
+        var currentState = turnController.GetCurrentState();
 
+        // アルファ値を下げて透明にしていく
         alpha -= 0.01f;
-
         fadeAlpha.color = new Color(0,0,0,alpha);
 
-        if(alpha <= 0)
+        // 完全に透明になったら処理を切り替える
+        if (!(alpha <= 0)) return;
+        fadeInTrigger = false;
+
+        // 状態に応じて処理を実行
+        switch (currentState)
         {
-            fadeInTrigger = false;
-
-            Debug.Log("���邭");
-
-            if (currentState == PhaseState.EnemyChoiceToOpenBox)
-            {
-                Debug.Log(",dak,lda,l");
-
+            case PhaseState.EnemyChoiceToOpenBox:
                 turnController.EnemyBoxChoice();
-            }
-            else if(currentState == PhaseState.EnemySetBomb)
-            {
+                break;
+            case PhaseState.EnemySetBomb:
                 StartCoroutine(turnController.NextState());
-            }
+                break;
         }
     }
 
-    public void FadeOut()
+    /// <summary>
+    /// 画面を暗くしていく処理（フェードアウト）
+    /// </summary>
+    private void FadeOut()
     {
-        // ���݂�state���擾
-        TurnController.PhaseState currentState = turnController.GetCurrentState();
+        //現在のstateを取得
+        var currentState = turnController.GetCurrentState();
 
+        // アルファ値を上げて暗くしていく
         alpha += 1f;
-
         fadeAlpha.color = new Color(0,0,0,alpha);
 
-        if(alpha >= 1)
+        // 完全に暗くなったらフェーズに応じて処理を実行
+        if (!(alpha >= 1)) return;
+        
+        switch (currentState)
         {
-            if(currentState == PhaseState.PlayerSetBomb)
-            {
+            case PhaseState.PlayerSetBomb:
+                // プレイヤー設置後に次のフェーズへ
                 StartCoroutine(turnController.NextState());
-
                 fadeInTrigger = true;
-
-            }
-            else if (currentState == PhaseState.EnemyChoiceToSetBomb)
-            {
-                Debug.Log("enemy�Â�");
-
+                break;
+            case PhaseState.EnemyChoiceToSetBomb:
+                // 敵が設置場所選択 → 設置処理と次フェーズへ
                 StartCoroutine(turnController.NextState());
-
                 turnController.EnemyBombSet();
-            }
+                break;
         }
     }
 }

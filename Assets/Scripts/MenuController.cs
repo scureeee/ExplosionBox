@@ -1,34 +1,55 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// メニューUIのパネルをスライドイン／スライドアウトで表示・非表示にする制御クラス。
+/// </summary>
 public class MenuController : MonoBehaviour
 {
-    public AnimationCurve slideAnimation = AnimationCurve.Linear(0, 0, 1, 1);
+    // スライドアニメーションの動きを定義（ここでは線形：時間に対して直線的に移動）
+    private readonly AnimationCurve slideAnimation = AnimationCurve.Linear(0, 0, 1, 1);
 
-    public Vector3 inPosition;
+    // パネルがスライドインする目標座標（ローカル座標）
+    [SerializeField] private Vector3 inPosition;
 
-    public Vector3 outPosition;
+    // パネルがスライドアウトする目標座標（ローカル座標）
+    [SerializeField] private Vector3 outPosition;
 
-    public float duration = 1.0f;
-
-    //bottom�������ƃR���[�`�����s
+    // アニメーションにかける時間（秒）
+    private const float Duration = 1.0f;
+    
+    /// <summary>
+    /// パネルをスライドインさせる（表示する）
+    /// </summary>
     public void SlideIn()
     {
+        // スライドイン用のコルーチンを開始
         StartCoroutine(StartSlidePanel(true));
     }
 
+    /// <summary>
+    /// パネルをスライドアウトさせる（非表示にする）
+    /// </summary>
     public void SlideOut()
     {
+        // スライドアウト用のコルーチンを開始
         StartCoroutine(StartSlidePanel(false));
     }
 
+    /// <summary>
+    /// スライドアニメーションを処理するコルーチン
+    /// </summary>
+    /// <param name="isSlideIn">true: スライドイン, false: スライドアウト</param>
+    /// <returns>IEnumerator</returns>
     private IEnumerator StartSlidePanel(bool isSlideIn)
     {
-        float startTime = Time.time;
+        // アニメーション開始時間を記録
+        var startTime = Time.time;
 
-        Vector3 startPos = transform.localPosition;
+        // 現在のローカル位置を取得（アニメーションの開始地点）
+        var startPos = transform.localPosition;
 
+        // 移動量ベクトルを算出（in/outに応じて）
         Vector3 moveDistance;
 
         if (isSlideIn)
@@ -40,11 +61,13 @@ public class MenuController : MonoBehaviour
             moveDistance= outPosition - startPos;
         }
 
-        while ((Time.time - startTime) < duration)
+        // 指定時間（Duration）かけてアニメーションを実行
+        while ((Time.time - startTime) < Duration)
         {
-            transform.localPosition = startPos + moveDistance * slideAnimation.Evaluate((Time.time - startTime) / duration);
+            //スライドアニメーション中の現在位置を更新する
+            transform.localPosition = startPos + moveDistance * slideAnimation.Evaluate((Time.time - startTime) / Duration);
 
-            yield return null;
+            yield return null;// 1フレーム待機
         }
         transform.localPosition = startPos + moveDistance;
     }

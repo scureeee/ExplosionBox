@@ -6969,9 +6969,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfb059d5fda8e2c48a245fec32cab5c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clickController: {fileID: 2094172657}
+  enemyMoveController: {fileID: 1327963281}
+  imageController: {fileID: 1965087088}
   turnCount: 0
   objectPrefab: {fileID: 3471643304241853864, guid: feb46b78f78e74267836b445901cf537, type: 3}
-  radius: 10
   objectArray: []
   playerObject: {fileID: 2094172655}
   enemyObject: {fileID: 1327963279}
@@ -6983,7 +6985,7 @@ MonoBehaviour:
   enemyLifeText: {fileID: 1411630036}
   enemyPointText: {fileID: 135871946}
   countText: {fileID: 702833347}
-  canselTriger: 0
+  canselTrigger: 0
 --- !u!114 &732875944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6996,6 +6998,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5236a84a714f26743990cee47371d2da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resultState: {fileID: 11400000, guid: e711afb80c7479149a759c3762dab958, type: 2}
+  turnController: {fileID: 732875943}
   lastTurn: {fileID: 1726992980}
 --- !u!82 &732875945
 AudioSource:
@@ -7775,6 +7779,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f630943881b5489499e9b0fa0da03098, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  turnController: {fileID: 732875943}
+  collisionController: {fileID: 635090848246112007, guid: feb46b78f78e74267836b445901cf537, type: 3}
   mainCamera: {fileID: 963194227}
   isCameraMoving: 0
   cameraStartPosition: {x: 0, y: 0, z: 0}
@@ -13124,33 +13130,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd366f5e62492f1468f137ee190c85b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slideAnimation:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   inPosition: {x: 300, y: 0, z: 0}
   outPosition: {x: 500, y: 0, z: 0}
-  duration: 1
 --- !u!1 &1288842619
 GameObject:
   m_ObjectHideFlags: 0
@@ -13460,7 +13441,6 @@ MonoBehaviour:
   enemyAnimator: {fileID: 1327963280}
   enemyTarget: {x: 0, y: 0, z: 0}
   enemySmooth: 10
-  enemyMoveSpeed: 5
   enemyMoving: 0
   turnController: {fileID: 732875943}
 --- !u!65 &1327963282
@@ -44231,6 +44211,7 @@ MonoBehaviour:
   safe: {fileID: 1476467770}
   safeSound: {fileID: 8300000, guid: 78bfa9e431e0250428890c3f781fd6a4, type: 3}
   imageTrigger: 0
+  turnController: {fileID: 732875943}
 --- !u!82 &1965087089
 AudioSource:
   m_ObjectHideFlags: 0
@@ -44241,7 +44222,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 04efff6d66116cd459fb2e7627d23145, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -44656,11 +44637,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   smooth: 10
   player: {fileID: 2094172655}
-  moveSpeed: 5
   targetPosition: {x: 0, y: 0, z: 0}
   isMoving: 0
   animator: {fileID: 2094172656}
-  navMeshUpdateRadius: 5
+  turnController: {fileID: 732875943}
 --- !u!65 &2094172658
 BoxCollider:
   m_ObjectHideFlags: 0
