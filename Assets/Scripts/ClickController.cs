@@ -11,7 +11,7 @@ public class ClickController : MonoBehaviour
 {
     // アニメーターのパラメータ（移動中アニメーションを切り替えるためのハッシュ値）
     private static readonly int Property = Animator.StringToHash("Bool Walk");
-    
+
     // プレイヤー回転補間速度
     [SerializeField] private float smooth = 10f;
 

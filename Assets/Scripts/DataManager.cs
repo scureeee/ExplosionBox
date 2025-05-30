@@ -10,7 +10,7 @@ public class DataManager : MonoBehaviour
 {
     //インスタンスへのアクセス用プロパティ
     public static DataManager Instance { get; private set; }
-    
+
     // ゲーム中に記録するオブジェクト数などのデータ
     public int objectCount;
 
@@ -27,10 +27,10 @@ public class DataManager : MonoBehaviour
         if (!Instance)
         {
             Instance = this;
-            
+
             // シーン遷移してもこのオブジェクトを破棄しないように設定
             DontDestroyOnLoad(gameObject);
-            
+
             // シーンロード時のイベントを登録
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
@@ -58,7 +58,7 @@ public class DataManager : MonoBehaviour
     {
         // 現在ロードされたシーン名が、破棄対象のシーン名に含まれるかを判定
         if (destroyInScenes.All(_ => scene.name != "ResultScene")) return;
-        
+
         // 対象のシーンであれば、DataManagerのインスタンスを破棄しnullに戻す
         Destroy(gameObject);
         Instance = null;

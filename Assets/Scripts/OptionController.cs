@@ -10,11 +10,11 @@ namespace optionSpace
     public class OptionController : MonoBehaviour
     {
         // インスタンス（シングルトンパターン）
-        public  static OptionController Instance {  get; private set; }
-        
+        public static OptionController Instance { get; private set; }
+
         // ゲーム開始時に生成するオブジェクト数
         private int objectCountToSet;
-        
+
         // ゲーム内の最大ターン数
         public static int maxTurn;
 
@@ -35,6 +35,7 @@ namespace optionSpace
 
         // タイマーをキャンセルするかどうか
         public bool canselTime;
+
         // Start is called before the first frame update
         private void Start()
         {
@@ -49,10 +50,10 @@ namespace optionSpace
                 Destroy(gameObject);
             }
 
-            maxPoint = 18;// 最大スコア（勝利条件などに使用）
-            maxTurn = 10;// 最大ターン数
-            maxLife = 2;// 最大ライフ数（2回までミス可能）
-            objectCountToSet = 8;// 初期に設置されるオブジェクト数
+            maxPoint = 18; // 最大スコア（勝利条件などに使用）
+            maxTurn = 10; // 最大ターン数
+            maxLife = 2; // 最大ライフ数（2回までミス可能）
+            objectCountToSet = 8; // 初期に設置されるオブジェクト数
         }
 
         // Update is called once per frame

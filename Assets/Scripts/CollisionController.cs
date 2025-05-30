@@ -76,7 +76,7 @@ public class CollisionController : MonoBehaviour
 
     // コルーチンの一時停止フラグ
     private bool isPaused;
-    
+
     // Start is called before the first frame update
     private void Start()
     {
@@ -102,13 +102,13 @@ public class CollisionController : MonoBehaviour
         // プレイヤーが「次へ」クリックを待っている時
         if (OptionController.Instance.clickNext)
         {
-            if (Input.GetMouseButtonDown(0))// クリックを検出
+            if (Input.GetMouseButtonDown(0)) // クリックを検出
             {
                 if (isPaused)
                 {
                     OptionController.Instance.clickNext = false;
-                    isPaused = false;// アニメーション中断を解除
-                    camController.MotionAids();// カメラ補助復帰
+                    isPaused = false; // アニメーション中断を解除
+                    camController.MotionAids(); // カメラ補助復帰
                 }
             }
         }
@@ -131,7 +131,7 @@ public class CollisionController : MonoBehaviour
 
             if (OptionController.Instance.openTime <= 0f)
             {
-                animator.SetBool(Open, true);// ボックスを開く
+                animator.SetBool(Open, true); // ボックスを開く
                 openBottom.SetActive(false);
                 buckBottom.SetActive(false);
                 OptionController.Instance.openTime = 60f;
@@ -139,7 +139,7 @@ public class CollisionController : MonoBehaviour
             }
 
             // 時間が少なくなったらカウント表示
-            if(OptionController.Instance.openTime <= 30f)
+            if (OptionController.Instance.openTime <= 30f)
             {
                 turnController.countText.enabled = true;
 
@@ -151,7 +151,7 @@ public class CollisionController : MonoBehaviour
         if (isExplosion != true) return;
         if (!particleSystem || particleSystem.IsAlive()) return;
         bomb.SetActive(false);
-        
+
         BottomInvisible();
     }
 
@@ -175,22 +175,22 @@ public class CollisionController : MonoBehaviour
             case "Player" when currentState == PhaseState.PlayerMoveToChoiceBox:
                 clickController.isMoving = false; // フラグをリセット
                 clickController.animator.SetBool(Property, false);
-                StartCoroutine(MovePlayerToWarpPoint());// プレイヤーを箱の中心に移動
-                camController.targetObject = other.transform;// ターゲットを当たったオブジェクトに設定
-                camController.isCameraMoving = true;// カメラ移動を開始
-                StartCoroutine(turnController.NextState());// 次フェーズへ移行
+                StartCoroutine(MovePlayerToWarpPoint()); // プレイヤーを箱の中心に移動
+                camController.targetObject = other.transform; // ターゲットを当たったオブジェクトに設定
+                camController.isCameraMoving = true; // カメラ移動を開始
+                StartCoroutine(turnController.NextState()); // 次フェーズへ移行
                 BottomEmerge();
                 break;
             // プレイヤーがセット箱に移動したとき
             case "Player":
             {
-                if(currentState == PhaseState.PlayerMoveToSetBox)
+                if (currentState == PhaseState.PlayerMoveToSetBox)
                 {
                     clickController.isMoving = false; // フラグをリセット
                     clickController.animator.SetBool(Property, false);
-                    StartCoroutine(MovePlayerToWarpPoint());// セット地点に移動
-                    clickController.ActivateOtherColliders();// 他のコライダーを有効化
-                    StartCoroutine(turnController.NextState());// 次フェーズへ
+                    StartCoroutine(MovePlayerToWarpPoint()); // セット地点に移動
+                    clickController.ActivateOtherColliders(); // 他のコライダーを有効化
+                    StartCoroutine(turnController.NextState()); // 次フェーズへ
                 }
 
                 break;
@@ -203,7 +203,7 @@ public class CollisionController : MonoBehaviour
                 StartCoroutine(MoveEnemyToWarpPoint());
                 camController.targetObject = other.transform;
                 camController.isCameraMoving = true;
-                
+
                 // boxOpenはアニメーションイベントで実行される
                 if (camController.targetObject == other.transform)
                 {
@@ -218,20 +218,19 @@ public class CollisionController : MonoBehaviour
             // 敵がセット箱に移動したとき
             case "Enemy":
             {
-                if(currentState == PhaseState.EnemyMoveToSetBox)
+                if (currentState == PhaseState.EnemyMoveToSetBox)
                 {
                     enemyMoveController.enemyMoving = false;
                     enemyMoveController.enemyAnimator.SetBool(Property, false);
                     StartCoroutine(MoveEnemyToWarpPoint());
                     StartCoroutine(turnController.NextState());
-                    turnController.randomObject.tag = "Explosion";// 敵が爆弾を設置
-                    turnController.PlayerTurn();// プレイヤーのターンに移行
+                    turnController.randomObject.tag = "Explosion"; // 敵が爆弾を設置
+                    turnController.PlayerTurn(); // プレイヤーのターンに移行
                 }
 
                 break;
             }
         }
-
     }
 
     /// <summary>
@@ -247,7 +246,8 @@ public class CollisionController : MonoBehaviour
 
         while (elapsedTime < duration)
         {
-            turnController.playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
+            turnController.playerObject.transform.position =
+                Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
@@ -267,7 +267,8 @@ public class CollisionController : MonoBehaviour
 
         while (elapsedTime < duration)
         {
-            turnController.enemyObject.transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
+            turnController.enemyObject.transform.position =
+                Vector3.Lerp(startPosition, targetPosition, elapsedTime / duration);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
@@ -287,6 +288,7 @@ public class CollisionController : MonoBehaviour
         OptionController.Instance.choiceTime = 60f;
         OptionController.Instance.openTime = 60f;
     }
+
     /// <summary>
     /// ボタンやエフェクトを非表示にし、状態をリセット
     /// </summary>
@@ -330,7 +332,7 @@ public class CollisionController : MonoBehaviour
     /// </summary>
     public void DeliveryBoxOpen()
     {
-        if (boxOpenCoroutine != null)  // 既存のコルーチンがある場合は停止
+        if (boxOpenCoroutine != null) // 既存のコルーチンがある場合は停止
         {
             StopCoroutine(boxOpenCoroutine);
             boxOpenCoroutine = null;
@@ -350,8 +352,8 @@ public class CollisionController : MonoBehaviour
             if (isPaused)
             {
                 OptionController.Instance.clickNext = true;
-                yield return null;  // 一時停止（次のフレームへ）
-                continue;  // ループの最初に戻る
+                yield return null; // 一時停止（次のフレームへ）
+                continue; // ループの最初に戻る
             }
 
             // プレイヤーのターン処理
@@ -370,7 +372,7 @@ public class CollisionController : MonoBehaviour
                     BottomInvisible();
                     imageController.Safe();
                     yield return new WaitForSeconds(1f);
-                    
+
                     var tempList = new List<GameObject>(turnController.objectArray);
                     if (tempList.Contains(this.gameObject))
                     {
@@ -379,7 +381,7 @@ public class CollisionController : MonoBehaviour
                         this.gameObject.SetActive(false);
                     }
 
-                    boxOpenCoroutine = null;  // コルーチンの参照をクリア
+                    boxOpenCoroutine = null; // コルーチンの参照をクリア
 
                     yield break;
                 }
@@ -397,26 +399,25 @@ public class CollisionController : MonoBehaviour
                     StartCoroutine(imageController.ExplosionSwitch());
                     GetComponent<AudioSource>().PlayOneShot(explosionSound);
                     this.gameObject.tag = "Cube";
-                    
+
                     yield return new WaitForSeconds(1f);
-                    boxOpenCoroutine = null;  // コルーチンの参照をクリア
+                    boxOpenCoroutine = null; // コルーチンの参照をクリア
                     yield break;
                 }
             }
             // 敵のターン処理
             else
             {
-
                 enemyOpen = false;
                 camController.isCameraMoving = false;
-                
+
                 if (this.gameObject.CompareTag("Cube"))
                 {
                     enemyPoint += turnController.ObjectNumberMapping[this.gameObject] + 1;
                     imageController.Safe();
                     yield return new WaitForSeconds(1f);
                     this.gameObject.SetActive(false);
-                    
+
                     var tempList = new List<GameObject>(turnController.objectArray);
                     tempList.Remove(this.gameObject);
                     turnController.objectArray = tempList.ToArray();
@@ -427,29 +428,29 @@ public class CollisionController : MonoBehaviour
                         obj.tag = "Cube";
                     }
 
-                    boxOpenCoroutine = null;  // コルーチンの参照をクリア
+                    boxOpenCoroutine = null; // コルーチンの参照をクリア
                     yield break;
                 }
                 else if (this.gameObject.CompareTag("Explosion"))
                 {
-
                     bomb.SetActive(true);
                     particle.SetActive(true);
                     enemyLife -= 1;
                     enemyPoint = 0;
-                    
+
                     //Animation Eventを使ってboxOpenを行う
                     animator.SetBool(Open, false);
                     StartCoroutine(imageController.ExplosionSwitch());
                     GetComponent<AudioSource>().PlayOneShot(explosionSound);
                     this.gameObject.tag = "Cube";
-                    
+
                     yield return new WaitForSeconds(1f);
-                    boxOpenCoroutine = null;  // コルーチンの参照をクリア
+                    boxOpenCoroutine = null; // コルーチンの参照をクリア
                     yield break;
                 }
             }
-            yield return null;  // 次のフレームへ
+
+            yield return null; // 次のフレームへ
         }
     }
 

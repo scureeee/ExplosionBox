@@ -10,7 +10,7 @@ public class ResultText : MonoBehaviour
 {
     // 現在のリザルトの状態（勝ち負け・引き分け）を管理する
     [SerializeField] private ResultState resultState;
-    
+
     // 各勝敗結果に対応するUIオブジェクト（事前にインスペクターで割り当てておく）
     [SerializeField] private GameObject lifeWin;
     [SerializeField] private GameObject lifeLose;
@@ -56,7 +56,7 @@ public class ResultText : MonoBehaviour
         }
 
         // プレイヤーと敵の現在のライフ・ポイントを画面に表示（TurnControllerの静的変数を使用）
-        playerLifeText.text = ""  + TurnController.playerLife;
+        playerLifeText.text = "" + TurnController.playerLife;
         enemyLifeText.text = "" + TurnController.enemyLife;
         playerPointText.text = "" + TurnController.playerPoint;
         enemyPointText.text = "" + TurnController.enemyPoint;

@@ -8,16 +8,16 @@ public class EnemyMoveController : MonoBehaviour
 {
     // Animatorの"Bool Walk"パラメータをハッシュ化（最適化のため）
     private static readonly int Property = Animator.StringToHash("Bool Walk");
-    
+
     // 敵のAnimatorコンポーネント
     public Animator enemyAnimator;
-    
+
     // 敵が目指すターゲット位置（座標）
     public Vector3 enemyTarget;
 
     // 敵の回転速度（補間係数）
     [SerializeField] private float enemySmooth = 10f;
-    
+
     // 敵の移動速度
     private const float EnemyMoveSpeed = 5f;
 
@@ -38,7 +38,7 @@ public class EnemyMoveController : MonoBehaviour
     private void Update()
     {
         //敵が移動中であれば移動処理を行う。
-        if(enemyMoving)
+        if (enemyMoving)
         {
             MoveEnemy();
         }
@@ -55,7 +55,7 @@ public class EnemyMoveController : MonoBehaviour
             enemyTarget,
             EnemyMoveSpeed * Time.deltaTime
         );
-        
+
         // ターゲット方向に向かってスムーズに回転させる
         var rotation = Quaternion.LookRotation(enemyTarget);
         transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * enemySmooth);

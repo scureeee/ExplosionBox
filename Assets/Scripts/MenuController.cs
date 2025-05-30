@@ -17,7 +17,7 @@ public class MenuController : MonoBehaviour
 
     // アニメーションにかける時間（秒）
     private const float Duration = 1.0f;
-    
+
     /// <summary>
     /// パネルをスライドインさせる（表示する）
     /// </summary>
@@ -58,17 +58,19 @@ public class MenuController : MonoBehaviour
         }
         else
         {
-            moveDistance= outPosition - startPos;
+            moveDistance = outPosition - startPos;
         }
 
         // 指定時間（Duration）かけてアニメーションを実行
         while ((Time.time - startTime) < Duration)
         {
             //スライドアニメーション中の現在位置を更新する
-            transform.localPosition = startPos + moveDistance * slideAnimation.Evaluate((Time.time - startTime) / Duration);
+            transform.localPosition =
+                startPos + moveDistance * slideAnimation.Evaluate((Time.time - startTime) / Duration);
 
-            yield return null;// 1フレーム待機
+            yield return null; // 1フレーム待機
         }
+
         transform.localPosition = startPos + moveDistance;
     }
 }

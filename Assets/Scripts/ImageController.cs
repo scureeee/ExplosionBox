@@ -9,14 +9,14 @@ using static TurnController;
 /// </summary>
 public class ImageController : MonoBehaviour
 {
-    [SerializeField] public Image targetImage;// UIに表示する画像（フェーズに応じて切り替える）
-    [SerializeField] public Sprite playerSet;// プレイヤーが爆弾を設置するフェーズ用のスプライト
-    [SerializeField] public Sprite playerOpen;// プレイヤーが箱を開けるフェーズ用のスプライト
-    [SerializeField] public Sprite enemySet;// 敵が爆弾を設置するフェーズ用のスプライト
-    [SerializeField] public Sprite enemyOpen;// 敵が箱を開けるフェーズ用のスプライト
-    [SerializeField] public GameObject explosion;// 爆発演出のGameObject
-    [SerializeField] public GameObject safe;// セーフ演出のGameObject
-    [SerializeField] public AudioClip safeSound;// セーフ演出時の音声
+    [SerializeField] public Image targetImage; // UIに表示する画像（フェーズに応じて切り替える）
+    [SerializeField] public Sprite playerSet; // プレイヤーが爆弾を設置するフェーズ用のスプライト
+    [SerializeField] public Sprite playerOpen; // プレイヤーが箱を開けるフェーズ用のスプライト
+    [SerializeField] public Sprite enemySet; // 敵が爆弾を設置するフェーズ用のスプライト
+    [SerializeField] public Sprite enemyOpen; // 敵が箱を開けるフェーズ用のスプライト
+    [SerializeField] public GameObject explosion; // 爆発演出のGameObject
+    [SerializeField] public GameObject safe; // セーフ演出のGameObject
+    [SerializeField] public AudioClip safeSound; // セーフ演出時の音声
 
     // 画像変更を許可するフラグ
     public bool imageTrigger;
@@ -64,7 +64,7 @@ public class ImageController : MonoBehaviour
     public IEnumerator ExplosionSwitch()
     {
         explosion.SetActive(true); // 爆発演出を表示
-        yield return new WaitForSeconds(5f);// 5秒待機
+        yield return new WaitForSeconds(5f); // 5秒待機
         explosion.SetActive(false); // 非表示に戻す
     }
 
@@ -76,7 +76,7 @@ public class ImageController : MonoBehaviour
     {
         StartCoroutine(SafeSwitch());
     }
-    
+
     /// <summary>
     /// セーフ演出用コルーチン。
     /// 音声を再生し、5秒間演出を表示する。
@@ -85,9 +85,9 @@ public class ImageController : MonoBehaviour
     {
         // AudioSourceを使って効果音を再生
         GetComponent<AudioSource>().PlayOneShot(safeSound);
-        
-        safe.SetActive(true);// セーフ演出を表示
-        yield return new WaitForSeconds(5f);// 5秒待機
-        safe.SetActive(false);// 非表示にする
+
+        safe.SetActive(true); // セーフ演出を表示
+        yield return new WaitForSeconds(5f); // 5秒待機
+        safe.SetActive(false); // 非表示にする
     }
 }

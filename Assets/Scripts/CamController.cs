@@ -66,7 +66,7 @@ public class CamController : MonoBehaviour
         }
 
         // フェードインが必要な場合または敵がボムを設置するフェーズに入ったらフェードイン
-        if(fadeInTrigger || currentState == PhaseState.EnemySetBomb)
+        if (fadeInTrigger || currentState == PhaseState.EnemySetBomb)
         {
             FadeIn();
         }
@@ -85,8 +85,8 @@ public class CamController : MonoBehaviour
 
         // ボックスオープンフェーズなら次の状態に遷移（戻るタイミングが来たとき）
         if (currentState is not (PhaseState.EnemyOpenBox or PhaseState.PlayerOpenBox)) return;
-        
-        if(collisionController.cameraBuck)
+
+        if (collisionController.cameraBuck)
         {
             StartCoroutine(turnController.NextState());
         }
@@ -108,6 +108,7 @@ public class CamController : MonoBehaviour
                 yield return new WaitForSeconds(2f);
                 break;
         }
+
         // カメラ位置を初期位置に戻す
         mainCamera.transform.position = cameraStartPosition;
 
@@ -124,7 +125,7 @@ public class CamController : MonoBehaviour
 
         // アルファ値を下げて透明にしていく
         alpha -= 0.01f;
-        fadeAlpha.color = new Color(0,0,0,alpha);
+        fadeAlpha.color = new Color(0, 0, 0, alpha);
 
         // 完全に透明になったら処理を切り替える
         if (!(alpha <= 0)) return;
@@ -152,11 +153,11 @@ public class CamController : MonoBehaviour
 
         // アルファ値を上げて暗くしていく
         alpha += 1f;
-        fadeAlpha.color = new Color(0,0,0,alpha);
+        fadeAlpha.color = new Color(0, 0, 0, alpha);
 
         // 完全に暗くなったらフェーズに応じて処理を実行
         if (!(alpha >= 1)) return;
-        
+
         switch (currentState)
         {
             case PhaseState.PlayerSetBomb:
