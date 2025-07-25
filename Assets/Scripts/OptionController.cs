@@ -36,6 +36,15 @@ namespace optionSpace
         // タイマーをキャンセルするかどうか
         public bool canselTime;
 
+        //キャッシュ
+        private DataManager dataManager;
+
+        private void Awake()
+        {
+            //キャッシュ
+            dataManager = DataManager.Instance;
+        }
+        
         // Start is called before the first frame update
         private void Start()
         {

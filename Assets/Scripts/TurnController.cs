@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using optionSpace;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 /// <summary>
 ///     TurnController クラスは、ターン制ゲームの進行管理を行う中枢スクリプト。
@@ -123,6 +125,17 @@ public class TurnController : MonoBehaviour
         { 10, PhaseState.PlayerMoveToChoiceBox },
         { 11, PhaseState.PlayerOpenBox }
     };
+    
+    //キャッシュ
+    private DataManager dataManager;
+    private OptionController optionController;
+
+    private void Awake()
+    {
+        //キャッシュ
+        dataManager = DataManager.Instance;
+        optionController = OptionController.Instance;
+    }
 
     private void Start()
     {

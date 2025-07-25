@@ -77,6 +77,15 @@ public class CollisionController : MonoBehaviour
     // コルーチンの一時停止フラグ
     private bool isPaused;
 
+    //キャッシュ
+    private OptionController optionController;
+
+    private void Awake()
+    {
+        //キャッシュ
+        optionController = OptionController.Instance;
+    }
+    
     // Start is called before the first frame update
     private void Start()
     {

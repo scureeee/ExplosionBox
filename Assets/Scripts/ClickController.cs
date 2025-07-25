@@ -33,6 +33,15 @@ public class ClickController : MonoBehaviour
     // フェーズを管理するTurnController
     [SerializeField] private TurnController turnController;
 
+    //キャッシュ
+    private OptionController optionController;
+
+    private void Awake()
+    {
+        //キャッシュ
+        optionController = OptionController.Instance;
+    }
+    
     //Start is called before the first frame update
     private void Start()
     {
